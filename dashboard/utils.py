@@ -1,5 +1,4 @@
 from django.conf import settings
-from twilio.rest import Client
 from django.utils import timezone
 from django.core.mail import send_mail
 import logging
@@ -105,16 +104,12 @@ def send_telegram_message(chat_id, message):
         return False
 
 def send_overdue_notification(borrower):
-    """Send overdue notification via email, SMS, and Telegram"""
+    """Send overdue notification via email and Telegram"""
     email_message = (
         f"Dear {borrower.borrower_name},\n\n"
         f"Your loan payment of ₱{borrower.total_debt} was due on "
         f"{borrower.due_date}. Please settle your payment as soon as possible.\n\n"
         f"Thank you,\nSari-Sari Store"
-    )
-    sms_message = (
-        f"Dear {borrower.borrower_name}, your loan payment of ₱{borrower.total_debt} was due on "
-        f"{borrower.due_date}. Please settle your payment as soon as possible."
     )
     telegram_message = (
         f"<b>OVERDUE NOTICE</b>\n\n"
@@ -123,23 +118,17 @@ def send_overdue_notification(borrower):
         f"{borrower.due_date}. Please settle your payment as soon as possible."
     )
     email_sent = send_notification_email(borrower, email_message)
-    sms_sent = send_sms(borrower.contact_number, sms_message)
     telegram_sent = send_telegram_message(borrower.telegram_chat_id, telegram_message)
-    return email_sent and sms_sent and telegram_sent
+    return email_sent and telegram_sent
 
 def send_due_date_warning(borrower, days_remaining):
-    """Send warning notification via email, SMS, and Telegram"""
+    """Send warning notification via email and Telegram"""
     email_message = (
         f"Dear {borrower.borrower_name},\n\n"
         f"This is a reminder that your loan payment of ₱{borrower.total_debt} "
         f"is due in {days_remaining} days on {borrower.due_date}. "
         f"Please prepare for payment.\n\n"
         f"Thank you,\nSari-Sari Store"
-    )
-    sms_message = (
-        f"Dear {borrower.borrower_name}, this is a reminder that your "
-        f"loan payment of ₱{borrower.total_debt} is due in {days_remaining} "
-        f"days on {borrower.due_date}. Please prepare for payment."
     )
     telegram_message = (
         f"<b>PAYMENT REMINDER</b>\n\n"
@@ -148,6 +137,5 @@ def send_due_date_warning(borrower, days_remaining):
         f"days on {borrower.due_date}. Please prepare for payment."
     )
     email_sent = send_notification_email(borrower, email_message)
-    sms_sent = send_sms(borrower.contact_number, sms_message)
     telegram_sent = send_telegram_message(borrower.telegram_chat_id, telegram_message)
-    return email_sent and sms_sent and telegram_sent
+    return email_sent and telegram_sent
