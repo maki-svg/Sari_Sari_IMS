@@ -106,13 +106,23 @@ DATABASES = {
     }
 }
 
-# Override with PostgreSQL if DATABASE_URL is set (e.g., on Render)
-if os.environ.get('DATABASE_URL'):
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.config(
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+# Override with PostgreSQL if DATABASE_URL is set and not empty (e.g., on Render)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    try:
+        import dj_database_url
+        DATABASES['default'] = dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    except Exception as e:
+        print(f"Error configuring database: {str(e)}")
+        # Fall back to SQLite if there's an error
+        DATABASES['default'] = {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
 
 
 # Password validation
