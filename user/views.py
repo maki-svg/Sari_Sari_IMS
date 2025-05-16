@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout
+from django.contrib import messages
 from .forms import CreateUserForm, UserUpdateForm, ProfileUpdateForm
+import logging
 
+logger = logging.getLogger(__name__)
 
 # Logout view
 def logout_view(request):
@@ -12,9 +15,21 @@ def logout_view(request):
 def register(request):
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('user-login')  # Redirect to login page after successful registration
+        try:
+            if form.is_valid():
+                user = form.save()
+                username = form.cleaned_data.get('username')
+                messages.success(request, f'Account created for {username}! You can now log in.')
+                return redirect('user-login')
+            else:
+                # Log form errors for debugging
+                logger.error(f"Form validation errors: {form.errors}")
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+        except Exception as e:
+            logger.error(f"Error during registration: {str(e)}")
+            messages.error(request, "An error occurred during registration. Please try again.")
     else:
         form = CreateUserForm()
     
