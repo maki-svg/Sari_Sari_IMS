@@ -1,0 +1,422 @@
+{% extends 'partials/base.html' %}
+{% block title %}Sales Management{% endblock %}
+
+{% block content %}
+<style>
+    /* Interactive Page Header styles */
+    .page-header {
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .page-header:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .page-title {
+        color: var(--white);
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-title i {
+        font-size: 2rem;
+        transition: transform 0.3s ease;
+    }
+
+    .page-header:hover .page-title i {
+        transform: rotate(15deg);
+    }
+
+    .page-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+
+    .page-header:hover::after {
+        transform: translateX(100%);
+    }
+
+    /* Sales-specific styles */
+    .summary-container {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px auto;
+        max-width: 1200px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .summary-card {
+        background-color: var(--white);
+        border-radius: 10px;
+        padding: 25px;
+        flex: 1;
+        min-width: 220px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    
+    .summary-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin: 15px 0;
+    }
+    
+    .form-container {
+        max-width: 650px;
+        margin: 30px auto;
+        padding: 30px;
+        background-color: var(--white);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    .price-display {
+        background-color: var(--light-gray);
+        padding: 20px;
+        border-radius: 8px;
+        margin: 25px 0;
+        border-left: 4px solid var(--primary-color);
+    }
+    
+    .table-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: var(--white);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    .sales-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 20px;
+    }
+    
+    .sales-table th {
+        background-color: var(--secondary-color);
+        color: var(--white);
+        padding: 15px;
+        text-align: left;
+    }
+    
+    .sales-table td {
+        padding: 15px;
+        border-bottom: 1px solid var(--medium-gray);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .summary-container {
+            flex-direction: column;
+        }
+        
+        .summary-card {
+            width: 100%;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+
+    .search-form {
+        display: flex;
+        gap: 15px; /* Increased spacing between input and button */
+        align-items: center;
+        width: 100%;
+        max-width: 500px; /* Control the overall form width */
+    }
+
+    .search-input {
+        flex: 1;
+        min-width: 300px; /* Minimum width for the search input */
+        padding: 10px 15px;
+        border: 2px solid var(--medium-gray);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.1);
+        outline: none;
+    }
+
+    .search-button {
+        padding: 10px 20px;
+        white-space: nowrap;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .search-button:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(4, 170, 109, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .search-form {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-input {
+            min-width: 100%;
+        }
+
+        .search-button {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- Page Content -->
+<div class="container-fluid">
+    <!-- Interactive Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-cash-register"></i>
+            <span>Sales Management</span>
+        </h1>
+    </div>
+
+    <!-- Sales Summary Section -->
+    <div class="summary-container">
+        <div class="summary-card">
+            <div class="summary-label">Total Sales</div>
+            <div class="summary-value">{{ total_sales|floatformat:2 }} PHP</div>
+            <div class="summary-label">All-time revenue</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Total Transactions</div>
+            <div class="summary-value">{{ total_transactions }}</div>
+            <div class="summary-label">Completed orders</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-label">Items Sold</div>
+            <div class="summary-value">{{ total_items_sold }}</div>
+            <div class="summary-label">Total units sold</div>
+        </div>
+    </div>
+
+    <!-- New Sale Form -->
+    <div class="form-container">
+        <h2 class="mb-4">Record New Sale</h2>
+        <form method="POST" id="sales-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_product">Product *</label>
+                <select name="product" id="id_product" class="form-control" required>
+                    <option value="">Select a product</option>
+                    {% for product in products %}
+                        <option value="{{ product.id }}" 
+                                data-price="{{ product.price }}"
+                                data-stock="{{ product.stock }}">
+                            {{ product.name }} ({{ product.stock }} available)
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="id_quantity">Quantity *</label>
+                <input type="number" name="quantity" id="id_quantity" 
+                       class="form-control" min="1" value="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_buyer_name">Customer Name (Optional)</label>
+                <input type="text" name="buyer_name" id="id_buyer_name" 
+                       class="form-control" placeholder="Enter customer name">
+            </div>
+            
+            <div class="price-display" id="price-display">
+                <i class="fas fa-info-circle"></i> Select a product to see details
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100" id="submit-btn">
+                <i class="fas fa-cash-register"></i> Record Sale
+            </button>
+        </form>
+    </div>
+    
+    <!-- Recent Sales Table -->
+    <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Recent Sales</h2>
+            <form class="search-form" method="GET">
+                <input type="text" 
+                       name="q" 
+                       class="search-input" 
+                       placeholder="Search sales..." 
+                       value="{{ request.GET.q }}"
+                       aria-label="Search sales">
+                <button type="submit" class="search-button">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="sales-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Customer</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in recent_sales %}
+                    <tr>
+                        <td>{{ sale.date|date:"M d, Y" }}</td>
+                        <td>{{ sale.product.name }}</td>
+                        <td>{{ sale.quantity }}</td>
+                        <td>{{ sale.price|floatformat:2 }} PHP</td>
+                        <td>{{ sale.total|floatformat:2 }} PHP</td>
+                        <td>{{ sale.buyer_name|default:"-" }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'dashboard-sales-edit' pk=sale.id %}" 
+                                   class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'dashboard-sales-delete' pk=sale.id %}" 
+                                   class="btn btn-sm btn-danger delete-btn">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">No sales records found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if recent_sales.has_other_pages %}
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if recent_sales.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ recent_sales.previous_page_number }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in recent_sales.paginator.page_range %}
+                        <li class="page-item {% if recent_sales.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+                    
+                    {% if recent_sales.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ recent_sales.next_page_number }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const productSelect = document.getElementById('id_product');
+        const quantityInput = document.getElementById('id_quantity');
+        const priceDisplay = document.getElementById('price-display');
+        const submitBtn = document.getElementById('submit-btn');
+
+        function updatePriceDisplay() {
+            const selectedOption = productSelect.selectedOptions[0];
+            if (selectedOption && selectedOption.value) {
+                const price = parseFloat(selectedOption.dataset.price);
+                const stock = parseInt(selectedOption.dataset.stock);
+                const quantity = parseInt(quantityInput.value) || 1;
+                const total = (price * quantity).toFixed(2);
+
+                priceDisplay.innerHTML = `
+                    <div class="mb-2"><i class="fas fa-tag"></i> Price: ${price.toFixed(2)} PHP</div>
+                    <div class="mb-2"><i class="fas fa-box"></i> Quantity: ${quantity}</div>
+                    <div class="mb-2"><i class="fas fa-warehouse"></i> Available: ${stock}</div>
+                    <div><i class="fas fa-calculator"></i> Total: ${total} PHP</div>
+                `;
+
+                if (quantity > stock) {
+                    submitBtn.disabled = true;
+                    priceDisplay.innerHTML += `
+                        <div class="text-danger mt-2">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Not enough stock!
+                        </div>
+                    `;
+                } else {
+                    submitBtn.disabled = false;
+                }
+            }
+        }
+
+        productSelect.addEventListener('change', updatePriceDisplay);
+        quantityInput.addEventListener('input', updatePriceDisplay);
+        
+                // Delete button animation        document.querySelectorAll('.delete-btn').forEach(btn => {            btn.addEventListener('click', function(e) {                const row = this.closest('tr');                row.style.transition = 'all 0.3s ease';                row.style.opacity = '0';                row.style.transform = 'translateX(-20px)';                setTimeout(() => {                    window.location.href = this.href;                }, 300);            });        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

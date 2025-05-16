@@ -1,0 +1,996 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        window.jsPDF = window.jspdf.jsPDF;
+    </script>
+
+    <!-- Add this in your base.html head section -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    {% block extra_head %}{% endblock %}
+
+    <title>{% block title %}SariSync{% endblock %}</title>
+    
+    <style>
+        :root {
+            --primary-color: #04AA6D;
+            --primary-hover: #028c54;
+            --secondary-color: #333;
+            --light-gray: #f9f9f9;
+            --medium-gray: #ddd;
+            --dark-gray: #666;
+            --white: #fff;
+            --error-color: #dc3545;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+        }
+
+        /* Logo styles */
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-logo {
+            width: 40px;
+            height: 40px;
+        }
+
+        .navbar-brand-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        main {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* Authenticated user styles */
+        body.authenticated main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 60px 0 0 0;
+            align-items: flex-start;
+        }
+
+        .container-fluid {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+            width: auto;
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--error-color);
+            border-left: 4px solid var(--error-color);
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: var(--warning-color);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hide all authenticated content when not logged in */
+        body:not(.authenticated) .authenticated-content {
+            display: none !important;
+        }
+
+        /* Hide sidebar when not authenticated */
+        body:not(.authenticated) .sidebar {
+            display: none !important;
+        }
+
+        /* Full-width container for login/register pages */
+        body:not(.authenticated) .container-fluid {
+            max-width: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        /* Reset main content margin when not authenticated */
+        body:not(.authenticated) main {
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding: 0 !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Center content vertically on login/register pages */
+        body:not(.authenticated) .content-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0;
+        }
+
+        /* Authenticated user styles */
+        body.authenticated main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 60px 0 0 0;
+            align-items: flex-start;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s infinite linear;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Make tables responsive */
+        .table-responsive {
+            width: 100%;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Content wrapper */
+        .content-wrapper {
+            width: 100%;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Center cards and tables */
+        .card, .table-container, .borrower-card {
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Make forms centered */
+        .form-container {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Center modal dialogs */
+        .modal-dialog {
+            max-width: 600px;
+            margin: 1.75rem auto;
+        }
+
+        @media (max-width: 768px) {
+            body.authenticated main {
+                margin-left: 60px;
+                width: calc(100% - 60px);
+                padding: 60px 10px 0 10px;
+            }
+
+            .container-fluid {
+                padding: 1rem;
+            }
+
+            /* Improve table responsiveness */
+            .table-responsive {
+                margin: 0;
+                padding: 0;
+            }
+
+            .table {
+                font-size: 0.9rem;
+            }
+
+            /* Make cards more mobile-friendly */
+            .card {
+                margin: 0.5rem 0;
+                border-radius: 8px;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            /* Adjust form layouts */
+            .form-group {
+                margin-bottom: 0.75rem;
+            }
+
+            .form-control {
+                font-size: 0.9rem;
+            }
+
+            /* Make modals more mobile-friendly */
+            .modal-dialog {
+                margin: 0.5rem;
+                max-width: calc(100% - 1rem);
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            /* Adjust alert messages */
+            .messages {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+
+            .alert {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            /* Improve button layouts */
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 0;
+            }
+        }
+
+        /* Additional breakpoint for very small devices */
+        @media (max-width: 480px) {
+            body.authenticated main {
+                margin-left: 0;
+                width: 100%;
+                padding-top: 50px;
+            }
+
+            .container-fluid {
+                padding: 0.5rem;
+            }
+
+            /* Stack form elements */
+            .row {
+                margin: 0;
+            }
+
+            [class*="col-"] {
+                padding: 0;
+            }
+
+            /* Adjust headings */
+            h1 { font-size: 1.75rem; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.25rem; }
+            h4 { font-size: 1.1rem; }
+
+            /* Make tables scroll horizontally */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Adjust card spacing */
+            .card {
+                border-radius: 0;
+                margin: 0.25rem 0;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body.authenticated main {
+                margin: 0;
+                width: 100%;
+                padding: 0;
+            }
+
+            .sidebar,
+            .messages,
+            .btn-print,
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light-gray);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--medium-gray);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-gray);
+        }
+
+        /* Add these styles */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .generate-report-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .generate-report-btn:hover {
+            background-color: #2b2b2b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Extra styles block */
+        .extra-styles {
+            /* This will be populated by child templates */
+            content: "";
+        }
+
+        /* Global styles for modern dashboard headers */
+        .dashboard-header {
+            background: linear-gradient(135deg, #04AA6D 0%, #025B3A 100%);
+            padding: 2.5rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotate 15s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .dashboard-header h2,
+        .dashboard-header h3,
+        .dashboard-header h4,
+        .page-title {
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            color: white;
+            margin: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .dashboard-header i,
+        .page-title i {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-header:hover i,
+        .page-title:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .dashboard-header .stats-summary {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            color: var(--white);
+            opacity: 0.9;
+        }
+
+        .dashboard-header .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .dashboard-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .dashboard-header:hover::after {
+            transform: translateX(100%);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 1.5rem;
+            }
+
+            .dashboard-header .stats-summary {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Replace .page-header with .dashboard-header */
+        .page-header {
+            background: linear-gradient(135deg, #04AA6D 0%, #025B3A 100%);
+            padding: 2.5rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: rotate 15s linear infinite;
+        }
+
+        .page-header h2,
+        .page-header h3,
+        .page-header h4 {
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            color: white;
+            margin: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .page-header i {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+        }
+
+        .page-header:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .page-header:hover::after {
+            transform: translateX(100%);
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Dashboard Overview Card Styles */
+        .dashboard-overview {
+            background: linear-gradient(135deg, #04AA6D 0%, #025B3A 100%);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-overview h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-overview i {
+            font-size: 1.5rem;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-item i {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* Date Range Selector */
+        .date-range {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .date-range input[type="date"] {
+            padding: 8px 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .date-range input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+
+        .generate-report-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .generate-report-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 768px) {
+            .dashboard-overview {
+                padding: 20px;
+                margin: 1rem;
+            }
+
+            .dashboard-overview h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .stat-item {
+                padding: 12px;
+            }
+
+            .stat-value {
+                font-size: 1.1rem;
+            }
+
+            .date-range {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+
+            .date-range input[type="date"] {
+                width: 100%;
+            }
+
+            .generate-report-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-overview {
+                margin: 0.5rem;
+                padding: 15px;
+            }
+
+            .dashboard-overview h2 {
+                font-size: 1.25rem;
+            }
+
+            .stat-item i {
+                width: 32px;
+                height: 32px;
+                font-size: 1.2rem;
+            }
+
+            .stat-label {
+                font-size: 0.8rem;
+            }
+
+            .stat-value {
+                font-size: 1rem;
+            }
+        }
+
+        /* Email notification animations */
+        .email-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: #04AA6D;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(150%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .email-notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .email-notification.hide {
+            transform: translateX(150%);
+            opacity: 0;
+        }
+
+        .email-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: email-spin 1s linear infinite;
+        }
+
+        @keyframes email-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    {% block extra_style %}{% endblock %}
+</head>
+<body class="{% if user.is_authenticated %}authenticated{% endif %}">
+    {% if user.is_authenticated %}
+        {% include 'partials/nav.html' %}
+    {% endif %}
+
+    <main>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle
+                                    {% elif message.tags == 'error' %}fa-exclamation-circle
+                                    {% elif message.tags == 'warning' %}fa-exclamation-triangle
+                                    {% else %}fa-info-circle{% endif %}">
+                        </i>
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="container-fluid">
+            <div class="content-wrapper">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Add this loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        window.jsPDF = window.jspdf.jsPDF;
+    </script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-dismiss alerts after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                $(alert).fadeOut('slow', function() {
+                    $(this).remove();
+                });
+            }, 5000);
+        });
+
+        // Add loading spinner to forms on submit
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function() {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn && !submitBtn.disabled) {
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner"></span> Processing...';
+                }
+            });
+        });
+
+        // Smooth scroll to top
+        const scrollToTop = document.createElement('button');
+        scrollToTop.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        scrollToTop.className = 'scroll-top-btn';
+        scrollToTop.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        `;
+        document.body.appendChild(scrollToTop);
+
+        window.addEventListener('scroll', function() {
+            scrollToTop.style.opacity = window.scrollY > 300 ? '1' : '0';
+        });
+
+        scrollToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Function to show email notification
+        function showEmailNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `email-notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-envelope'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+            
+            // Show animation
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Hide and remove after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('hide');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Handle email notification button click
+        const emailButtons = document.querySelectorAll('[data-email-action]');
+        emailButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                const originalContent = this.innerHTML;
+                this.innerHTML = '<span class="email-spinner"></span> Sending...';
+                this.disabled = true;
+                
+                // Make the request
+                fetch(this.href)
+                    .then(response => response.ok ? 'Notifications sent successfully!' : 'Failed to send notifications')
+                    .then(message => {
+                        showEmailNotification(message, 'success');
+                    })
+                    .catch(error => {
+                        showEmailNotification('Failed to send notifications', 'error');
+                    })
+                    .finally(() => {
+                        // Restore button state
+                        this.innerHTML = originalContent;
+                        this.disabled = false;
+                    });
+            });
+        });
+    });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

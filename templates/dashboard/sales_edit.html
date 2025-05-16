@@ -1,0 +1,272 @@
+{% extends 'partials/base.html' %}
+{% block title %}Update Sale Record{% endblock %}
+
+{% block content %}
+<head>
+    <style>
+        /* Match inventory page styles */
+        .update-container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .sale-header {
+            border-bottom: 2px solid #04AA6D;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .current-details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #04AA6D;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #04AA6D;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #028c54;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #04AA6D;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(4, 170, 109, 0.2);
+        }
+        
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Alert styling */
+        .alert {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        
+        .alert-danger {
+            background-color: #fff3f3;
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+        
+        .alert-success {
+            background-color: #f0fff4;
+            border-color: #04AA6D;
+            color: #04AA6D;
+        }
+
+        /* Total amount display */
+        .total-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #04AA6D;
+        }
+
+        /* Form field transition */
+        .form-group {
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head>
+
+<div class="update-container">
+    <div class="sale-header">
+        <h2><i class="fas fa-edit"></i> Update Sale Record</h2>
+        <p>Edit the details of sale #{{ sale.id }}</p>
+    </div>
+    
+    <div class="current-details">
+        <h4><i class="fas fa-info-circle"></i> Current Details</h4>
+        <p><strong>Product:</strong> {{ sale.product.name }}</p>
+        <p><strong>Date:</strong> {{ sale.date|date:"F j, Y, g:i a" }}</p>
+        <p><strong>Price per Unit:</strong> <span class="price-display">₱{{ sale.product.price|floatformat:2 }}</span></p>
+        <p><strong>Current Total:</strong> <span class="total-display">₱{{ sale.total|floatformat:2 }}</span></p>
+        <p><strong>Available Stock:</strong> {{ available_stock }} units</p>
+    </div>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" id="sales-edit-form">
+        {% csrf_token %}
+        <input type="hidden" name="product" value="{{ sale.product.id }}">
+        
+        <div class="form-group">
+            <label for="id_quantity">Quantity *</label>
+            <input 
+                type="number" 
+                name="quantity" 
+                value="{{ form.quantity.value|default:sale.quantity }}" 
+                class="form-control {% if form.quantity.errors %}is-invalid{% endif %}" 
+                id="id_quantity" 
+                min="1"
+                max="{{ available_stock }}"
+                required
+            >
+            {% if form.quantity.errors %}
+                <div class="invalid-feedback">
+                    {{ form.quantity.errors|join:", " }}
+                </div>
+            {% endif %}
+            <small class="form-text text-muted">Available stock: {{ available_stock }} units</small>
+        </div>
+
+        <div class="form-group">
+            <label for="id_buyer_name">Customer Name (Optional)</label>
+            <input 
+                type="text" 
+                name="buyer_name" 
+                value="{{ form.buyer_name.value|default:sale.buyer_name }}" 
+                class="form-control" 
+                id="id_buyer_name"
+            >
+        </div>
+
+        <div class="btn-group">
+            <a href="{% url 'dashboard-sales' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-primary" id="save-button">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('sales-edit-form');
+    const quantityInput = document.getElementById('id_quantity');
+    const saveButton = document.getElementById('save-button');
+    const availableStock = parseInt('{{ available_stock }}');
+    const productPrice = parseFloat('{{ sale.product.price }}');
+    
+    // Update total amount when quantity changes
+    function updateTotal() {
+        const quantity = parseInt(quantityInput.value) || 0;
+        const total = (quantity * productPrice).toFixed(2);
+        document.querySelector('.total-display').textContent = `₱${total}`;
+    }
+    
+    // Add hover effects to buttons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            btn.style.transform = 'translateY(-2px)';
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Form field focus effects
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+        });
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+    
+    // Initialize total and add event listener
+    updateTotal();
+    quantityInput.addEventListener('input', updateTotal);
+    
+    // Form validation and submission
+    form.addEventListener('submit', function(e) {
+        const quantity = parseInt(quantityInput.value) || 0;
+        
+        if (quantity < 1) {
+            e.preventDefault();
+            alert('Quantity must be at least 1');
+            return;
+        }
+        
+        if (quantity > availableStock) {
+            e.preventDefault();
+            alert(`Only ${availableStock} units available`);
+            return;
+        }
+        
+        // Prevent double submission and show loading state
+        if (!form.hasAttribute('data-submitting')) {
+            form.setAttribute('data-submitting', 'true');
+            saveButton.disabled = true;
+            saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        } else {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

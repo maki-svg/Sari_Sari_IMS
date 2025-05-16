@@ -1,0 +1,539 @@
+{% extends 'partials/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block extra_css %}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<style>
+    :root {
+        --primary-color: #04AA6D;
+        --primary-hover: #028c54;
+        --danger-color: #dc3545;
+        --danger-hover: #bb2d3b;
+        --secondary-color: #333;
+        --light-gray: #f9f9f9;
+        --medium-gray: #ddd;
+        --white: #fff;
+        --error-color: #dc3545;
+        --success-color: #28a745;
+    }
+
+    /* Form Card Styling */
+    .form-card {
+        background: var(--white);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        color: var(--white);
+        padding: 1.5rem;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .header-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Form Sections */
+    .form-section {
+        background: var(--light-gray);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .form-section:hover {
+        background: var(--white);
+        transform: translateY(-3px);
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    .section-title i {
+        font-size: 1.25rem;
+        color: var(--primary-color);
+        margin-right: 0.75rem;
+        transition: transform 0.3s ease;
+    }
+
+    .form-section:hover .section-title i {
+        transform: rotate(10deg);
+    }
+
+    .section-title h5 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+    }
+
+    /* Form Controls */
+    .form-group {
+        position: relative;
+    }
+
+    .form-control {
+        border: 2px solid var(--medium-gray);
+        border-radius: 8px;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.15rem rgba(4, 170, 109, 0.2);
+    }
+
+    .form-control:valid:not(:placeholder-shown) {
+        border-color: var(--success-color);
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--error-color);
+    }
+
+    .form-control:valid:not(:placeholder-shown) + .valid-icon,
+    .form-control.is-invalid + .valid-icon {
+        display: block;
+    }
+
+    .valid-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+        font-size: 1rem;
+    }
+
+    .invalid-feedback {
+        color: var(--error-color);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Signature Upload */
+    .signature-upload {
+        border: 2px dashed var(--medium-gray);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: var(--white);
+    }
+
+    .signature-upload:hover,
+    .signature-upload.dragover {
+        border-color: var(--primary-color);
+        background: rgba(4, 170, 109, 0.05);
+        transform: scale(1.01);
+    }
+
+    .signature-upload i {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .signature-upload:hover i,
+    .signature-upload.dragover i {
+        transform: translateY(-3px);
+    }
+
+    .signature-preview {
+        max-width: 100%;
+        max-height: 150px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        cursor: pointer;
+
+    }
+
+    .signature-preview:hover {
+        transform: scale(1.05);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 2rem;
+        padding: 0 1rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        min-width: 160px;
+        max-width: 200px;
+        justify-content: center;
+    }
+
+    .btn-success {
+        background: var(--primary-color);
+        color: var(--white);
+    }
+
+    .btn-success:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(4, 170, 109, 0.2);
+    }
+
+    .btn-danger {
+        background: var(--danger-color);
+        color: var(--white);
+    }
+
+    .btn-danger:hover {
+        background: var(--danger-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+    }
+
+    .btn i {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .btn:hover i {
+        transform: scale(1.1);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+
+    /* Spinner */
+    .spinner-border {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.15em;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .toast {
+        background: var(--white);
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: slideIn 0.3s ease;
+        max-width: 280px;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast.success { border-left: 3px solid var(--success-color); }
+    .toast.error { border-left: 3px solid var(--error-color); }
+
+    /* Modal for Signature Preview */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: var(--white);
+        font-size: 2rem;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-card" data-aos="fade-up">
+                <div class="card-header">
+                    <h3 class="header-title">
+                        <i class="fas {% if form.instance.pk %}fa-user-edit{% else %}fa-user-plus{% endif %}"></i>
+                        {% if form.instance.pk %}Update{% else %}Add{% endif %} Borrower
+                    </h3>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data" id="borrowerForm" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Personal Information -->
+                        <div class="form-section" data-aos="fade-up" data-aos-delay="100">
+                            <div class="section-title">
+                                <i class="fas fa-user"></i>
+                                <h5>Personal Information</h5>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        {{ form.borrower_name|as_crispy_field }}
+                                        <i class="fas fa-check-circle valid-icon text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.contact_number|as_crispy_field }}
+                                        <i class="fas fa-check-circle valid-icon text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.email|as_crispy_field }}
+                                        <i class="fas fa-check-circle valid-icon text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        {{ form.address|as_crispy_field }}
+                                        <i class="fas fa-check-circle valid-icon text-success"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Loan Details -->
+                        <div class="form-section" data-aos="fade-up" data-aos-delay="200">
+                            <div class="section-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                <h5>Loan Details</h5>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.date_borrowed|as_crispy_field }}
+                                        <i class="fas fa-check-circle valid-icon text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form.due_date|as_crispy_field }}
+                                        <i class="fas fa-check-circle valid-icon text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        {{ form.notes|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Signature Upload -->
+                        <div class="form-section" data-aos="fade-up" data-aos-delay="300">
+                            <div class="section-title">
+                                <i class="fas fa-signature"></i>
+                                <h5>Signature (Optional)</h5>
+                            </div>
+                            <div class="signature-upload" id="signatureUpload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h6 class="mb-2">Drop your signature here or click to browse</h6>
+                                <p class="text-muted mb-0">Supports: JPG, PNG (Max: 5MB)</p>
+                                <input type="file" name="signature" id="signatureInput" class="d-none" accept="image/*">
+                            </div>
+
+                            {% if form.instance.signature %}
+                            <div class="text-center mt-3">
+                                <p class="text-muted mb-2">Current Signature</p>
+                                <div class="signature-image-container">
+                                    <img src="{{ form.instance.signature.url }}" 
+                                         alt="Current signature" 
+                                         class="signature-preview" 
+                                         onclick="openModal(this.src)" 
+                                         loading="lazy"
+                                         width="200"
+                                         height="auto"
+                                         style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="remove_signature" id="removeSignature">
+                                        <label class="form-check-label" for="removeSignature">
+                                            Remove current signature
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div id="newSignaturePreview" class="text-center mt-3" style="display: none;">
+                                <p class="text-muted mb-2">New Signature Preview</p>
+                                <img id="previewImage" class="signature-preview" onclick="openModal(this.src)" loading="lazy" style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-success" id="submitBtn">
+                                <i class="fas {% if form.instance.pk %}fa-save{% else %}fa-plus-circle{% endif %}"></i>
+                                <span>{% if form.instance.pk %}Update{% else %}Add{% endif %}</span>
+                            </button>
+                            <a href="{% url 'dashboard-borrower-list' %}" class="btn btn-danger">
+                                <i class="fas fa-times"></i>
+                                <span>Cancel</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container"></div>
+
+<!-- Modal for Signature Preview -->
+<div class="modal" id="signatureModal">
+    <span class="modal-close">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Defer non-critical JavaScript -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+<script>
+// Initialize AOS after it loads
+window.addEventListener('load', function() {
+    if (typeof AOS !== 'undefined') {
+        AOS.init();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const signatureUpload = document.getElementById('signatureUpload');
+    const signatureInput = document.getElementById('signatureInput');
+    const newSignaturePreview = document.getElementById('newSignaturePreview');
+    const previewImage = document.getElementById('previewImage');
+
+    signatureUpload.addEventListener('click', () => signatureInput.click());
+    signatureUpload.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        signatureUpload.classList.add('dragover');
+    });
+    signatureUpload.addEventListener('dragleave', () => signatureUpload.classList.remove('dragover'));
+    signatureUpload.addEventListener('drop', (e) => {
+        e.preventDefault();
+        signatureUpload.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        handleFile(file);
+    });
+    signatureInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+    function handleFile(file) {
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('File size must be less than 5MB', 'error');
+            return;
+        }
+        if (!file.type.startsWith('image/')) {
+            showToast('Please upload an image file', 'error');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImage.src = e.target.result;
+            newSignaturePreview.style.display = 'block';
+            showToast('Signature uploaded successfully', 'success');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        document.querySelector('.toast-container').appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Add email validation
+    const emailInput = document.querySelector('input[name="email"]');
+    if (emailInput) {
+        emailInput.addEventListener('change', function() {
+            const email = this.value.trim();
+            if (email && !isValidEmail(email)) {
+                showToast('Please enter a valid email address', 'error');
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+
+    function isValidEmail(email) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'partials/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Update Product{% endblock %}
+
+{% block content %}
+<head>
+    <style>
+        /* Match existing inventory page styles */
+        .update-container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-header {
+            border-bottom: 2px solid #04AA6D;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #04AA6D;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #028c54;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .current-details {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #04AA6D;
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .update-container {
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        /* Form styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            transition: border 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #04AA6D;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(4, 170, 109, 0.2);
+        }
+
+        /* Form field focus effects */
+        .form-group {
+            transition: transform 0.3s ease;
+        }
+
+        .form-group:focus-within {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="update-container">
+        <div class="product-header">
+            <h2><i class="fas fa-edit"></i> Update Product</h2>
+            <p>Edit the details of {{ item.name }}</p>
+        </div>
+        
+        <div class="current-details">
+            <h4><i class="fas fa-info-circle"></i> Current Details</h4>
+            <p><strong>Name:</strong> {{ item.name }}</p>
+            <p><strong>Stock:</strong> {{ item.stock }} units</p>
+            <p><strong>Price:</strong> {{ item.price|floatformat:2 }} PHP</p>
+            <p><strong>Category:</strong> {{ item.category }}</p>
+        </div>
+        
+        <!-- Regular Update Form -->
+        <form method="POST" id="updateForm">
+            {% csrf_token %}
+            {{ form|crispy }}
+            
+            <div class="btn-group">
+                <a href="{% url 'dashboard-inventory' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects for buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    if (!btn.disabled) {
+                        btn.style.transform = 'translateY(-2px)';
+                    }
+                });
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+{% endblock %}

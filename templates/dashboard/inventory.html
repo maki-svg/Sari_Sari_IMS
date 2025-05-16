@@ -1,0 +1,1034 @@
+{% extends 'partials/base.html' %}
+{% load crispy_forms_tags %}
+{% load inventory_filters %}  <!-- This will now work -->
+{% block title %}Inventory{% endblock %}
+
+{% block extra_head %}
+<!-- PDF Generation Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script>
+    window.jsPDF = window.jspdf.jsPDF;
+</script>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Keep only inventory-specific styles */
+    .search-bar-container {
+        display: flex;
+        justify-content: center;
+        margin: 20px auto;
+        width: 100%;
+        max-width: 1000px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .search-bar {
+        display: flex;
+        flex: 1;
+        min-width: 300px;
+        gap: 10px;
+    }
+    
+    .search-bar select, 
+    .search-bar input {
+        padding: 12px 15px;
+        border: 2px solid var(--medium-gray);
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        flex: 1;
+    }
+    
+    .search-bar select:focus, 
+    .search-bar input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.2);
+    }
+    
+    .add-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .add-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(4, 170, 109, 0.3);
+    }
+    
+    .add-btn:active {
+        transform: translateY(0);
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 25px auto;
+        max-width: 1200px;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    th {
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        position: sticky;
+        top: 0;
+    }
+    
+    td {
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--medium-gray);
+        text-align: center;
+        transition: all 0.2s;
+    }
+    
+    tr:not(:hover) td {
+        background-color: white;
+    }
+    
+    tr:hover td {
+        background-color: #f0f0f0;
+        transform: scale(1.01);
+    }
+    
+    .edit-btn, 
+    .delete-btn {
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0 3px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .edit-btn {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .edit-btn:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .delete-btn {
+        background-color: var(--error-color);
+        color: white;
+    }
+    
+    .delete-btn:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        backdrop-filter: blur(3px);
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 500px;
+        background: white;
+        border-radius: 12px;
+        z-index: 1001;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        animation: modalFadeIn 0.3s ease-out;
+    }
+
+    .modal-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px 12px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        transform: rotate(90deg);
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--secondary-color);
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid var(--medium-gray);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-overflow: ellipsis;
+    }
+
+    select.form-control {
+        padding: 0.75rem;
+        border: 2px solid var(--medium-gray);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background-color: var(--white);
+        width: 100%;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1em;
+        padding-right: 2.5rem;
+    }
+
+    select.form-control option {
+        padding: 1rem;
+        background-color: var(--white);
+        color: var(--secondary-color);
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+    }
+
+    select.form-control option:hover,
+    select.form-control option:focus,
+    select.form-control option:active {
+        background-color: var(--primary-color);
+        color: var(--white);
+    }
+
+    select.form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.2);
+        outline: none;
+    }
+
+    #search-category {
+        min-width: 200px;
+        max-width: 300px;
+        height: auto;
+    }
+
+    #search-category option {
+        white-space: normal;
+        word-wrap: break-word;
+        min-height: 2.5rem;
+        display: block;
+        width: 100%;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .search-bar {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #search-category {
+            width: 100%;
+            max-width: none;
+        }
+
+        select.form-control {
+            width: 100%;
+        }
+    }
+
+    /* Modal animations */
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -48%);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    .spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .generate-report-btn {
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .generate-report-btn:hover {
+        background-color: #2b2b2b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .page-header {
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .page-header:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .page-title {
+        color: var(--white);
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-title i {
+        font-size: 2rem;
+        transition: transform 0.3s ease;
+    }
+
+    .page-header:hover .page-title i {
+        transform: rotate(15deg);
+    }
+
+    .inventory-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+
+    .stat-item {
+        color: var(--white);
+        opacity: 0.9;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stat-item i {
+        font-size: 1rem;
+    }
+
+    .page-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+
+    .page-header:hover::after {
+        transform: translateX(100%);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.5s ease forwards;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">
+        <i class="fas fa-boxes"></i>
+        <span>Inventory Management</span>
+    </h1>
+    <div class="inventory-stats">
+        <div class="stat-item">
+            <i class="fas fa-cubes"></i>
+            <span>Total Products: {{ items.count }}</span>
+        </div>
+        <div class="stat-item">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Low Stock Items: {{ items|count_low_stock }}</span>
+        </div>
+        <div class="stat-item">
+            <i class="fas fa-coins"></i>
+            <span>Total Value: ₱{{ items|sum_stock_value|floatformat:2 }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="search-bar-container">
+    <div class="search-bar">
+        <select id="search-category" name="category" class="form-control">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+                <option value="{{ category.0 }}" {% if current_category == category.0 %}selected{% endif %}>
+                    {{ category.1 }}
+                </option>
+            {% endfor %}
+        </select>
+        <input type="text" id="search-input" class="form-control" placeholder="Search products..." value="{{ search_query|default:'' }}">
+        <button class="add-btn" id="add-product-btn">
+            <i class="fas fa-plus"></i> Add Product
+        </button>
+    </div>
+    <button class="generate-report-btn" id="generateReport">
+        <i class="fas fa-file-pdf"></i> Generate Report
+    </button>
+</div>
+
+<!-- Modal Overlay -->
+<div class="modal-overlay" id="modalOverlay"></div>
+
+<!-- Modal Form -->
+<div class="modal" id="productModal">
+    <div class="modal-header">
+        <h3>
+            <i class="fas fa-box-open"></i>
+            Add New Product
+        </h3>
+        <button class="modal-close" id="modal-close-btn" title="Close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form method="POST" action="{% url 'dashboard-inventory' %}" id="product-form" class="needs-validation">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_name">Product Name *</label>
+                {{ form.name }}
+                <div class="invalid-feedback" id="name-error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_category">Category *</label>
+                {{ form.category }}
+                <div class="invalid-feedback" id="category-error"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="id_price">Price (PHP) *</label>
+                    {{ form.price }}
+                    <div class="invalid-feedback" id="price-error"></div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="id_stock">Initial Stock *</label>
+                    {{ form.stock }}
+                    <div class="invalid-feedback" id="stock-error"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="add-btn w-100" id="submit-btn">
+                <i class="fas fa-save"></i>
+                <span>Save Product</span>
+                <div class="spinner" id="form-spinner"></div>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Inventory Table -->
+<div class="table-container">
+    <table id="inventory-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total Value</th>
+                <th>Category</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="inventory-body">
+            {% for item in items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.stock }}</td>
+                <td>{{ item.price|floatformat:2 }} PHP</td>
+                <td>{% widthratio item.stock 1 item.price as total %}{{ total|floatformat:2 }} PHP</td>
+                <td>{{ item.category }}</td>
+                <td>
+                    <a href="{% url 'dashboard-inventory-update' item.id %}" class="edit-btn">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'dashboard-inventory-delete' item.id %}" class="delete-btn">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center;">No products found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+   
+    const modal = document.getElementById('productModal');
+    const overlay = document.getElementById('modalOverlay');
+    const openModalBtn = document.getElementById('add-product-btn');
+    const closeModalBtn = document.getElementById('modal-close-btn');
+    const searchInput = document.getElementById('search-input');
+    const categorySelect = document.getElementById('search-category');
+    const productForm = document.getElementById('product-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const formSpinner = document.getElementById('form-spinner');
+    
+    // Open modal with animation
+    function openModal() {
+        modal.style.display = 'block';
+        overlay.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // Close modal with animation
+    function closeModal() {
+        modal.style.animation = 'modalFadeIn 0.3s ease-out reverse';
+        setTimeout(() => {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            modal.style.animation = 'modalFadeIn 0.3s ease-out';
+        }, 250);
+    }
+    
+    // Event listeners
+    openModalBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
+            closeModal();
+        }
+    });
+    
+    // Enhanced search functionality with debounce
+    let searchTimeout;
+    function filterProducts() {
+        const filterText = searchInput.value.toUpperCase();
+        const filterCategory = categorySelect.value;
+        const rows = document.querySelectorAll('#inventory-body tr');
+        
+        rows.forEach(row => {
+            const nameCell = row.querySelector('td:first-child');
+            const categoryCell = row.querySelector('td:nth-child(5)');
+            
+            if (nameCell && categoryCell) {
+                const nameText = nameCell.textContent.toUpperCase();
+                const categoryText = categoryCell.textContent;
+                
+                const nameMatch = nameText.includes(filterText);
+                const categoryMatch = filterCategory === "" || categoryText === filterCategory;
+                
+                if (nameMatch && categoryMatch) {
+                    row.style.display = "";
+                    row.classList.add('fade-in');
+                } else {
+                    row.style.display = "none";
+                }
+            }
+        });
+    }
+    
+    // Debounced search input
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterProducts, 300);
+    });
+    
+    // Category filter
+    categorySelect.addEventListener('change', filterProducts);
+    
+    // Form submission handling
+    productForm.addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        formSpinner.style.display = 'inline-block';
+        submitBtn.querySelector('i').style.display = 'none';
+    });
+    
+    // Initialize search on page load
+    filterProducts();
+    
+    // Add hover effects to table rows
+    const tableRows = document.querySelectorAll('#inventory-body tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.01)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+        // Delete button animation    const deleteButtons = document.querySelectorAll('.delete-btn');    deleteButtons.forEach(button => {        button.addEventListener('click', function(e) {            e.preventDefault();            const row = this.closest('tr');            row.style.transition = 'all 0.3s ease';            row.style.opacity = '0';            row.style.transform = 'translateX(-20px)';            setTimeout(() => {                window.location.href = this.href;            }, 300);        });    });
+
+    // Add this inside your DOMContentLoaded event listener
+    const form = document.getElementById('product-form');
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const nameInput = document.getElementById('id_name');
+        const categoryInput = document.getElementById('id_category');
+        const priceInput = document.getElementById('id_price');
+        const stockInput = document.getElementById('id_stock');
+
+        // Reset previous errors
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
+
+        // Validate name
+        if (!nameInput.value.trim()) {
+            document.getElementById('name-error').textContent = 'Product name is required';
+            nameInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Validate category
+        if (!categoryInput.value) {
+            document.getElementById('category-error').textContent = 'Please select a category';
+            categoryInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Validate price
+        const price = parseFloat(priceInput.value);
+        if (isNaN(price) || price <= 0) {
+            document.getElementById('price-error').textContent = 'Please enter a valid price';
+            priceInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Validate stock
+        const stock = parseInt(stockInput.value);
+        if (isNaN(stock) || stock < 0) {
+            document.getElementById('stock-error').textContent = 'Stock cannot be negative';
+            stockInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            return;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        formSpinner.style.display = 'inline-block';
+        submitBtn.querySelector('span').textContent = 'Saving...';
+        submitBtn.querySelector('i').style.display = 'none';
+    });
+
+    // Reset form when modal is closed
+    function resetForm() {
+        form.reset();
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
+        submitBtn.disabled = false;
+        formSpinner.style.display = 'none';
+        submitBtn.querySelector('span').textContent = 'Save Product';
+        submitBtn.querySelector('i').style.display = 'inline';
+    }
+
+    closeModalBtn.addEventListener('click', resetForm);
+    overlay.addEventListener('click', resetForm);
+
+    // Add name validation
+    const nameInput = document.getElementById('id_name');
+    let timeoutId;
+
+    nameInput.addEventListener('input', function() {
+        clearTimeout(timeoutId);
+        const productName = this.value.trim();
+        
+        if (productName) {
+            timeoutId = setTimeout(() => {
+                // Check if product exists
+                fetch(`/check-product-name/?name=${encodeURIComponent(productName)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const errorDiv = document.getElementById('name-error');
+                        if (data.exists) {
+                            nameInput.classList.add('is-invalid');
+                            errorDiv.textContent = `Product "${productName}" already exists`;
+                            submitBtn.disabled = true;
+                        } else {
+                            nameInput.classList.remove('is-invalid');
+                            errorDiv.textContent = '';
+                            submitBtn.disabled = false;
+                        }
+                    });
+            }, 500);
+        }
+    });
+
+    // Enhanced form validation
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        const nameInput = document.getElementById('id_name');
+        const categoryInput = document.getElementById('id_category');
+        const priceInput = document.getElementById('id_price');
+        const stockInput = document.getElementById('id_stock');
+
+        // Reset previous errors
+        document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+        document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
+
+        // Validate name (required and no duplicates)
+        if (!nameInput.value.trim()) {
+            document.getElementById('name-error').textContent = 'Product name is required';
+            nameInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (nameInput.classList.contains('is-invalid')) {
+            isValid = false;
+        }
+
+        // Validate category
+        if (!categoryInput.value) {
+            document.getElementById('category-error').textContent = 'Please select a category';
+            categoryInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Validate price
+        const price = parseFloat(priceInput.value);
+        if (isNaN(price) || price <= 0) {
+            document.getElementById('price-error').textContent = 'Please enter a valid price';
+            priceInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Validate stock
+        const stock = parseInt(stockInput.value);
+        if (isNaN(stock) || stock < 0) {
+            document.getElementById('stock-error').textContent = 'Stock cannot be negative';
+            stockInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            return;
+        }
+        
+        // Show loading state if valid
+        submitBtn.disabled = true;
+        formSpinner.style.display = 'inline-block';
+        submitBtn.querySelector('span').textContent = 'Saving...';
+        submitBtn.querySelector('i').style.display = 'none';
+    });
+
+    document.getElementById('generateReport').addEventListener('click', async function() {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        
+        try {
+            // Show loading overlay
+            loadingOverlay.style.display = 'flex';
+
+            // Get table data
+            const table = document.getElementById('inventory-table');
+            if (!table) {
+                throw new Error('Inventory table not found');
+            }
+
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const data = [];
+            let totalValue = 0;
+            let totalItems = 0;
+
+            // Process each row
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length >= 5) {
+                    const name = cells[0].textContent.trim();
+                    const quantity = parseInt(cells[1].textContent) || 0;
+                    const price = parseFloat(cells[2].textContent.replace(/[^\d.-]/g, '')) || 0;
+                    const value = quantity * price;
+                    const category = cells[4].textContent.trim();
+
+                    totalItems += quantity;
+                    totalValue += value;
+
+                    data.push([
+                        name,
+                        quantity.toString(),
+                        `₱${price.toFixed(2)}`,
+                        `₱${value.toFixed(2)}`,
+                        category
+                    ]);
+                }
+            });
+
+            // Validate data
+            if (data.length === 0) {
+                throw new Error('No inventory data available to generate report');
+            }
+
+            // Create PDF
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // Add header with logo-like styling
+            doc.setFillColor(4, 170, 109);
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(28);
+            doc.setTextColor(255, 255, 255);
+            doc.text('SariSync', 105, 20, { align: 'center' });
+
+            doc.setFontSize(14);
+            doc.text('Inventory Report', 105, 30, { align: 'center' });
+
+            // Add timestamp
+            doc.setFontSize(10);
+            doc.setTextColor(220, 220, 220);
+            const timestamp = new Date().toLocaleString('en-US', { 
+                dateStyle: 'full', 
+                timeStyle: 'short' 
+            });
+            doc.text(`Generated: ${timestamp}`, 105, 37, { align: 'center' });
+
+            // Add summary box
+            doc.setDrawColor(4, 170, 109);
+            doc.setFillColor(240, 255, 244);
+            doc.roundedRect(15, 45, 180, 30, 3, 3, 'FD');
+
+            doc.setTextColor(4, 170, 109);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Inventory Summary', 25, 55);
+
+            doc.setTextColor(51, 51, 51);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'normal');
+            doc.text([
+                `Total Products: ${data.length}`,
+                `Total Items in Stock: ${totalItems.toLocaleString()}`,
+                `Total Inventory Value: ₱${totalValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`
+            ], 25, 63, { lineHeightFactor: 1.5 });
+
+            // Generate table using autoTable
+            doc.autoTable({
+                startY: 85,
+                head: [['Product', 'Quantity', 'Unit Price', 'Total Value', 'Category']],
+                body: data,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [4, 170, 109],
+                    textColor: [255, 255, 255],
+                    fontSize: 12,
+                    fontStyle: 'bold',
+                    halign: 'center'
+                },
+                styles: {
+                    fontSize: 10,
+                    cellPadding: 5,
+                    lineColor: [200, 200, 200],
+                    lineWidth: 0.1
+                },
+                columnStyles: {
+                    0: { cellWidth: 'auto' },
+                    1: { halign: 'center' },
+                    2: { halign: 'right' },
+                    3: { halign: 'right' },
+                    4: { halign: 'center' }
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 255, 250]
+                },
+                margin: { top: 80 }
+            });
+
+            // Save the PDF
+            doc.save('SariSync_Inventory_Report.pdf');
+
+        } catch (error) {
+            console.error('Error generating report:', error);
+            alert('Failed to generate report: ' + error.message);
+        } finally {
+            // Hide loading overlay
+            loadingOverlay.style.display = 'none';
+        }
+    });
+
+    // Add interactive effects for page header
+    const pageHeader = document.querySelector('.page-header');
+    const titleIcon = document.querySelector('.page-title i');
+
+    pageHeader.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        titleIcon.style.transform = `rotate(${(x - rect.width/2) * 0.02}deg) translateY(${(y - rect.height/2) * 0.02}px)`;
+    });
+
+    pageHeader.addEventListener('mouseleave', function() {
+        titleIcon.style.transform = 'rotate(0) translateY(0)';
+    });
+
+    // Add fade-in animation on load
+    const statItems = document.querySelectorAll('.stat-item');
+    statItems.forEach((item, index) => {
+        item.style.animation = `fadeInUp 0.5s ease forwards ${index * 0.1}s`;
+        item.style.opacity = '0';
+    });
+});
+</script>
+{% endblock %}

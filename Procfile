@@ -1,0 +1,1 @@
+web: gunicorn Sari_Sari_IMS.wsgi:application --log-file - 

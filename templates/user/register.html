@@ -1,0 +1,627 @@
+{% extends 'partials/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Register | SariSync{% endblock %}
+
+{% block content %}
+<div class="modern-auth-wrapper">
+    <div class="auth-left">
+        <div class="auth-brand">
+            <img src="{% static 'images/logo.svg' %}" alt="SariSync Logo" class="auth-logo">
+            <h1>SariSync</h1>
+            <p>Join our community of store owners</p>
+        </div>
+        <div class="auth-illustration">
+            <img src="{% static 'images/register-illustration.svg' %}" alt="Register" onerror="this.style.display='none'">
+        </div>
+    </div>
+    <div class="auth-right">
+        <div class="auth-card register-container">
+            <div class="auth-header">
+                <h2 class="auth-title">Create Account 🚀</h2>
+                <p class="auth-subtitle">Start managing your inventory today</p>
+            </div>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST" class="auth-form" id="registerForm">
+                {% csrf_token %}
+                
+                <div class="form-section">
+                    <h3 class="section-title">Account Information</h3>
+                    <div class="form-floating mb-3">
+                        {{ form.username|as_crispy_field }}
+                    </div>
+                    <div class="form-floating mb-3">
+                        {{ form.email|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Security</h3>
+                    <div class="form-floating mb-3 password-field">
+                        {{ form.password1|as_crispy_field }}
+                        <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="password-strength-meter">
+                            <div class="strength-bar"></div>
+                        </div>
+                        <div class="password-requirements">
+                            <p class="requirement" data-requirement="length">
+                                <i class="fas fa-check-circle"></i> At least 8 characters
+                            </p>
+                            <p class="requirement" data-requirement="uppercase">
+                                <i class="fas fa-check-circle"></i> One uppercase letter
+                            </p>
+                            <p class="requirement" data-requirement="number">
+                                <i class="fas fa-check-circle"></i> One number
+                            </p>
+                            <p class="requirement" data-requirement="special">
+                                <i class="fas fa-check-circle"></i> One special character
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-floating mb-3 password-field">
+                        {{ form.password2|as_crispy_field }}
+                        <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group terms-checkbox">
+                    <label class="custom-checkbox">
+                        <input type="checkbox" name="terms" required>
+                        <span class="checkmark"></span>
+                        I agree to the <a href="#" class="auth-link">Terms of Service</a> and <a href="#" class="auth-link">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="auth-button">
+                    <span class="button-text">Create Account</span>
+                    <div class="button-loader"></div>
+                </button>
+
+                <div class="auth-separator">
+                    <span>Already have an account?</span>
+                </div>
+
+                <a href="{% url 'user-login' %}" class="auth-button secondary">
+                    Sign In
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Include all styles from login.html */
+    .modern-auth-wrapper {
+        min-height: 100vh;
+        display: flex;
+        background: #ffffff;
+    }
+
+    .auth-left {
+        flex: 1;
+        background: linear-gradient(135deg, #04AA6D 0%, #038c54 100%);
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-brand {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .auth-logo {
+        width: 80px;
+        height: 80px;
+        filter: brightness(0) invert(1);
+    }
+
+    .auth-brand h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .auth-brand p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-top: 8px;
+    }
+
+    .auth-illustration {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .auth-illustration img {
+        max-width: 80%;
+        height: auto;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .auth-right {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        background: #f8fafc;
+        overflow-y: auto;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 480px;
+        padding: 40px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .form-section {
+        margin-bottom: 32px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        color: #2d3748;
+        margin-bottom: 16px;
+        font-weight: 600;
+    }
+
+    /* Password strength meter */
+    .password-strength-meter {
+        height: 4px;
+        background: #edf2f7;
+        margin-top: 8px;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .strength-bar {
+        height: 100%;
+        width: 0;
+        transition: all 0.3s ease;
+        border-radius: 2px;
+    }
+
+    .strength-weak .strength-bar {
+        width: 33.33%;
+        background: #f56565;
+    }
+
+    .strength-medium .strength-bar {
+        width: 66.66%;
+        background: #ed8936;
+    }
+
+    .strength-strong .strength-bar {
+        width: 100%;
+        background: #48bb78;
+    }
+
+    .password-requirements {
+        margin-top: 12px;
+        font-size: 14px;
+    }
+
+    .requirement {
+        color: #718096;
+        margin: 4px 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .requirement i {
+        margin-right: 8px;
+        font-size: 12px;
+    }
+
+    .requirement.valid {
+        color: #48bb78;
+    }
+
+    .requirement.valid i {
+        color: #48bb78;
+    }
+
+    .requirement.invalid {
+        color: #718096;
+    }
+
+    .requirement.invalid i {
+        color: #718096;
+    }
+
+    /* Include other styles from login.html */
+    .auth-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .auth-title {
+        color: #1a202c;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .auth-subtitle {
+        color: #718096;
+        font-size: 16px;
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-floating {
+        position: relative;
+    }
+
+    .auth-form input:not([type="checkbox"]) {
+        width: 100%;
+        padding: 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+
+    .auth-form input:focus {
+        border-color: #04AA6D;
+        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.1);
+        outline: none;
+        background: white;
+    }
+
+    /* Include remaining styles from login.html */
+    .password-field {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #718096;
+        cursor: pointer;
+        padding: 0;
+        font-size: 16px;
+        transition: color 0.3s ease;
+    }
+
+    .toggle-password:hover {
+        color: #04AA6D;
+    }
+
+    .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 20px 0;
+    }
+
+    .custom-checkbox {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+        color: #4a5568;
+        font-size: 14px;
+    }
+
+    .custom-checkbox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .checkmark {
+        height: 20px;
+        width: 20px;
+        background-color: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        margin-right: 8px;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .custom-checkbox input:checked ~ .checkmark {
+        background-color: #04AA6D;
+        border-color: #04AA6D;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .custom-checkbox input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    .auth-button {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .auth-button:not(.secondary) {
+        background: #04AA6D;
+        color: white;
+    }
+
+    .auth-button.secondary {
+        background: #f8fafc;
+        color: #04AA6D;
+        border: 2px solid #04AA6D;
+        margin-top: 16px;
+    }
+
+    .auth-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(4, 170, 109, 0.15);
+    }
+
+    .auth-button:active {
+        transform: translateY(0);
+    }
+
+    .button-loader {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+        position: absolute;
+    }
+
+    .auth-separator {
+        text-align: center;
+        margin: 24px 0;
+        position: relative;
+    }
+
+    .auth-separator::before,
+    .auth-separator::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: calc(50% - 70px);
+        height: 1px;
+        background: #e2e8f0;
+    }
+
+    .auth-separator::before {
+        left: 0;
+    }
+
+    .auth-separator::after {
+        right: 0;
+    }
+
+    .auth-separator span {
+        background: white;
+        padding: 0 16px;
+        color: #718096;
+        font-size: 14px;
+    }
+
+    .auth-link {
+        color: #04AA6D;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: color 0.3s ease;
+    }
+
+    .auth-link:hover {
+        color: #038c54;
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        position: relative;
+        animation: slideIn 0.3s ease;
+    }
+
+    .alert-success {
+        background: #def7ec;
+        color: #03543f;
+    }
+
+    .alert-error {
+        background: #fde8e8;
+        color: #9b1c1c;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(-10px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+        .auth-left {
+            display: none;
+        }
+        
+        .auth-right {
+            flex: 1;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .auth-right {
+            padding: 20px;
+        }
+
+        .auth-card {
+            padding: 30px 20px;
+        }
+
+        .auth-title {
+            font-size: 24px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const button = form.querySelector('button[type="submit"]');
+    const buttonText = button.querySelector('.button-text');
+    const buttonLoader = button.querySelector('.button-loader');
+    const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+    const passwordInputs = form.querySelectorAll('input[type="password"]');
+    const password1Input = form.querySelector('input[name="password1"]');
+    const strengthMeter = document.querySelector('.password-strength-meter');
+    const requirements = {
+        length: str => str.length >= 8,
+        uppercase: str => /[A-Z]/.test(str),
+        number: str => /[0-9]/.test(str),
+        special: str => /[^A-Za-z0-9]/.test(str)
+    };
+
+    // Toggle password visibility
+    togglePasswordButtons.forEach((toggle, index) => {
+        toggle.addEventListener('click', function() {
+            const input = passwordInputs[index];
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    });
+
+    // Password strength checker
+    if (password1Input) {
+        password1Input.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            let validRequirements = 0;
+
+            // Update requirement indicators
+            Object.entries(requirements).forEach(([key, validator]) => {
+                const requirement = document.querySelector(`[data-requirement="${key}"]`);
+                const isValid = validator(password);
+                requirement.classList.toggle('valid', isValid);
+                requirement.classList.toggle('invalid', !isValid);
+                if (isValid) validRequirements++;
+            });
+
+            // Update strength meter
+            strengthMeter.className = 'password-strength-meter';
+            if (validRequirements === 4) strengthMeter.classList.add('strength-strong');
+            else if (validRequirements >= 2) strengthMeter.classList.add('strength-medium');
+            else if (validRequirements >= 1) strengthMeter.classList.add('strength-weak');
+        });
+    }
+
+    // Form submission animation
+    form.addEventListener('submit', function(e) {
+        buttonText.style.opacity = '0';
+        buttonLoader.style.display = 'block';
+        button.disabled = true;
+    });
+
+    // Input focus effects
+    const inputs = document.querySelectorAll('.auth-form input:not([type="checkbox"])');
+    inputs.forEach(input => {
+        const field = input.closest('.form-floating');
+        if (field) {
+            input.addEventListener('focus', () => field.classList.add('focused'));
+            input.addEventListener('blur', () => {
+                if (!input.value) field.classList.remove('focused');
+            });
+            if (input.value) field.classList.add('focused');
+        }
+    });
+
+    // Alert auto-dismiss
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.classList.remove('show');
+            setTimeout(() => alert.remove(), 300);
+        }, 5000);
+    });
+});
+</script>
+{% endblock %}

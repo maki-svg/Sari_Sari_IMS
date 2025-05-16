@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="32" height="32" rx="6" fill="#4A90E2"/>
+    
+    <!-- Store Icon -->
+    <path d="M8 14V22H24V14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <path d="M6 14L10 8H22L26 14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    
+    <!-- Sync Arrow -->
+    <path d="M13 16C13 15 15 14 16 14C17 14 19 15 19 16" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M19 19C19 20 17 21 16 21C15 21 13 20 13 19" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+</svg> 

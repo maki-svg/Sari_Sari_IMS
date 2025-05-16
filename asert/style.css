@@ -1,0 +1,83 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+nav {
+    background-color: #555;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin: 0 10px;
+    border-radius: 5px;
+}
+nav a:hover {
+    background-color: #777;
+}
+nav a.active {
+    background-color: #04AA6D;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    height: 100vh;
+}
+.sidebar {
+    width: 250px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    position: fixed;
+    height: 100%;
+}
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: block;
+}
+.sidebar a:hover {
+    background-color: #555;
+}
+.sidebar a.active {
+    background-color: #04AA6D;
+}
+.sidebar .user-info {
+    margin-top: auto;
+    text-align: center;
+}
+.main {
+    margin-left: 260px;
+    padding: 20px;
+    flex: 1;
+}
+.btn {
+    cursor: pointer;
+    background-color: #04AA6D;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    width: 100%;
+}
+.btn:hover {
+    background-color: #028c54;
+}

@@ -1,0 +1,994 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_head %}
+<!-- Add jsPDF and autotable plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+    window.jsPDF = window.jspdf.jsPDF;
+</script>
+<style>
+    /* Glassmorphism effect for modern UI */
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Enhanced animations */
+    @keyframes slideIn {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .animate-slide-in {
+        animation: slideIn 0.6s ease-out forwards;
+    }
+
+    .animate-pulse:hover {
+        animation: pulse 0.8s ease infinite;
+    }
+
+    /* Enhanced button styles */
+    .btn-modern {
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+
+    .btn-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s ease;
+        z-index: -1;
+    }
+
+    .btn-modern:hover::before {
+        left: 100%;
+    }
+
+    /* Highlight animation for stock updates */
+    @keyframes highlightUpdate {
+        0% { background-color: rgba(4, 170, 109, 0.3); }
+        100% { background-color: transparent; }
+    }
+
+    .highlight-update {
+        animation: highlightUpdate 2s ease-out;
+    }
+
+    /* Toast styling */
+    .toast-container {
+        z-index: 1060;
+    }
+
+    .toast {
+        opacity: 0.9;
+    }
+
+    .toast:hover {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<style>
+    /* Base styles */
+    :root {
+        --primary-color: #04AA6D;
+        --primary-hover: #028c54;
+        --secondary-color: #333;
+        --light-gray: #f9f9f9;
+        --white: #fff;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+    }
+
+    /* Enhanced chart cards with glassmorphism */
+    .chart-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+        margin-bottom: 24px;
+        height: 100%;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .chart-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 320px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .stats-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-info {
+        flex: 1;
+    }
+
+    .stats-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0;
+    }
+
+    .stats-value {
+        color: #2c3e50;
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .progress {
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+
+    .progress-bar {
+        transition: width 1s ease;
+    }
+
+    /* Animation for stats cards */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slide-in {
+        animation: slideUp 0.6s ease forwards;
+    }
+
+    .col-md-4:nth-child(1) .animate-slide-in { animation-delay: 0.1s; }
+    .col-md-4:nth-child(2) .animate-slide-in { animation-delay: 0.2s; }
+    .col-md-4:nth-child(3) .animate-slide-in { animation-delay: 0.3s; }
+
+    /* Enhanced table styles */
+    .table-responsive {
+        margin-top: 1.5rem;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background: linear-gradient(135deg, var(--secondary-color), #222);
+        color: var(--white);
+        padding: 1.2rem;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody tr {
+        transition: all 0.4s ease;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(4, 170, 109, 0.05);
+        transform: translateX(5px);
+    }
+
+    /* Enhanced button styles */
+    .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+        border-radius: 12px;
+        padding: 0.8rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        color: var(--white);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(4, 170, 109, 0.3);
+    }
+
+    /* Enhanced report section */
+    .report-section {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.4s ease;
+    }
+
+    .report-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .date-range-picker {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .date-range-picker input {
+        border: 2px solid var(--light-gray);
+        border-radius: 12px;
+        padding: 0.8rem;
+        transition: all 0.3s ease;
+    }
+
+    .date-range-picker input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.2);
+        outline: none;
+    }
+
+    .generate-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+        color: var(--white);
+        padding: 0.8rem 1.8rem;
+        border-radius: 12px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-weight: 600;
+        transition: all 0.4s ease;
+    }
+
+    .generate-btn:hover {
+        background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(4, 170, 109, 0.3);
+    }
+
+    /* Enhanced page header */
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-color), #025B3A);
+        padding: 2.5rem;
+        border-radius: 20px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+        animation: rotate 15s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .page-title {
+        color: var(--white);
+        margin: 0;
+        font-size: 2.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-title i {
+        font-size: 2.2rem;
+        transition: transform 0.4s ease;
+    }
+
+    .page-header:hover .page-title i {
+        transform: rotate(360deg) scale(1.1);
+    }
+</style>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<div class="container-fluid py-5">
+    <!-- Enhanced Dashboard Overview -->
+    <div class="page-header glass-effect animate-slide-in">
+        <h2 class="page-title">
+            <i class="fas fa-chart-line"></i>
+            Dashboard Overview
+        </h2>
+    </div>
+
+    <!-- Date Range Selector -->
+    <div class="report-section glass-effect animate-slide-in" style="animation-delay: 0.2s;">
+        <div class="date-range-picker">
+            <input type="date" id="startDate" value="{{ today|date:'Y-m-d' }}" aria-label="Start Date">
+            <input type="date" id="endDate" value="{{ today|date:'Y-m-d' }}" aria-label="End Date">
+            <button class="generate-btn btn-modern" id="generateReport">
+                <i class="fas fa-file-pdf"></i> Generate Report
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Container -->
+    <div class="row g-4 mb-4">
+        <!-- Total Sales Card -->
+        <div class="col-md-4">
+            <div class="stats-card glass-effect animate-slide-in">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="stats-icon me-3">
+                        <i class="fas fa-coins fa-2x text-success"></i>
+                    </div>
+                    <div class="stats-info">
+                        <h6 class="stats-label mb-1">Total Sales</h6>
+                        <h3 class="stats-value mb-0">₱{{ total_sales|floatformat:2 }}</h3>
+                    </div>
+                </div>
+                <div class="progress" style="height: 4px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Card -->
+        <div class="col-md-4">
+            <div class="stats-card glass-effect animate-slide-in">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="stats-icon me-3">
+                        <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+                    </div>
+                    <div class="stats-info">
+                        <h6 class="stats-label mb-1">Transactions</h6>
+                        <h3 class="stats-value mb-0">{{ total_transactions }}</h3>
+                    </div>
+                </div>
+                <div class="progress" style="height: 4px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items Sold Card -->
+        <div class="col-md-4">
+            <div class="stats-card glass-effect animate-slide-in">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="stats-icon me-3">
+                        <i class="fas fa-boxes fa-2x text-warning"></i>
+                    </div>
+                    <div class="stats-info">
+                        <h6 class="stats-label mb-1">Items Sold</h6>
+                        <h3 class="stats-value mb-0">{{ total_items_sold }}</h3>
+                    </div>
+                </div>
+                <div class="progress" style="height: 4px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row">
+        <div class="col-md-4 mb-4 animate-slide-in" style="animation-delay: 0.6s;">
+            <div class="chart-card glass-effect">
+                <div class="chart-header">
+                    <h5 class="mb-0">Product Categories</h5>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4 animate-slide-in" style="animation-delay: 0.7s;">
+            <div class="chart-card glass-effect">
+                <h5 class="mb-3">Sales Trend</h5>
+                <div class="chart-container">
+                    <canvas id="salesTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4 animate-slide-in" style="animation-delay: 0.8s;">
+            <div class="chart-card glass-effect">
+                <h5 class="mb-3">Borrower Status</h5>
+                <div class="chart-container">
+                    <canvas id="borrowerChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Alerts -->
+    <div class="alerts-section mb-4 animate-slide-in">
+        <div class="card glass-effect">
+            <div class="card-header bg-danger text-white d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <h5 class="mb-0">Low Stock Alerts</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if low_stock_items %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="px-4">PRODUCT</th>
+                                <th class="text-center">CURRENT STOCK</th>
+                                <th class="text-center">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in low_stock_items %}
+                            <tr data-product-id="{{ item.id }}">
+                                <td class="px-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="product-icon me-3">
+                                            <i class="fas fa-box text-secondary"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ item.name }}</h6>
+                                            <small class="text-muted">{{ item.get_category_display }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-{{ item.stock|yesno:'warning,danger' }} rounded-pill stock-value">
+                                        {{ item.stock }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{% url 'dashboard-inventory-update' item.id %}" 
+                                       class="btn btn-success btn-sm">
+                                        <i class="fas fa-plus me-1"></i> Restock
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center">
+                    <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                    <h5>No Low Stock Items</h5>
+                    <p class="text-muted mb-0">All products have sufficient stock levels.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize chart data with proper JSON parsing
+    const chartData = {
+        categories: {
+            labels: JSON.parse('{{ category_labels|escapejs }}'),
+            data: JSON.parse('{{ category_counts|escapejs }}')
+        },
+        sales: {
+            labels: JSON.parse('{{ sales_dates|escapejs }}'),
+            data: JSON.parse('{{ sales_amounts|escapejs }}')
+        },
+        borrowers: {
+            data: [
+                parseInt('{{ borrower_active_count|default:0|escapejs }}'),
+                parseInt('{{ borrower_paid_count|default:0|escapejs }}'),
+                parseInt('{{ borrower_overdue_count|default:0|escapejs }}')
+            ]
+        }
+    };
+
+    // Enhanced Chart.js animations and options
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                    boxWidth: 12,
+                    font: {
+                        size: 11,
+                        weight: '600'
+                    }
+                }
+            },
+            tooltip: {
+                enabled: true,
+                mode: 'index',
+                intersect: false,
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += '₱' + context.parsed.y.toLocaleString();
+                        }
+                        return label;
+                    }
+                }
+            }
+        },
+        animation: {
+            duration: 1000,
+            easing: 'easeInOutQuart'
+        }
+    };
+
+    // Category Chart with improved styling
+    const categoryChart = document.getElementById('categoryChart');
+    if (categoryChart) {
+        const catChart = new Chart(categoryChart, {
+            type: 'doughnut',
+            data: {
+                labels: chartData.categories.labels,
+                datasets: [{
+                    data: chartData.categories.data,
+                    backgroundColor: [
+                        'rgba(4, 170, 109, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(13, 110, 253, 0.8)',
+                        'rgba(220, 53, 69, 0.8)',
+                        'rgba(108, 117, 125, 0.8)'
+                    ],
+                    borderWidth: 2,
+                    borderColor: 'white',
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                ...chartOptions,
+                cutout: '70%',
+                plugins: {
+                    ...chartOptions.plugins,
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total ? Math.round((value / total) * 100) : 0;
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Sales Trend Chart with improved styling
+    const salesChart = document.getElementById('salesTrendChart');
+    if (salesChart) {
+        const sChart = new Chart(salesChart, {
+            type: 'line',
+            data: {
+                labels: chartData.sales.labels,
+                datasets: [{
+                    label: 'Sales',
+                    data: chartData.sales.data,
+                    borderColor: 'rgba(4, 170, 109, 1)',
+                    backgroundColor: 'rgba(4, 170, 109, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: 'white',
+                    pointBorderColor: 'rgba(4, 170, 109, 1)',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                ...chartOptions,
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₱' + value.toLocaleString();
+                            }
+                        },
+                        min: 0,
+                        suggestedMax: Math.max(...chartData.sales.data) * 1.1
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    // Borrower Status Chart with improved styling
+    const borrowerChart = document.getElementById('borrowerChart');
+    if (borrowerChart) {
+        const bChart = new Chart(borrowerChart, {
+            type: 'doughnut',
+            data: {
+                labels: ['Active', 'Paid', 'Overdue'],
+                datasets: [{
+                    data: chartData.borrowers.data,
+                    backgroundColor: [
+                        'rgba(13, 110, 253, 0.8)',
+                        'rgba(4, 170, 109, 0.8)',
+                        'rgba(220, 53, 69, 0.8)'
+                    ],
+                    borderWidth: 2,
+                    borderColor: 'white',
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                ...chartOptions,
+                cutout: '70%',
+                plugins: {
+                    ...chartOptions.plugins,
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total ? Math.round((value / total) * 100) : 0;
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Format currency in stats cards
+    document.querySelectorAll('.stats-value').forEach(stat => {
+        if (stat.textContent.startsWith('₱')) {
+            const value = parseFloat(stat.textContent.replace('₱', ''));
+            stat.textContent = '₱' + value.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+    });
+
+    // Real-time chart data update simulation
+    function simulateChartUpdate(chart, dataKey) {
+        setInterval(() => {
+            if (chart && chart.chart) {
+                const newData = chartData[dataKey].data.map(val => 
+                    Math.max(0, val + (Math.random() - 0.5) * 10)
+                );
+                chart.chart.data.datasets[0].data = newData;
+                chart.chart.update();
+            }
+        }, 5000);
+    }
+
+    simulateChartUpdate(categoryChart, 'categories');
+    simulateChartUpdate(salesChart, 'sales');
+    simulateChartUpdate(borrowerChart, 'borrowers');
+
+    // Report Generation with Enhanced Feedback
+    document.getElementById('generateReport').addEventListener('click', async function() {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        try {
+            loadingOverlay.style.display = 'flex';
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) throw new Error('PDF generation library not loaded');
+
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            // Enhanced header
+            doc.setFillColor(4, 170, 109);
+            doc.rect(0, 0, 210, 50, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(32);
+            doc.setTextColor(255, 255, 255);
+            doc.text('SariSync Dashboard', 105, 25, { align: 'center' });
+
+            doc.setFontSize(16);
+            doc.text('Performance Report', 105, 35, { align: 'center' });
+
+            // Timestamp
+            doc.setFontSize(10);
+            doc.setTextColor(220, 220, 220);
+            const timestamp = new Date().toLocaleString('en-US', { 
+                dateStyle: 'full', 
+                timeStyle: 'short' 
+            });
+            doc.text(`Generated: ${timestamp}`, 105, 45, { align: 'center' });
+
+            // Summary
+            const stats = document.querySelectorAll('.stats-value');
+            const totalSales = stats[0].textContent;
+            const totalTransactions = stats[1].textContent;
+            const totalItems = stats[2].textContent;
+
+            doc.setDrawColor(4, 170, 109);
+            doc.setFillColor(240, 255, 244);
+            doc.roundedRect(15, 55, 180, 35, 5, 5, 'FD');
+            doc.setTextColor(4, 170, 109);
+            doc.setFontSize(16);
+            doc.text('Summary', 25, 65);
+            doc.setTextColor(51, 51, 51);
+            doc.setFontSize(12);
+            doc.text([
+                `Total Sales: ${totalSales}`,
+                `Total Transactions: ${totalTransactions}`,
+                `Total Items Sold: ${totalItems}`
+            ], 25, 75, { lineHeightFactor: 1.6 });
+
+            // Charts
+            const charts = [
+                { name: 'Category Distribution', canvas: document.getElementById('categoryChart') },
+                { name: 'Sales Trend', canvas: document.getElementById('salesTrendChart') },
+                { name: 'Borrower Status', canvas: document.getElementById('borrowerChart') }
+            ];
+
+            let yPos = 100;
+            for (const chart of charts) {
+                if (chart.canvas) {
+                    doc.setFontSize(14);
+                    doc.setTextColor(4, 170, 109);
+                    doc.text(chart.name, 105, yPos, { align: 'center' });
+                    const imgData = chart.canvas.toDataURL('image/png', 1.0);
+                    doc.addImage(imgData, 'PNG', 15, yPos + 10, 180, 80);
+                    yPos += 100;
+                    if (yPos > 240 && charts.indexOf(chart) < charts.length - 1) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                }
+            }
+
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            doc.setFontSize(8);
+            doc.setTextColor(128, 128, 128);
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+            }
+
+            // Save PDF
+            const date = new Date();
+            const dateStr = date.toISOString().split('T')[0];
+            const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, '-');
+            const fileName = `SariSync-Dashboard-${dateStr}-${timeStr}.pdf`;
+            doc.save(fileName);
+
+        } catch (error) {
+            console.error('Error generating report:', error);
+            alert(`Error generating report: ${error.message}`);
+        } finally {
+            loadingOverlay.style.display = 'none';
+        }
+    });
+
+    // Enhanced chart interactions
+    document.querySelectorAll('.chart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const chartId = this.dataset.chart;
+            const chart = document.getElementById(`${chartId}Chart`);
+            if (this.title === 'Download PNG') {
+                const link = document.createElement('a');
+                link.download = `${chartId}-chart.png`;
+                link.href = chart.toBase64Image();
+                link.click();
+            } else if (this.title === 'View Fullscreen') {
+                const container = chart.parentElement;
+                if (!document.fullscreenElement) {
+                    container.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        });
+    });
+
+    // Add tooltips for buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = this.title || this.textContent;
+            tooltip.style.position = 'absolute';
+            tooltip.style.background = 'rgba(0, 0, 0, 0.8)';
+            tooltip.style.color = 'white';
+            tooltip.style.padding = '5px 10px';
+            tooltip.style.borderRadius = '6px';
+            tooltip.style.fontSize = '12px';
+            tooltip.style.zIndex = '1000';
+            document.body.appendChild(tooltip);
+
+            const rect = this.getBoundingClientRect();
+            tooltip.style.top = `${rect.top - 30}px`;
+            tooltip.style.left = `${rect.left + rect.width / 2}px`;
+            tooltip.style.transform = 'translateX(-50%)';
+        });
+
+        btn.addEventListener('mouseleave', function() {
+            document.querySelectorAll('.tooltip').forEach(t => t.remove());
+        });
+    });
+
+    // Add scroll animation
+    window.addEventListener('scroll', () => {
+        const elements = document.querySelectorAll('.animate-slide-in');
+        elements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight * 0.8) {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }
+        });
+    });
+
+    // Handle restock calculations
+    document.querySelectorAll('.restock-form').forEach(form => {
+        const productId = form.closest('.modal').id.replace('restockModal', '');
+        const currentStockInput = document.getElementById(`currentStock${productId}`);
+        const addStockInput = document.getElementById(`addStock${productId}`);
+        const newTotalInput = document.getElementById(`newTotal${productId}`);
+        const submitBtn = form.querySelector('.restock-submit-btn');
+
+        // Calculate new total when add stock value changes
+        addStockInput.addEventListener('input', function() {
+            const currentStock = parseInt(currentStockInput.value) || 0;
+            const addStock = parseInt(this.value) || 0;
+            newTotalInput.value = currentStock + addStock;
+        });
+
+        // Form submission handling
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const url = this.getAttribute('action');
+
+            // Disable submit button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message using Bootstrap toast
+                    const toastContainer = document.createElement('div');
+                    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                    toastContainer.innerHTML = `
+                        <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    Stock updated successfully!
+                                </div>
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(toastContainer);
+                    
+                    const toast = new bootstrap.Toast(toastContainer.querySelector('.toast'));
+                    toast.show();
+
+                    // Update the stock display in the table
+                    const stockCell = document.querySelector(`tr[data-product-id="${productId}"] .stock-value`);
+                    if (stockCell) {
+                        stockCell.textContent = data.new_stock;
+                        stockCell.classList.add('highlight-update');
+                        setTimeout(() => stockCell.classList.remove('highlight-update'), 2000);
+                    }
+                    
+                    // Close modal and reset form
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(`restockModal${productId}`));
+                    modal.hide();
+                    this.reset();
+                } else {
+                    // Show error message
+                    alert(data.error || 'Error updating stock');
+                }
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check me-1"></i> Confirm Restock';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating stock');
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check me-1"></i> Confirm Restock';
+            });
+        });
+    });
+});
+</script>
+{% endblock content %}

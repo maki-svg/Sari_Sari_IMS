@@ -1,0 +1,273 @@
+{% extends 'partials/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Login | SariSync{% endblock %}
+
+{% block extra_style %}
+<style>
+    .modern-auth-wrapper {
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        background: #ffffff;
+    }
+
+    .auth-left {
+        flex: 1;
+        background: linear-gradient(135deg, #04AA6D 0%, #038c54 100%);
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-brand {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .auth-logo {
+        width: 80px;
+        height: 80px;
+        filter: brightness(0) invert(1);
+    }
+
+    .auth-brand h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .auth-brand p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-top: 8px;
+    }
+
+    .auth-illustration {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .auth-illustration img {
+        max-width: 80%;
+        height: auto;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .auth-right {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        background: #f8fafc;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 420px;
+        padding: 40px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .auth-title {
+        color: #1a202c;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .auth-subtitle {
+        color: #718096;
+        font-size: 16px;
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .auth-form input:not([type="checkbox"]) {
+        width: 100%;
+        padding: 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+
+    .auth-form input:focus {
+        border-color: #04AA6D;
+        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.1);
+        outline: none;
+        background: white;
+    }
+
+    .auth-button {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 12px;
+        background: #04AA6D;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        margin-bottom: 16px;
+    }
+
+    .auth-button:hover {
+        background: #038c54;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(4, 170, 109, 0.2);
+        color: white;
+        text-decoration: none;
+    }
+
+    .auth-button.secondary {
+        background: transparent;
+        border: 2px solid #04AA6D;
+        color: #04AA6D;
+    }
+
+    .auth-button.secondary:hover {
+        background: rgba(4, 170, 109, 0.1);
+        color: #038c54;
+    }
+
+    .auth-separator {
+        text-align: center;
+        margin: 24px 0;
+        position: relative;
+    }
+
+    .auth-separator::before,
+    .auth-separator::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 45%;
+        height: 1px;
+        background: #e2e8f0;
+    }
+
+    .auth-separator::before {
+        left: 0;
+    }
+
+    .auth-separator::after {
+        right: 0;
+    }
+
+    .auth-separator span {
+        background: white;
+        padding: 0 10px;
+        color: #718096;
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .modern-auth-wrapper {
+            flex-direction: column;
+        }
+
+        .auth-left {
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .auth-right {
+            padding: 20px;
+        }
+
+        .auth-card {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="modern-auth-wrapper">
+    <div class="auth-left">
+        <div class="auth-brand">
+            <img src="{% static 'images/logo.svg' %}" alt="SariSync Logo" class="auth-logo">
+            <h1>SariSync</h1>
+            <p>Smart Inventory Management for Sari-Sari Stores</p>
+        </div>
+        <div class="auth-illustration">
+            <img src="{% static 'images/inventory-illustration.svg' %}" alt="Inventory Management" onerror="this.style.display='none'">
+        </div>
+    </div>
+    <div class="auth-right">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2 class="auth-title">Welcome Back! 👋</h2>
+                <p class="auth-subtitle">Sign in to continue to your dashboard</p>
+            </div>
+            
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <form method="POST" class="auth-form" id="loginForm">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="auth-button">
+                    <span class="button-text">Sign In</span>
+                    <div class="button-loader"></div>
+                </button>
+
+                <div class="auth-separator">
+                    <span>Don't have an account?</span>
+                </div>
+
+                <a href="{% url 'user-register' %}" class="auth-button secondary">
+                    Create Account
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

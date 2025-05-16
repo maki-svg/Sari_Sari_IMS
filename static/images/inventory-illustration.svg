@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Elements -->
+    <circle cx="300" cy="200" r="180" fill="#E3F2FD" opacity="0.5"/>
+    <circle cx="300" cy="200" r="150" fill="#BBDEFB" opacity="0.3"/>
+    
+    <!-- Store Building -->
+    <path d="M150 150L200 100H400L450 150" stroke="#04AA6D" stroke-width="8" stroke-linecap="round"/>
+    <path d="M150 150V350H450V150" stroke="#04AA6D" stroke-width="8" stroke-linecap="round"/>
+    
+    <!-- Door -->
+    <path d="M275 250V350H325V250" stroke="#04AA6D" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="315" cy="300" r="4" fill="#04AA6D"/>
+    
+    <!-- Windows -->
+    <rect x="175" y="175" width="50" height="50" rx="5" stroke="#04AA6D" stroke-width="4"/>
+    <rect x="375" y="175" width="50" height="50" rx="5" stroke="#04AA6D" stroke-width="4"/>
+    
+    <!-- Shelves with Items -->
+    <g transform="translate(200, 150)">
+        <!-- Shelf 1 -->
+        <rect x="0" y="0" width="200" height="30" fill="#04AA6D" opacity="0.2"/>
+        <rect x="20" y="5" width="20" height="20" fill="#04AA6D"/>
+        <rect x="60" y="5" width="20" height="20" fill="#04AA6D"/>
+        <rect x="100" y="5" width="20" height="20" fill="#04AA6D"/>
+        
+        <!-- Shelf 2 -->
+        <rect x="0" y="50" width="200" height="30" fill="#04AA6D" opacity="0.2"/>
+        <rect x="40" y="55" width="20" height="20" fill="#04AA6D"/>
+        <rect x="80" y="55" width="20" height="20" fill="#04AA6D"/>
+        <rect x="120" y="55" width="20" height="20" fill="#04AA6D"/>
+    </g>
+    
+    <!-- Shopping Cart -->
+    <g transform="translate(450, 300)">
+        <path d="M-30 0L0 0L10 -40L-20 -40Z" fill="#04AA6D" opacity="0.5"/>
+        <circle cx="-25" cy="5" r="5" fill="#04AA6D"/>
+        <circle cx="-5" cy="5" r="5" fill="#04AA6D"/>
+    </g>
+    
+    <!-- Decorative Elements -->
+    <circle cx="100" cy="100" r="10" fill="#04AA6D" opacity="0.2"/>
+    <circle cx="500" cy="100" r="15" fill="#04AA6D" opacity="0.2"/>
+    <circle cx="150" cy="300" r="12" fill="#04AA6D" opacity="0.2"/>
+    <circle cx="450" cy="250" r="8" fill="#04AA6D" opacity="0.2"/>
+</svg> 

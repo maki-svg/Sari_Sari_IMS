@@ -1,0 +1,154 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            <i class="fas fa-clipboard-check"></i>
+            <span>Inventory Audit</span>
+        </h1>
+        <div class="inventory-stats">
+            <div class="stat-item">
+                <i class="fas fa-box"></i>
+                <span>Total Products: {{ products.count }}</span>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Pending Audits: {{ pending_audits.count }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Audit Form -->
+        <div class="col-md-6">
+            <div class="card glass-effect mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>New Audit</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="auditForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="product" class="form-label">Select Product</label>
+                            <select name="product" id="product" class="form-control" required>
+                                <option value="">Choose a product...</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}" data-current-stock="{{ product.stock }}">
+                                    {{ product.name }} (Current Stock: {{ product.stock }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="physical_count" class="form-label">Physical Count</label>
+                            <input type="number" name="physical_count" id="physical_count" 
+                                   class="form-control" required min="0">
+                            <div id="stockDifference" class="form-text text-muted mt-2"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea name="notes" id="notes" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="adjust_immediately" id="adjust_immediately" 
+                                       class="form-check-input">
+                                <label class="form-check-label" for="adjust_immediately">
+                                    Adjust inventory immediately
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Record Audit
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Audits -->
+        <div class="col-md-6">
+            <div class="card glass-effect">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Pending Audits</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_audits %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>System Count</th>
+                                    <th>Physical Count</th>
+                                    <th>Discrepancy</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for audit in pending_audits %}
+                                <tr>
+                                    <td>{{ audit.product.name }}</td>
+                                    <td>{{ audit.system_count }}</td>
+                                    <td>{{ audit.physical_count }}</td>
+                                    <td class="{% if audit.discrepancy < 0 %}text-danger{% elif audit.discrepancy > 0 %}text-success{% endif %}">
+                                        {{ audit.discrepancy }}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'dashboard-resolve-audit' audit.id %}" 
+                                           class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i> Resolve
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-center mb-0">No pending audits</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productSelect = document.getElementById('product');
+    const physicalCount = document.getElementById('physical_count');
+    const stockDifference = document.getElementById('stockDifference');
+
+    function updateStockDifference() {
+        const selectedOption = productSelect.selectedOptions[0];
+        if (selectedOption && physicalCount.value) {
+            const currentStock = parseInt(selectedOption.dataset.currentStock);
+            const newStock = parseInt(physicalCount.value);
+            const difference = newStock - currentStock;
+
+            let message = `Difference: ${difference} `;
+            if (difference < 0) {
+                message += `(Shortage)`;
+                stockDifference.className = 'form-text text-danger mt-2';
+            } else if (difference > 0) {
+                message += `(Surplus)`;
+                stockDifference.className = 'form-text text-success mt-2';
+            } else {
+                message += `(No discrepancy)`;
+                stockDifference.className = 'form-text text-muted mt-2';
+            }
+            stockDifference.textContent = message;
+        } else {
+            stockDifference.textContent = '';
+        }
+    }
+
+    productSelect.addEventListener('change', updateStockDifference);
+    physicalCount.addEventListener('input', updateStockDifference);
+});
+</script>
+{% endblock %} 

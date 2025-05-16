@@ -1,0 +1,255 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}Audit History{% endblock %}
+
+{% block content %}
+<style>
+    .audit-header {
+        background: linear-gradient(135deg, #04AA6D 0%, #025B3A 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        color: white;
+    }
+
+    .filter-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #04AA6D;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .download-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: white;
+    }
+
+    .download-btn.excel {
+        background-color: #217346;
+    }
+
+    .download-btn.csv {
+        background-color: #ff6b6b;
+    }
+
+    .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        color: white;
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .discrepancy-positive {
+        color: #28a745;
+    }
+
+    .discrepancy-negative {
+        color: #dc3545;
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+
+    .badge-success {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .badge-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="audit-header">
+        <h2 class="mb-4">
+            <i class="fas fa-history me-2"></i>
+            Audit History
+        </h2>
+        
+        <div class="filter-section">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-2"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_audits }}</div>
+                <div class="stat-label">Total Audits</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ total_discrepancies.total|default:0 }}</div>
+                <div class="stat-label">Net Discrepancy</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ total_discrepancies.absolute_total|default:0 }}</div>
+                <div class="stat-label">Total Absolute Discrepancy</div>
+            </div>
+        </div>
+
+        <div class="download-buttons">
+            <a href="{% url 'dashboard-audit-download-excel' %}{% if start_date and end_date %}?start_date={{ start_date }}&end_date={{ end_date }}{% endif %}" 
+               class="download-btn excel">
+                <i class="fas fa-file-excel"></i>
+                Download Excel
+            </a>
+            <a href="{% url 'dashboard-audit-download-csv' %}{% if start_date and end_date %}?start_date={{ start_date }}&end_date={{ end_date }}{% endif %}" 
+               class="download-btn csv">
+                <i class="fas fa-file-csv"></i>
+                Download CSV
+            </a>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>System Count</th>
+                        <th>Physical Count</th>
+                        <th>Discrepancy</th>
+                        <th>Status</th>
+                        <th>Conducted By</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for audit in audits %}
+                    <tr>
+                        <td>{{ audit.audit_date|date:"Y-m-d H:i" }}</td>
+                        <td>{{ audit.product.name }}</td>
+                        <td>{{ audit.system_count }}</td>
+                        <td>{{ audit.physical_count }}</td>
+                        <td class="{% if audit.discrepancy > 0 %}discrepancy-positive{% elif audit.discrepancy < 0 %}discrepancy-negative{% endif %}">
+                            {{ audit.discrepancy }}
+                        </td>
+                        <td>
+                            {% if audit.adjusted %}
+                            <span class="badge badge-success">Adjusted</span>
+                            {% else %}
+                            <span class="badge badge-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ audit.conducted_by.username }}</td>
+                        <td>
+                            {% if audit.notes %}
+                            <button type="button" class="btn btn-sm btn-info" 
+                                    data-bs-toggle="tooltip" data-bs-placement="top" 
+                                    title="{{ audit.notes }}">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <i class="fas fa-clipboard-list fa-2x mb-3 text-muted"></i>
+                            <p class="mb-0">No audit records found for the selected period.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    // Add animation to download buttons
+    const downloadButtons = document.querySelectorAll('.download-btn');
+    downloadButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'translateY(-2px)';
+            }, 100);
+        });
+    });
+});
+</script>
+{% endblock %} 

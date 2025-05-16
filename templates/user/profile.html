@@ -1,0 +1,88 @@
+{% extends 'partials/base.html' %}
+{% block title %} Profile Page {% endblock %}
+
+{% block content %}
+    <style>
+        /* Make Container Bigger & Add Background */
+        .container {
+            max-width: 1000px; /* Wider layout */
+            width: 100%;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef); /* Soft gradient background */
+            padding: 50px 0;
+        }
+
+        /* Profile Card - Bigger & Centered */
+        .profile-card {
+            max-width: 600px; /* Increased from 500px to 600px */
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .profile-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Profile Image - Centered & Interactive */
+        .profile-img-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .profile-img {
+            width: 120px; /* Reduced size for the image */
+            height: 120px; /* Reduced size for the image */
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #028c54;
+            transition: transform 0.3s ease-in-out, border 0.3s ease-in-out;
+        }
+
+        .profile-img:hover {
+            transform: scale(1.05);
+            border-color: #026b43;
+        }
+
+        /* Edit Button - Stylish & Interactive */
+        .edit-btn {
+            background: #028c54;
+            color: white;
+            border: 2px solid #026b43;
+            border-radius: 8px;
+            padding: 14px 24px;
+            font-size: 18px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .edit-btn:hover {
+            background: #026b43;
+            border-color: #024c30;
+            transform: scale(1.05);
+        }
+    </style>
+
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow-lg p-5 text-center profile-card">
+            <div class="profile-header">
+                <h3 class="text-primary fw-bold">{{ user.username }}'s Profile</h3>
+                <div class="profile-img-container">
+                    <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle profile-img">
+                </div>
+            </div>
+            <div class="profile-details mt-4 text-left">
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Address:</strong> {{ user.profile.address }}</p>
+                <p><strong>Bio:</strong> {{ user.profile.bio }}</p>
+            </div>
+            
+            <!-- Edit Profile Button -->
+            <a href="{% url 'user-profile-update' %}" class="btn edit-btn mt-4">Edit Profile</a>
+        </div>
+    </div>
+{% endblock %}

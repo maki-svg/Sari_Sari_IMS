@@ -1,0 +1,129 @@
+{% extends 'partials/base.html' %}
+{% block title %} Update Profile {% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <style>
+        /* Make Container Bigger & Add Background */
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            padding: 50px 0;
+        }
+
+        /* Profile Card - Bigger & Centered */
+        .profile-card {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .profile-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Profile Image - Centered & Interactive */
+        .profile-img-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #028c54;
+            transition: transform 0.3s ease-in-out, border 0.3s ease-in-out;
+        }
+
+        .profile-img:hover {
+            transform: scale(1.05);
+            border-color: #026b43;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-control {
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #028c54;
+            transition: border 0.3s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: #026b43;
+            box-shadow: 0 0 5px rgba(2, 140, 84, 0.5);
+        }
+
+        /* File Upload Styling */
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid #028c54;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: border 0.3s ease-in-out;
+        }
+
+        input[type="file"]:hover {
+            border-color: #026b43;
+        }
+
+        /* Save Button */
+        .save-btn {
+            background: #028c54;
+            color: white;
+            border: 2px solid #026b43;
+            border-radius: 8px;
+            padding: 14px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .save-btn:hover {
+            background: #026b43;
+            border-color: #024c30;
+            transform: scale(1.05);
+        }
+    </style>
+
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow-lg p-5 text-center profile-card">
+            <div class="profile-header">
+                <h3 class="text-primary fw-bold">Update Your Profile</h3>
+                <div class="profile-img-container">
+                    <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle profile-img">
+                </div>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ user_form|crispy }}
+                {{ profile_form|crispy }}
+                <button type="submit" class="btn save-btn mt-4">Save Changes</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
