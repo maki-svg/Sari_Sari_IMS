@@ -14,6 +14,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 import logging
 from django.core.validators import validate_email
+from cloudinary.models import CloudinaryField
 
 logger = logging.getLogger(__name__)
 class Product(models.Model):
@@ -162,8 +163,9 @@ class Borrower(models.Model):
         )
     ])
     address = models.TextField()
-    signature = models.ImageField(
-        upload_to='signatures/',
+    signature = CloudinaryField(
+        'signature',
+        folder='signatures',
         null=True,
         blank=True,
         help_text="Upload borrower's signature (optional)"
