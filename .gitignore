@@ -49,4 +49,9 @@ Thumbs.db
 debug.log
 email_log.txt
 status_log.txt
-*.bat 
+*.bat
+
+# Environment variables
+.env
+.env.local
+.env.*.local 
