@@ -91,7 +91,7 @@ class Product(models.Model):
         self.save()
 
 class Sale(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales', null=True)  # Make nullable initially
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales')  # Make user required
     product = models.ForeignKey(
         'Product',
         on_delete=models.PROTECT,
@@ -116,6 +116,13 @@ class Sale(models.Model):
         related_name='sales_recorded'
     )
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['date']),
+            models.Index(fields=['user']),
+            models.Index(fields=['product']),
+        ]
+
     def save(self, *args, **kwargs):
         """Handle stock updates and timezone awareness"""
         if not self.date:
@@ -125,6 +132,10 @@ class Sale(models.Model):
 
         if not self.pk:  # New sale
             with transaction.atomic():
+                # Ensure product belongs to the same user
+                if self.product.user != self.user:
+                    raise ValidationError("You can only sell your own products.")
+                    
                 product = Product.objects.select_for_update().get(pk=self.product.pk)
                 if product.stock < self.quantity:
                     raise ValidationError(f"Not enough stock. Only {product.stock} available.")

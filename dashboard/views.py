@@ -239,16 +239,22 @@ def sales_list(request):
         form = SaleForm(request.POST, user=request.user)
         if form.is_valid():
             try:
-                sale = form.save(commit=False)
-                sale.recorded_by = request.user
-                sale.date = timezone.now()
-                sale.save()
-                messages.success(request, f"Sale recorded successfully! Total: ₱{sale.total:.2f}")
-                return redirect('dashboard-sales')
+                with transaction.atomic():
+                    sale = form.save(commit=False)
+                    sale.user = request.user
+                    sale.recorded_by = request.user
+                    sale.date = timezone.now()
+                    sale.save()
+                    messages.success(request, f"Sale recorded successfully! Total: ₱{sale.total:.2f}")
+                    return redirect('dashboard-sales')
+            except ValidationError as e:
+                messages.error(request, str(e))
             except Exception as e:
                 messages.error(request, f"Error recording sale: {str(e)}")
         else:
-            messages.error(request, "Please correct the errors below.")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = SaleForm(user=request.user)
     
@@ -262,7 +268,7 @@ def sales_list(request):
         'total_sales': total_sales,
         'total_transactions': sales.count(),
         'total_items_sold': sales.aggregate(Sum('quantity'))['quantity__sum'] or 0,
-        'products': Product.objects.filter(stock__gt=0),
+        'products': Product.objects.filter(user=request.user, stock__gt=0),
         'form': form,
     }
     return render(request, 'dashboard/sales.html', context)

@@ -72,21 +72,39 @@ class SaleForm(forms.ModelForm):
     class Meta:
         model = Sale
         fields = ['product', 'quantity', 'buyer_name']
+        widgets = {
+            'product': forms.Select(attrs={
+                'class': 'form-control',
+                'required': True
+            }),
+            'quantity': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '1',
+                'required': True
+            }),
+            'buyer_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter buyer name (optional)'
+            })
+        }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         
-        # For editing, include the current product
+        if not self.user:
+            raise ValueError("User must be provided")
+            
+        # Filter products by current user and stock availability
         if self.instance.pk:
             self.fields['product'].queryset = Product.objects.filter(
-                Q(stock__gt=0) | Q(pk=self.instance.product.pk)
+                Q(user=self.user) & (Q(stock__gt=0) | Q(pk=self.instance.product.pk))
             )
-            # Make product field readonly for editing
-            self.fields['product'].widget.attrs['readonly'] = True
-            self.fields['product'].widget.attrs['disabled'] = True
         else:
-            self.fields['product'].queryset = Product.objects.filter(stock__gt=0)
+            self.fields['product'].queryset = Product.objects.filter(
+                user=self.user,
+                stock__gt=0
+            )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -95,6 +113,12 @@ class SaleForm(forms.ModelForm):
         
         if not product or not quantity:
             return cleaned_data
+
+        # Ensure product belongs to user
+        if product.user != self.user:
+            raise ValidationError({
+                'product': 'You can only sell your own products.'
+            })
 
         # For editing, consider the original quantity
         if self.instance.pk:
@@ -110,7 +134,17 @@ class SaleForm(forms.ModelForm):
                 raise ValidationError({
                     'quantity': f'Not enough stock. Only {available_stock} units available.'
                 })
-        else:  # Only for new sales
+        else:  # New sale
+            if quantity < 1:
+                raise ValidationError({
+                    'quantity': 'Quantity must be at least 1'
+                })
+            
+            if quantity > product.stock:
+                raise ValidationError({
+                    'quantity': f'Not enough stock. Only {product.stock} units available.'
+                })
+            
             cleaned_data['date'] = timezone.now()
         
         return cleaned_data
