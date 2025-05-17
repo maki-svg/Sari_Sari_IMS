@@ -136,30 +136,14 @@ def inventory(request):
     categories = Product.CATEGORY
     
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        form = ProductForm(request.POST, user=request.user)
         if form.is_valid():
             try:
-                product_name = form.cleaned_data['name'].strip()
-                # Double-check for existing product with same name for current user
-                if Product.objects.filter(user=request.user, name__iexact=product_name).exists():
-                    messages.error(request, f'A product with the name "{product_name}" already exists. Product names must be unique regardless of category.')
-                    return render(request, 'dashboard/inventory.html', {
-                        'items': items,
-                        'form': form,
-                        'categories': categories,
-                        'current_category': category,
-                        'search_query': query,
-                    })
-                
-                with transaction.atomic():
-                    product = form.save(commit=False)
-                    product.user = request.user  # Set the user
-                    product.name = product_name.title()  # Ensure consistent capitalization
-                    product.save()
-                    messages.success(request, 'Product added successfully!')
+                product = form.save(commit=False)
+                product.user = request.user  # Set the user
+                product.save()
+                messages.success(request, 'Product added successfully!')
                 return redirect('dashboard-inventory')
-            except ValidationError as e:
-                messages.error(request, str(e))
             except Exception as e:
                 messages.error(request, f'Error adding product: {str(e)}')
         else:
@@ -168,7 +152,7 @@ def inventory(request):
                 for error in errors:
                     messages.error(request, f'{error}')
     else:
-        form = ProductForm()
+        form = ProductForm(user=request.user)
         
     context = {
         'items': items,
@@ -207,71 +191,23 @@ def inventory_delete(request, pk):
 @login_required
 def inventory_update(request, pk):
     """Update product view"""
-    item = get_object_or_404(Product.objects.filter(is_deleted=False), id=pk)
+    item = get_object_or_404(Product, id=pk, user=request.user)
     
     if request.method == 'POST':
-        # Check if this is a restock action
-        if 'stock' in request.POST and not any(field for field in request.POST if field not in ['stock', 'csrfmiddlewaretoken']):
-            try:
-                with transaction.atomic():
-                    # Get the additional stock amount
-                    additional_stock = int(request.POST['stock'])
-                    if additional_stock < 0:
-                        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                            return JsonResponse({'success': False, 'error': 'Stock amount cannot be negative'})
-                        messages.error(request, 'Stock amount cannot be negative')
-                        return redirect('dashboard-inventory')
-                    
-                    # Update the stock
-                    item.stock = F('stock') + additional_stock
-                    item.save()
-                    
-                    # Refresh from db to get the new stock value
-                    item.refresh_from_db()
-                    
-                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return JsonResponse({
-                            'success': True,
-                            'message': f'Successfully added {additional_stock} units to stock',
-                            'new_stock': item.stock
-                        })
-                    messages.success(request, f'Successfully added {additional_stock} units to stock')
-                    return redirect('dashboard-inventory')
-            except ValueError:
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'success': False, 'error': 'Invalid stock amount'})
-                messages.error(request, 'Invalid stock amount')
-                return redirect('dashboard-inventory')
-            except Exception as e:
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'success': False, 'error': str(e)})
-                messages.error(request, f'Error updating stock: {str(e)}')
-                return redirect('dashboard-inventory')
-        
-        # Regular update
-        form = ProductForm(request.POST, instance=item)
+        form = ProductForm(request.POST, instance=item, user=request.user)
         if form.is_valid():
             try:
-                # Check for existing product with same name, excluding current product
-                product_name = form.cleaned_data['name'].strip()
-                if Product.objects.filter(user=request.user, name__iexact=product_name).exclude(id=pk).exists():
-                    messages.error(request, f'A product with the name "{product_name}" already exists. Product names must be unique regardless of category.')
-                    return render(request, 'dashboard/inventory_update.html', {
-                        'item': item,
-                        'form': form,
-                    })
-                
-                with transaction.atomic():
-                    product = form.save(commit=False)
-                    product.user = request.user  # Set the user
-                    product.name = product_name.title()  # Ensure consistent capitalization
-                    product.save()
-                    messages.success(request, 'Product updated successfully!')
+                product = form.save(commit=False)
+                product.user = request.user  # Ensure user is set
+                product.save()
+                messages.success(request, 'Product updated successfully!')
                 return redirect('dashboard-inventory')
             except Exception as e:
                 messages.error(request, f'Error updating product: {str(e)}')
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
-        form = ProductForm(instance=item)
+        form = ProductForm(instance=item, user=request.user)
 
     return render(request, 'dashboard/inventory_update.html', {
         'item': item,
@@ -713,9 +649,9 @@ def filter_is_returned(items):
 
 @login_required
 def check_product_name(request):
-    """Check if a product name already exists"""
+    """Check if a product name already exists for the current user"""
     name = request.GET.get('name', '').strip().title()
-    exists = Product.objects.filter(name__iexact=name).exists()
+    exists = Product.objects.filter(user=request.user, name__iexact=name).exists()
     return JsonResponse({'exists': exists})
 
 
@@ -936,10 +872,12 @@ def inventory_audit(request):
 
         try:
             with transaction.atomic():
-                product = Product.objects.select_for_update().get(id=product_id)
+                # Ensure the product belongs to the current user
+                product = Product.objects.select_for_update().get(id=product_id, user=request.user)
                 
                 # Create audit record
                 audit = InventoryAudit.objects.create(
+                    user=request.user,  # Set the user
                     product=product,
                     system_count=product.stock,
                     physical_count=int(physical_count),
@@ -956,14 +894,17 @@ def inventory_audit(request):
                 return redirect('dashboard-inventory')
 
         except Product.DoesNotExist:
-            messages.error(request, 'Product not found.')
+            messages.error(request, 'Product not found or you do not have permission to audit it.')
         except ValueError:
             messages.error(request, 'Invalid count value provided.')
         except Exception as e:
             messages.error(request, f'Error during audit: {str(e)}')
 
-    # Get products for audit
-    pending_audits = InventoryAudit.objects.filter(adjusted=False).select_related('product')
+    # Get pending audits for current user's products
+    pending_audits = InventoryAudit.objects.filter(
+        user=request.user,
+        adjusted=False
+    ).select_related('product')
 
     context = {
         'products': products,
@@ -974,8 +915,8 @@ def inventory_audit(request):
 @login_required
 def audit_history(request):
     """Audit history view"""
-    # Filter audits by current user's products
-    audits = InventoryAudit.objects.filter(product__user=request.user).order_by('-audit_date')
+    # Filter audits by current user
+    audits = InventoryAudit.objects.filter(user=request.user).order_by('-audit_date')
     
     # Filter by date range
     start_date = request.GET.get('start_date')
@@ -1008,7 +949,8 @@ def audit_history(request):
 @login_required
 def resolve_audit(request, audit_id):
     """Resolve pending audit by adjusting inventory"""
-    audit = get_object_or_404(InventoryAudit, id=audit_id, adjusted=False)
+    # Ensure the audit belongs to the current user
+    audit = get_object_or_404(InventoryAudit, id=audit_id, user=request.user, adjusted=False)
     
     try:
         with transaction.atomic():
@@ -1030,8 +972,8 @@ def download_audit_report(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     
-    # Query audits with filters
-    audits = InventoryAudit.objects.all().select_related('product', 'conducted_by')
+    # Query audits with filters for current user only
+    audits = InventoryAudit.objects.filter(user=request.user).select_related('product', 'conducted_by')
     
     if start_date and end_date:
         try:
@@ -1087,8 +1029,8 @@ def download_audit_report_excel(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     
-    # Query audits with filters
-    audits = InventoryAudit.objects.all().select_related('product', 'conducted_by')
+    # Query audits with filters for current user only
+    audits = InventoryAudit.objects.filter(user=request.user).select_related('product', 'conducted_by')
     
     if start_date and end_date:
         try:
@@ -1102,7 +1044,7 @@ def download_audit_report_excel(request):
     buffer = BytesIO()
     
     # Create Excel workbook and add a worksheet
-    workbook = xlsxwriter.Workbook(buffer, {'remove_timezone': True})  # Add remove_timezone option
+    workbook = xlsxwriter.Workbook(buffer, {'remove_timezone': True})
     worksheet = workbook.add_worksheet('Audit Report')
     
     # Add formats

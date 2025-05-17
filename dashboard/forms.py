@@ -46,18 +46,25 @@ class ProductForm(forms.ModelForm):
             })
         }
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
     def clean_name(self):
         name = self.cleaned_data.get('name', '').strip()
         if not name:
             raise ValidationError('Product name is required.')
             
-        # Check for existing product with same name, case-insensitive
+        # Check for existing product with same name for current user only
         if self.instance.pk:  # If updating
-            if Product.objects.filter(name__iexact=name).exclude(id=self.instance.pk).exists():
-                raise ValidationError('A product with this name already exists. Product names must be unique regardless of category.')
+            if Product.objects.filter(
+                user=self.user,
+                name__iexact=name
+            ).exclude(id=self.instance.pk).exists():
+                raise ValidationError('You already have a product with this name.')
         else:  # If creating new
-            if Product.objects.filter(name__iexact=name).exists():
-                raise ValidationError('A product with this name already exists. Product names must be unique regardless of category.')
+            if Product.objects.filter(user=self.user, name__iexact=name).exists():
+                raise ValidationError('You already have a product with this name.')
         
         return name.title()  # Return the name in title case
 

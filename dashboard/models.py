@@ -27,7 +27,7 @@ class Product(models.Model):
         ('Stationary', 'Stationary'),
     )
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', null=True)  # Make nullable initially
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
     name = models.CharField(max_length=100)  # Remove unique=True since it should be unique per user
     category = models.CharField(
         max_length=100, 
@@ -366,12 +366,13 @@ class BorrowedItem(models.Model):
         return self.price * self.quantity
 
 class InventoryAudit(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='audits', null=True)  # Make nullable initially
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='audits')
     system_count = models.PositiveIntegerField()  # Stock count in system
     physical_count = models.PositiveIntegerField()  # Actual physical count
     discrepancy = models.IntegerField()  # Can be positive or negative
     notes = models.TextField(blank=True, null=True)
-    conducted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    conducted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='conducted_audits')
     audit_date = models.DateTimeField(auto_now_add=True)
     adjusted = models.BooleanField(default=False)  # Whether discrepancy was resolved
 
@@ -380,6 +381,7 @@ class InventoryAudit(models.Model):
         indexes = [
             models.Index(fields=['audit_date']),
             models.Index(fields=['adjusted']),
+            models.Index(fields=['user']),  # Add index for user field
         ]
 
     def save(self, *args, **kwargs):
