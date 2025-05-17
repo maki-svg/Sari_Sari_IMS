@@ -371,6 +371,126 @@
             width: 100%;
         }
     }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 1.5rem;
+            margin: 1rem;
+        }
+
+        .search-box {
+            padding: 1rem;
+            margin: 1rem;
+        }
+
+        .filter-row {
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group {
+            width: 100%;
+        }
+
+        /* Make table scrollable horizontally */
+        .table-container {
+            margin: 1rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table {
+            min-width: 800px; /* Ensure table can be scrolled on mobile */
+        }
+
+        .table thead th {
+            padding: 1rem 0.75rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        /* Improve action buttons for touch */
+        .action-button {
+            width: 45px;
+            height: 45px;
+            margin: 0.25rem;
+        }
+
+        /* Adjust status badges */
+        .status-badge {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* Additional fixes for very small screens */
+    @media (max-width: 480px) {
+        .dashboard-header {
+            padding: 1rem;
+            margin: 0.5rem;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .search-box {
+            padding: 0.75rem;
+            margin: 0.5rem;
+        }
+
+        .table-container {
+            margin: 0.5rem;
+            border-radius: 12px;
+        }
+
+        /* Adjust button sizes */
+        .action-button {
+            width: 40px;
+            height: 40px;
+        }
+
+        /* Further reduce text sizes */
+        .table thead th {
+            font-size: 0.8rem;
+        }
+
+        .table tbody td {
+            font-size: 0.85rem;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    /* Landscape mode optimizations */
+    @media (max-height: 480px) and (orientation: landscape) {
+        .dashboard-header {
+            padding: 1rem;
+        }
+
+        .search-box {
+            padding: 1rem;
+        }
+
+        .filter-row {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            width: calc(50% - 0.75rem);
+        }
+    }
 </style>
 
 <div class="container-fluid py-4">
