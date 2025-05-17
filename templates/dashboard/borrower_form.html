@@ -249,29 +249,57 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        z-index: 1000;
+        z-index: 1050;
     }
 
     .toast {
-        background: var(--white);
+        background: white;
         border-radius: 8px;
-        padding: 0.75rem 1.25rem;
-        margin-bottom: 0.75rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transform: translateX(100%);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .toast.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .toast-content {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        animation: slideIn 0.3s ease;
-        max-width: 280px;
     }
 
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+    .toast-success {
+        border-left: 4px solid var(--success-color);
     }
 
-    .toast.success { border-left: 3px solid var(--success-color); }
-    .toast.error { border-left: 3px solid var(--error-color); }
+    .toast-error {
+        border-left: 4px solid var(--error-color);
+    }
+
+    .toast i {
+        font-size: 1.25rem;
+    }
+
+    .toast-success i {
+        color: var(--success-color);
+    }
+
+    .toast-error i {
+        color: var(--error-color);
+    }
+
+    /* Loading spinner styles */
+    .spinner-border {
+        width: 1rem;
+        height: 1rem;
+        margin-right: 0.5rem;
+    }
 
     /* Modal for Signature Preview */
     .modal {
@@ -466,162 +494,116 @@
 {% block extra_js %}
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize AOS
-    if (typeof AOS !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', function() {
         AOS.init();
-    }
-
-    const form = document.getElementById('borrowerForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const buttonText = submitBtn.querySelector('.button-text');
-    const spinner = submitBtn.querySelector('.spinner-border');
-    const signatureUpload = document.getElementById('signatureUpload');
-    const signatureInput = document.getElementById('signatureInput');
-    const newSignaturePreview = document.getElementById('newSignaturePreview');
-    const previewImage = document.getElementById('previewImage');
-
-    // Handle form submission
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
         
-        // Clear previous error messages
-        clearErrors();
+        const form = document.getElementById('borrowerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const spinner = submitBtn.querySelector('.spinner-border');
+        const buttonText = submitBtn.querySelector('.button-text');
         
-        // Disable submit button and show spinner
-        submitBtn.disabled = true;
-        buttonText.classList.add('d-none');
-        spinner.classList.remove('d-none');
-
-        try {
-            const formData = new FormData(form);
-            const response = await fetch(window.location.href, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+        // Clear previous errors when focusing on inputs
+        document.querySelectorAll('input, textarea').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.classList.remove('is-invalid');
+                const errorDiv = document.getElementById(`${this.name}_error`);
+                if (errorDiv) {
+                    errorDiv.textContent = '';
+                    errorDiv.style.display = 'none';
                 }
             });
+        });
 
-            const data = await response.json();
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            buttonText.textContent = 'Saving...';
+            
+            // Clear previous errors
+            document.querySelectorAll('.invalid-feedback').forEach(el => {
+                el.textContent = '';
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.is-invalid').forEach(el => {
+                el.classList.remove('is-invalid');
+            });
 
-            if (response.ok && data.success) {
-                showToast('Borrower saved successfully!', 'success');
-                // Redirect to the specified URL or borrower list
-                setTimeout(() => {
-                    window.location.href = data.redirect_url || "{% url 'dashboard-borrower-list' %}";
-                }, 1500);
-            } else {
-                // Handle validation errors
-                if (data.errors) {
-                    Object.keys(data.errors).forEach(field => {
-                        const errorElement = document.getElementById(`${field}_error`);
-                        if (errorElement) {
-                            errorElement.textContent = data.errors[field].join(' ');
-                            errorElement.style.display = 'block';
-                            
-                            // Add error class to the input
-                            const input = document.querySelector(`[name="${field}"]`);
-                            if (input) {
-                                input.classList.add('is-invalid');
-                            }
-                        }
-                    });
-                    showToast('Please correct the errors and try again.', 'error');
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showToast(data.message || 'Borrower saved successfully!', 'success');
+                    window.location.href = data.redirect_url;
                 } else {
-                    showToast('An error occurred while saving. Please try again.', 'error');
+                    // Reset button state
+                    submitBtn.disabled = false;
+                    spinner.classList.add('d-none');
+                    buttonText.textContent = '{% if form.instance.pk %}Update{% else %}Add{% endif %}';
+                    
+                    // Handle validation errors
+                    if (data.errors) {
+                        Object.entries(data.errors).forEach(([field, errors]) => {
+                            const errorMessage = Array.isArray(errors) ? errors.join(' ') : errors;
+                            const errorElement = document.getElementById(`${field}_error`);
+                            if (errorElement) {
+                                errorElement.textContent = errorMessage;
+                                errorElement.style.display = 'block';
+                                
+                                const input = document.querySelector(`[name="${field}"]`);
+                                if (input) {
+                                    input.classList.add('is-invalid');
+                                }
+                            }
+                        });
+                        showToast('Please correct the errors and try again.', 'error');
+                    } else {
+                        showToast('An error occurred while saving. Please try again.', 'error');
+                    }
                 }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred. Please try again.', 'error');
+                
+                // Reset button state
+                submitBtn.disabled = false;
+                spinner.classList.add('d-none');
+                buttonText.textContent = '{% if form.instance.pk %}Update{% else %}Add{% endif %}';
             }
-        } catch (error) {
-            console.error('Error:', error);
-            showToast('An error occurred. Please try again.', 'error');
-        } finally {
-            // Re-enable submit button and hide spinner
-            submitBtn.disabled = false;
-            buttonText.classList.remove('d-none');
-            spinner.classList.add('d-none');
-        }
-    });
-
-    // File upload handling
-    signatureUpload.addEventListener('click', () => signatureInput.click());
-    signatureUpload.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        signatureUpload.classList.add('dragover');
-    });
-    signatureUpload.addEventListener('dragleave', () => signatureUpload.classList.remove('dragover'));
-    signatureUpload.addEventListener('drop', (e) => {
-        e.preventDefault();
-        signatureUpload.classList.remove('dragover');
-        const file = e.dataTransfer.files[0];
-        handleFile(file);
-    });
-    signatureInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
-
-    function handleFile(file) {
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('File size must be less than 5MB', 'error');
-            return;
-        }
-        if (!file.type.startsWith('image/')) {
-            showToast('Please upload an image file', 'error');
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            previewImage.src = e.target.result;
-            newSignaturePreview.style.display = 'block';
-            showToast('Signature uploaded successfully', 'success');
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function clearErrors() {
-        // Clear all error messages
-        document.querySelectorAll('.invalid-feedback').forEach(el => {
-            el.textContent = '';
-            el.style.display = 'none';
         });
-        
-        // Remove error classes from inputs
-        document.querySelectorAll('.is-invalid').forEach(el => {
-            el.classList.remove('is-invalid');
-        });
-    }
+    });
 
     function showToast(message, type = 'info') {
+        const toastContainer = document.querySelector('.toast-container');
         const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
+        toast.className = `toast toast-${type}`;
         toast.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${message}</span>
+            <div class="toast-content">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            </div>
         `;
-        document.querySelector('.toast-container').appendChild(toast);
+        toastContainer.appendChild(toast);
+        
+        // Trigger reflow to enable animation
+        toast.offsetHeight;
+        toast.classList.add('show');
+        
         setTimeout(() => {
-            toast.style.opacity = '0';
+            toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
-
-    // Email validation
-    const emailInput = document.querySelector('input[name="email"]');
-    if (emailInput) {
-        emailInput.addEventListener('change', function() {
-            const email = this.value.trim();
-            if (email && !isValidEmail(email)) {
-                showToast('Please enter a valid email address', 'error');
-                this.classList.add('is-invalid');
-            } else {
-                this.classList.remove('is-invalid');
-            }
-        });
-    }
-
-    function isValidEmail(email) {
-        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(email).toLowerCase());
-    }
-});
 </script>
 {% endblock %}

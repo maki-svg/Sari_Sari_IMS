@@ -398,14 +398,37 @@ def borrower_create(request):
         form = BorrowerForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                borrower = form.save(commit=False)
-                borrower.user = request.user  # Set the user
-                borrower.save()
-                messages.success(request, f'Borrower "{borrower.borrower_name}" created successfully!')
-                return redirect('dashboard-borrower-detail', pk=borrower.pk)
+                with transaction.atomic():
+                    borrower = form.save(commit=False)
+                    borrower.user = request.user
+                    borrower.save()
+                    
+                    success_message = f'Borrower "{borrower.borrower_name}" created successfully!'
+                    
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'success': True,
+                            'message': success_message,
+                            'redirect_url': reverse('dashboard-borrower-detail', kwargs={'pk': borrower.pk})
+                        })
+                    
+                    messages.success(request, success_message)
+                    return redirect('dashboard-borrower-detail', pk=borrower.pk)
+                    
             except Exception as e:
-                messages.error(request, f'Error creating borrower: {str(e)}')
+                error_message = f'Error creating borrower: {str(e)}'
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': False,
+                        'errors': {'__all__': [error_message]}
+                    }, status=400)
+                messages.error(request, error_message)
         else:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': form.errors
+                }, status=400)
             messages.error(request, "Please correct the errors below.")
     else:
         form = BorrowerForm()

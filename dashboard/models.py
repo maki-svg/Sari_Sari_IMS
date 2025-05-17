@@ -163,7 +163,7 @@ class Sale(models.Model):
         )
 
 class Borrower(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='borrowers', null=True)  # Make nullable initially
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='borrowers')  # Make user required
     STATUS_CHOICES = [
         ('active', 'Active'),
         ('paid', 'Paid'),
@@ -175,7 +175,7 @@ class Borrower(models.Model):
         error_messages={
             'unique': "A borrower with this name already exists."
         }
-    )  # Remove unique=True since it should be unique per user
+    )
     contact_number = models.CharField(max_length=20, validators=[
         RegexValidator(
             regex=r'^(\+63|0)?(9\d{9})$',
@@ -188,7 +188,13 @@ class Borrower(models.Model):
         folder='signatures',
         null=True,
         blank=True,
-        help_text="Upload borrower's signature (optional)"
+        help_text="Upload borrower's signature (optional)",
+        transformation={
+            'quality': 'auto',
+            'fetch_format': 'auto',
+            'width': 800,
+            'crop': 'limit'
+        }
     )
     email = models.EmailField(
         max_length=254, 
@@ -217,10 +223,10 @@ class Borrower(models.Model):
             models.Index(fields=['due_date']),
             models.Index(fields=['borrower_name']),
             models.Index(fields=['email']),
-            models.Index(fields=['user']),  # Add index for user
+            models.Index(fields=['user']),
         ]
         constraints = [
-            models.UniqueConstraint(  # Update unique constraint for borrower name per user
+            models.UniqueConstraint(
                 fields=['user', 'borrower_name'],
                 name='unique_borrower_name_per_user'
             )
@@ -290,20 +296,20 @@ class Borrower(models.Model):
                     raise ValidationError({'email': 'Please enter a valid email address'})
 
     def save(self, *args, **kwargs):
+        # Clean and validate email before saving
+        if self.email:
+            self.email = self.email.strip()
+            if not self.email:
+                self.email = None
+
         # Clean up old signature if a new one is being set
-        if self.pk:
+        if self.pk and 'signature' in kwargs.get('update_fields', []):
             try:
                 old_instance = Borrower.objects.get(pk=self.pk)
                 if old_instance.signature and self.signature != old_instance.signature:
                     old_instance.signature.delete(save=False)
             except Borrower.DoesNotExist:
                 pass
-
-        # Clean and validate email before saving
-        if self.email:
-            self.email = self.email.strip()
-            if not self.email:
-                self.email = None
 
         super().save(*args, **kwargs)
 
