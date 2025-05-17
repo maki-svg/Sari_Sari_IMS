@@ -113,7 +113,7 @@ else:
     # Use PostgreSQL in production
     DATABASES = {
         'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
+            default='postgres://sarisync_db_user:L9N8eCCI9E10x7CsHoIggvNvPObAlyfr@dpg-d0jou4d6ubrc73amcjv0-a.singapore-postgres.render.com/sarisync_db',
             conn_max_age=600,
             conn_health_checks=True,
             ssl_require=True

@@ -5,32 +5,41 @@
 
 {% block content %}
 <style>
+    :root {
+        --primary-color: #04AA6D;
+        --primary-hover: #028c54;
+        --secondary-color: #333;
+        --light-gray: #f9f9f9;
+        --medium-gray: #ddd;
+        --white: #fff;
+    }
+
     .audit-header {
-        background: linear-gradient(135deg, #04AA6D 0%, #025B3A 100%);
-        padding: 2rem;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #025B3A 100%);
+        padding: clamp(1rem, 4vw, 2rem);
         border-radius: 15px;
-        margin-bottom: 2rem;
+        margin-bottom: clamp(1rem, 4vw, 2rem);
         color: white;
     }
 
     .filter-section {
-        background: white;
-        padding: 1.5rem;
+        background: var(--white);
+        padding: clamp(1rem, 3vw, 1.5rem);
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
+        margin-bottom: clamp(1rem, 4vw, 2rem);
     }
 
     .stats-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: clamp(0.75rem, 3vw, 1.5rem);
+        margin-bottom: clamp(1rem, 4vw, 2rem);
     }
 
     .stat-card {
-        background: white;
-        padding: 1.5rem;
+        background: var(--white);
+        padding: clamp(1rem, 3vw, 1.5rem);
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease;
@@ -41,33 +50,36 @@
     }
 
     .stat-value {
-        font-size: 1.8rem;
+        font-size: clamp(1.25rem, 4vw, 1.8rem);
         font-weight: bold;
-        color: #04AA6D;
+        color: var(--primary-color);
         margin-bottom: 0.5rem;
     }
 
     .stat-label {
         color: #666;
-        font-size: 0.9rem;
+        font-size: clamp(0.8rem, 2vw, 0.9rem);
     }
 
     .download-buttons {
         display: flex;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: clamp(0.5rem, 2vw, 1rem);
+        margin-bottom: clamp(1rem, 3vw, 1.5rem);
     }
 
     .download-btn {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        padding: 0.8rem 1.5rem;
+        padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
         border-radius: 8px;
         font-weight: 500;
         transition: all 0.3s ease;
         text-decoration: none;
         color: white;
+        min-height: 44px;
+        touch-action: manipulation;
     }
 
     .download-btn.excel {
@@ -85,19 +97,77 @@
     }
 
     .table-container {
-        background: white;
+        background: var(--white);
         border-radius: 12px;
-        overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-top: clamp(1rem, 3vw, 1.5rem);
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
     .table th {
-        background-color: #f8f9fa;
-        border-bottom: 2px solid #dee2e6;
+        background: var(--secondary-color);
+        color: var(--white);
+        padding: clamp(0.75rem, 2vw, 1rem);
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .table td {
+        padding: clamp(0.75rem, 2vw, 1rem);
+        border-bottom: 1px solid var(--medium-gray);
+    }
+
+    @media (max-width: 768px) {
+        .table thead {
+            display: none;
+        }
+
+        .table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            background: var(--white);
+        }
+
+        .table td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border: none;
+            text-align: right;
+        }
+
+        .table td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            margin-right: 1rem;
+            text-align: left;
+        }
+
+        .discrepancy-positive,
+        .discrepancy-negative {
+            width: auto;
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
     }
 
     .discrepancy-positive {
-        color: #28a745;
+        color: var(--primary-color);
     }
 
     .discrepancy-negative {
@@ -105,28 +175,32 @@
     }
 
     .badge {
-        padding: 0.5rem 1rem;
-        border-radius: 30px;
+        padding: clamp(0.25rem, 1vw, 0.5rem) clamp(0.5rem, 2vw, 0.75rem);
+        border-radius: 20px;
+        font-size: clamp(0.75rem, 2vw, 0.875rem);
         font-weight: 500;
     }
 
     .badge-success {
-        background-color: rgba(40, 167, 69, 0.1);
-        color: #28a745;
+        background-color: var(--primary-color);
+        color: var(--white);
     }
 
     .badge-warning {
-        background-color: rgba(255, 193, 7, 0.1);
-        color: #ffc107;
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    @supports (-webkit-touch-callout: none) {
+        input, select {
+            font-size: 16px !important;
+        }
     }
 </style>
 
-<div class="container-fluid py-4">
+<div class="container">
     <div class="audit-header">
-        <h2 class="mb-4">
-            <i class="fas fa-history me-2"></i>
-            Audit History
-        </h2>
+        <h1>Audit History</h1>
         
         <div class="filter-section">
             <form method="get" class="row g-3 align-items-end">
@@ -177,7 +251,7 @@
 
     <div class="table-container">
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -193,30 +267,22 @@
                 <tbody>
                     {% for audit in audits %}
                     <tr>
-                        <td>{{ audit.audit_date|date:"Y-m-d H:i" }}</td>
-                        <td>{{ audit.product.name }}</td>
-                        <td>{{ audit.system_count }}</td>
-                        <td>{{ audit.physical_count }}</td>
-                        <td class="{% if audit.discrepancy > 0 %}discrepancy-positive{% elif audit.discrepancy < 0 %}discrepancy-negative{% endif %}">
+                        <td data-label="Date">{{ audit.audit_date|date:"Y-m-d H:i" }}</td>
+                        <td data-label="Product">{{ audit.product.name }}</td>
+                        <td data-label="System Count">{{ audit.system_count }}</td>
+                        <td data-label="Physical Count">{{ audit.physical_count }}</td>
+                        <td data-label="Discrepancy" class="{% if audit.discrepancy > 0 %}discrepancy-positive{% elif audit.discrepancy < 0 %}discrepancy-negative{% endif %}">
                             {{ audit.discrepancy }}
                         </td>
-                        <td>
+                        <td data-label="Status">
                             {% if audit.adjusted %}
                             <span class="badge badge-success">Adjusted</span>
                             {% else %}
                             <span class="badge badge-warning">Pending</span>
                             {% endif %}
                         </td>
-                        <td>{{ audit.conducted_by.username }}</td>
-                        <td>
-                            {% if audit.notes %}
-                            <button type="button" class="btn btn-sm btn-info" 
-                                    data-bs-toggle="tooltip" data-bs-placement="top" 
-                                    title="{{ audit.notes }}">
-                                <i class="fas fa-info-circle"></i>
-                            </button>
-                            {% endif %}
-                        </td>
+                        <td data-label="Conducted By">{{ audit.conducted_by.username }}</td>
+                        <td data-label="Notes">{{ audit.notes|default:"-" }}</td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -234,20 +300,14 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    });
-
-    // Add animation to download buttons
-    const downloadButtons = document.querySelectorAll('.download-btn');
-    downloadButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = 'translateY(-2px)';
-            }, 100);
+    // Touch feedback for buttons
+    document.querySelectorAll('.download-btn').forEach(btn => {
+        btn.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.98)';
+        });
+        
+        btn.addEventListener('touchend', function() {
+            this.style.transform = 'scale(1)';
         });
     });
 });

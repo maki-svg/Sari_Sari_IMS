@@ -27,7 +27,8 @@ class Product(models.Model):
         ('Stationary', 'Stationary'),
     )
     
-    name = models.CharField(max_length=100, unique=True)  # Add unique=True
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', null=True)  # Make nullable initially
+    name = models.CharField(max_length=100)  # Remove unique=True since it should be unique per user
     category = models.CharField(
         max_length=100, 
         choices=CATEGORY,
@@ -49,7 +50,14 @@ class Product(models.Model):
             models.Index(fields=['stock']),
             models.Index(fields=['price']),
             models.Index(fields=['is_active']),
-            models.Index(fields=['is_deleted']),  # Add index for is_deleted
+            models.Index(fields=['is_deleted']),
+            models.Index(fields=['user']),  # Add index for user
+        ]
+        constraints = [
+            models.UniqueConstraint(  # Add unique constraint for name per user
+                fields=['user', 'name'],
+                name='unique_product_name_per_user'
+            )
         ]
 
     @property
@@ -83,9 +91,10 @@ class Product(models.Model):
         self.save()
 
 class Sale(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sales', null=True)  # Make nullable initially
     product = models.ForeignKey(
         'Product',
-        on_delete=models.PROTECT,  # Change this to PROTECT to prevent deletion of products with sales
+        on_delete=models.PROTECT,
         related_name='sales'
     )
     quantity = models.PositiveIntegerField()
@@ -143,6 +152,7 @@ class Sale(models.Model):
         )
 
 class Borrower(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='borrowers', null=True)  # Make nullable initially
     STATUS_CHOICES = [
         ('active', 'Active'),
         ('paid', 'Paid'),
@@ -150,12 +160,11 @@ class Borrower(models.Model):
     ]
 
     borrower_name = models.CharField(
-        max_length=100, 
-        unique=True,
+        max_length=100,
         error_messages={
             'unique': "A borrower with this name already exists."
         }
-    )
+    )  # Remove unique=True since it should be unique per user
     contact_number = models.CharField(max_length=20, validators=[
         RegexValidator(
             regex=r'^(\+63|0)?(9\d{9})$',
@@ -197,11 +206,12 @@ class Borrower(models.Model):
             models.Index(fields=['due_date']),
             models.Index(fields=['borrower_name']),
             models.Index(fields=['email']),
+            models.Index(fields=['user']),  # Add index for user
         ]
         constraints = [
-            models.UniqueConstraint(
-                fields=['borrower_name'],
-                name='unique_borrower_name_case_insensitive'
+            models.UniqueConstraint(  # Update unique constraint for borrower name per user
+                fields=['user', 'borrower_name'],
+                name='unique_borrower_name_per_user'
             )
         ]
 

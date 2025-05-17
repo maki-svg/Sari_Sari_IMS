@@ -32,8 +32,8 @@ def index(request):
     today = date.today()
     last_week = today - timedelta(days=7)
     
-    # Get all sales
-    sales = Sale.objects.all()
+    # Get all sales for the current user
+    sales = Sale.objects.filter(user=request.user)
     
     # Calculate total sales by multiplying price and quantity
     total_sales = sales.aggregate(
@@ -48,8 +48,8 @@ def index(request):
         total=Sum('quantity')
     )['total'] or 0
     
-    # Category distribution data
-    categories = Product.objects.values('category').annotate(
+    # Category distribution data for current user's products
+    categories = Product.objects.filter(user=request.user).values('category').annotate(
         count=Count('id')
     ).order_by('category')
     
@@ -65,16 +65,16 @@ def index(request):
     category_labels = json.dumps([cat['category'] for cat in categories])
     category_counts = json.dumps([cat['count'] for cat in categories])
     
-    # Sales trend data (last 7 days)
+    # Sales trend data (last 7 days) for current user
     sales_data = []
     for i in range(7):
         date_i = today - timedelta(days=i)
-        daily_total = Sale.objects.filter(date__date=date_i).aggregate(
-            total=Sum(F('price') * F('quantity'))  # Calculate daily total from price and quantity
+        daily_total = Sale.objects.filter(user=request.user, date__date=date_i).aggregate(
+            total=Sum(F('price') * F('quantity'))
         )['total'] or 0
         sales_data.append({
             'date__date': date_i,
-            'total': float(daily_total)  # Convert Decimal to float for JSON serialization
+            'total': float(daily_total)
         })
     
     sales_data.reverse()  # Show oldest to newest
@@ -82,13 +82,15 @@ def index(request):
     sales_dates = json.dumps([sale['date__date'].strftime('%b %d') for sale in sales_data])
     sales_amounts = json.dumps([sale['total'] for sale in sales_data])
     
-    # Low stock alerts
+    # Low stock alerts for current user's products
     low_stock_items = Product.objects.filter(
-        Q(stock__gt=0) & Q(stock__lte=5)
+        user=request.user,
+        stock__gt=0,
+        stock__lte=5
     ).order_by('stock')
     
-    # Add borrower statistics with defaults
-    borrower_stats = Borrower.objects.aggregate(
+    # Add borrower statistics with defaults for current user
+    borrower_stats = Borrower.objects.filter(user=request.user).aggregate(
         active_count=Count('id', filter=Q(status='active')),
         paid_count=Count('id', filter=Q(status='paid')),
         overdue_count=Count('id', filter=Q(status='overdue'))
@@ -118,8 +120,8 @@ def inventory(request):
     query = request.GET.get('q', '')
     category = request.GET.get('category', '')
     
-    # Only show non-deleted products
-    items = Product.objects.filter(is_deleted=False).order_by('name')
+    # Only show non-deleted products for current user
+    items = Product.objects.filter(user=request.user, is_deleted=False).order_by('name')
     
     if query:
         items = items.filter(
@@ -138,8 +140,8 @@ def inventory(request):
         if form.is_valid():
             try:
                 product_name = form.cleaned_data['name'].strip()
-                # Double-check for existing product with same name (including soft-deleted ones)
-                if Product.objects.filter(name__iexact=product_name).exists():
+                # Double-check for existing product with same name for current user
+                if Product.objects.filter(user=request.user, name__iexact=product_name).exists():
                     messages.error(request, f'A product with the name "{product_name}" already exists. Product names must be unique regardless of category.')
                     return render(request, 'dashboard/inventory.html', {
                         'items': items,
@@ -151,6 +153,7 @@ def inventory(request):
                 
                 with transaction.atomic():
                     product = form.save(commit=False)
+                    product.user = request.user  # Set the user
                     product.name = product_name.title()  # Ensure consistent capitalization
                     product.save()
                     messages.success(request, 'Product added successfully!')
@@ -251,7 +254,7 @@ def inventory_update(request, pk):
             try:
                 # Check for existing product with same name, excluding current product
                 product_name = form.cleaned_data['name'].strip()
-                if Product.objects.filter(name__iexact=product_name).exclude(id=pk).exists():
+                if Product.objects.filter(user=request.user, name__iexact=product_name).exclude(id=pk).exists():
                     messages.error(request, f'A product with the name "{product_name}" already exists. Product names must be unique regardless of category.')
                     return render(request, 'dashboard/inventory_update.html', {
                         'item': item,
@@ -260,6 +263,7 @@ def inventory_update(request, pk):
                 
                 with transaction.atomic():
                     product = form.save(commit=False)
+                    product.user = request.user  # Set the user
                     product.name = product_name.title()  # Ensure consistent capitalization
                     product.save()
                     messages.success(request, 'Product updated successfully!')
@@ -276,26 +280,19 @@ def inventory_update(request, pk):
 
 @login_required
 def sales_list(request):
-    """Sales list view with proper timezone handling"""
-    today = timezone.localtime().date()
-    start_of_week = today - timedelta(days=7)
-    
-    # Create timezone-aware datetime objects
-    start_datetime = timezone.make_aware(datetime.combine(start_of_week, datetime.min.time()))
-    end_datetime = timezone.make_aware(datetime.combine(today, datetime.max.time()))
+    """Sales list view"""
+    # Filter sales by current user
+    sales = Sale.objects.filter(user=request.user).order_by('-date')
     
     # Recent sales metrics
-    recent_sales = Sale.objects.filter(date__range=(start_datetime, end_datetime))
-    total_sales = recent_sales.aggregate(
+    recent_sales = sales.aggregate(
         total=Sum(F('price') * F('quantity'))
-    )['total'] or Decimal('0.00')
-    
-    # Get all sales ordered by date (newest first)
-    sales_list = Sale.objects.all().order_by('-date')
+    )
+    total_sales = recent_sales['total'] or Decimal('0.00')
     
     # Search functionality
     if q := request.GET.get('q'):
-        sales_list = sales_list.filter(
+        sales = sales.filter(
             Q(product__name__icontains=q) |
             Q(buyer_name__icontains=q) |
             Q(date__date__icontains=q)
@@ -320,15 +317,15 @@ def sales_list(request):
         form = SaleForm(user=request.user)
     
     # Pagination
-    paginator = Paginator(sales_list, 10)
+    paginator = Paginator(sales, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
     context = {
         'recent_sales': page_obj,
         'total_sales': total_sales,
-        'total_transactions': sales_list.count(),
-        'total_items_sold': sales_list.aggregate(Sum('quantity'))['quantity__sum'] or 0,
+        'total_transactions': sales.count(),
+        'total_items_sold': sales.aggregate(Sum('quantity'))['quantity__sum'] or 0,
         'products': Product.objects.filter(stock__gt=0),
         'form': form,
     }
@@ -336,7 +333,9 @@ def sales_list(request):
 
 @login_required 
 def sales_edit(request, pk):
-    sale = get_object_or_404(Sale, pk=pk)
+    """Edit sale view"""
+    # Get sale for current user
+    sale = get_object_or_404(Sale, id=pk, user=request.user)
     original_quantity = sale.quantity
     
     if request.method == 'POST':
@@ -386,7 +385,9 @@ def sales_edit(request, pk):
 
 @login_required
 def sales_delete(request, pk):
-    sale = get_object_or_404(Sale, pk=pk)
+    """Delete sale view"""
+    # Get sale for current user
+    sale = get_object_or_404(Sale, id=pk, user=request.user)
     
     if request.method == 'POST':
         # Restore product stock before deletion
@@ -404,16 +405,12 @@ def sales_delete(request, pk):
 
 @login_required
 def borrower_list(request):
-    search_query = request.GET.get('search', '')
-    status_filter = request.GET.get('status', '')
+    """Borrower list view"""
+    # Filter borrowers by current user
+    borrowers = Borrower.objects.filter(user=request.user).order_by('-date_borrowed')
     
-    today = timezone.now().date()
-    
-    # Base queryset with select_related for optimization
-    borrowers = Borrower.objects.all()
-    
-    # Apply search filter
-    if search_query:
+    # Search functionality
+    if search_query := request.GET.get('search'):
         borrowers = borrowers.filter(
             Q(borrower_name__icontains=search_query) |
             Q(contact_number__icontains=search_query) |
@@ -423,12 +420,13 @@ def borrower_list(request):
     # Update overdue status for active borrowers
     Borrower.objects.filter(
         Q(status='active'),
-        due_date__lte=today
+        due_date__lte=timezone.now().date()
     ).exclude(
         status='paid'
     ).update(status='overdue')
     
     # Apply status filter after updating statuses
+    status_filter = request.GET.get('status')
     if status_filter:
         borrowers = borrowers.filter(status=status_filter)
     
@@ -453,125 +451,36 @@ def borrower_list(request):
 
 @login_required
 def borrower_create(request):
-    """Create new borrower with styled form"""
-    today = timezone.localtime().date()
-    min_due_date = today + timedelta(days=1)
-    
+    """Create borrower view"""
     if request.method == 'POST':
-        logger.info("Received POST request to create borrower")
-        logger.debug(f"POST data: {request.POST}")
-        logger.debug(f"FILES data: {request.FILES}")
-        
         form = BorrowerForm(request.POST, request.FILES)
-        logger.info("Form initialized with POST data")
-        
         if form.is_valid():
-            logger.info("Form is valid, attempting to save")
             try:
-                with transaction.atomic():
-                    borrower_name = form.cleaned_data['borrower_name'].title()
-                    logger.debug(f"Processing borrower name: {borrower_name}")
-                    
-                    if Borrower.objects.filter(borrower_name__iexact=borrower_name).exists():
-                        logger.warning(f"Borrower with name '{borrower_name}' already exists")
-                        error_msg = f'A borrower with the name "{borrower_name}" already exists.'
-                        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                            return JsonResponse({
-                                'success': False,
-                                'errors': {'borrower_name': [error_msg]}
-                            }, status=400)
-                        form.add_error('borrower_name', error_msg)
-                        return render(request, 'dashboard/borrower_form.html', {
-                            'form': form,
-                            'today': today,
-                            'min_due_date': min_due_date,
-                            'title': 'Add Borrower'
-                        })
-                    
-                    borrower = form.save(commit=False)
-                    borrower.borrower_name = borrower_name
-                    
-                    if 'signature' in request.FILES:
-                        logger.info("Processing signature file")
-                        try:
-                            borrower.signature = request.FILES['signature']
-                            logger.info("Signature file assigned successfully")
-                        except Exception as e:
-                            logger.error(f"Error processing signature file: {str(e)}")
-                            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                                return JsonResponse({
-                                    'success': False,
-                                    'errors': {'signature': [f'Error uploading signature: {str(e)}']}
-                                }, status=400)
-                            form.add_error('signature', f'Error uploading signature: {str(e)}')
-                            raise
-                    
-                    try:
-                        borrower.save()
-                        logger.info(f"Borrower '{borrower_name}' created successfully with ID {borrower.pk}")
-                    except Exception as e:
-                        logger.error(f"Error saving borrower: {str(e)}")
-                        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                            return JsonResponse({
-                                'success': False,
-                                'errors': {'__all__': [f'Error saving borrower: {str(e)}']}
-                            }, status=400)
-                        raise
-                    
-                    messages.success(request, f'Borrower "{borrower_name}" created successfully!')
-                    
-                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return JsonResponse({
-                            'success': True,
-                            'message': f'Borrower "{borrower_name}" created successfully!',
-                            'redirect_url': reverse('dashboard-borrower-detail', kwargs={'pk': borrower.pk})
-                        })
-                    return redirect('dashboard-borrower-detail', pk=borrower.pk)
-                    
-            except IntegrityError as e:
-                logger.error(f"IntegrityError while creating borrower: {str(e)}")
-                error_msg = f'A borrower with the name "{borrower_name}" already exists.'
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': False,
-                        'errors': {'borrower_name': [error_msg]}
-                    }, status=400)
-                messages.error(request, error_msg)
+                borrower = form.save(commit=False)
+                borrower.user = request.user  # Set the user
+                borrower.save()
+                messages.success(request, f'Borrower "{borrower.borrower_name}" created successfully!')
+                return redirect('dashboard-borrower-detail', pk=borrower.pk)
             except Exception as e:
-                logger.error(f"Unexpected error while creating borrower: {str(e)}")
-                error_msg = f'Error creating borrower: {str(e)}'
-                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'success': False,
-                        'errors': {'__all__': [error_msg]}
-                    }, status=400)
-                messages.error(request, error_msg)
+                messages.error(request, f'Error creating borrower: {str(e)}')
         else:
-            logger.warning("Form validation failed")
-            logger.debug(f"Form errors: {form.errors}")
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': False,
-                    'errors': form.errors
-                }, status=400)
+            messages.error(request, "Please correct the errors below.")
     else:
-        logger.info("Displaying empty borrower creation form")
-        form = BorrowerForm(initial={
-            'date_borrowed': today,
-            'due_date': min_due_date
-        })
+        form = BorrowerForm()
     
     context = {
         'form': form,
-        'today': today,
-        'min_due_date': min_due_date,
+        'today': timezone.localtime().date(),
+        'min_due_date': timezone.localtime().date() + timedelta(days=1),
         'title': 'Add Borrower'
     }
     return render(request, 'dashboard/borrower_form.html', context)
 
 @login_required
 def borrower_detail(request, pk):
-    borrower = get_object_or_404(Borrower, pk=pk)
+    """Borrower detail view"""
+    # Get borrower for current user
+    borrower = get_object_or_404(Borrower, id=pk, user=request.user)
     items = BorrowedItem.objects.filter(borrower=borrower)
     
     if request.method == 'POST':
@@ -610,11 +519,8 @@ def borrower_detail(request, pk):
 @login_required
 def borrower_update(request, pk):
     """Update borrower view"""
-    # Use select_related to optimize queries
-    borrower = get_object_or_404(
-        Borrower.objects.select_related(),
-        pk=pk
-    )
+    # Get borrower for current user
+    borrower = get_object_or_404(Borrower, id=pk, user=request.user)
     
     if request.method == 'POST':
         form = BorrowerForm(request.POST, request.FILES, instance=borrower)
@@ -663,7 +569,9 @@ def borrower_update(request, pk):
 
 @login_required
 def borrower_delete(request, pk):
-    borrower = get_object_or_404(Borrower, pk=pk)
+    """Delete borrower view"""
+    # Get borrower for current user
+    borrower = get_object_or_404(Borrower, id=pk, user=request.user)
     if request.method == 'POST':
         try:
             with transaction.atomic():
@@ -683,8 +591,9 @@ def borrower_delete(request, pk):
 
 @login_required
 def mark_as_paid(request, pk):
-    """Mark borrower as paid view"""
-    borrower = get_object_or_404(Borrower, pk=pk)
+    """Mark borrower as paid"""
+    # Get borrower for current user
+    borrower = get_object_or_404(Borrower, id=pk, user=request.user)
     try:
         with transaction.atomic():
             borrower.status = 'paid'
@@ -699,20 +608,21 @@ def mark_as_paid(request, pk):
 
 @login_required
 def mark_as_returned(request, item_id):
-    """Mark borrowed item as returned view"""
-    item = get_object_or_404(BorrowedItem, id=item_id)
-    borrower_pk = item.borrower.pk
+    """Mark borrowed item as returned"""
+    # Get borrowed item for current user's borrower
+    borrowed_item = get_object_or_404(BorrowedItem, id=item_id, borrower__user=request.user)
+    borrower_pk = borrowed_item.borrower.pk
     
     try:
         with transaction.atomic():
-            if not item.is_returned:
+            if not borrowed_item.is_returned:
                 # Return the item to stock
-                Product.objects.filter(pk=item.product.id).update(
-                    stock=F('stock') + item.quantity
+                Product.objects.filter(pk=borrowed_item.product.id).update(
+                    stock=F('stock') + borrowed_item.quantity
                 )
-                item.is_returned = True
-                item.date_returned = timezone.now().date()
-                item.save()
+                borrowed_item.is_returned = True
+                borrowed_item.date_returned = timezone.now().date()
+                borrowed_item.save()
                 messages.success(request, 'Item marked as returned!')
             else:
                 messages.warning(request, 'Item was already returned')
@@ -725,19 +635,21 @@ def mark_as_returned(request, item_id):
 
 @login_required
 def borrowed_item_delete(request, pk):
-    item = get_object_or_404(BorrowedItem, pk=pk)
-    borrower_pk = item.borrower.pk
-    deleted_quantity = item.quantity
+    """Delete borrowed item"""
+    # Get borrowed item for current user's borrower
+    borrowed_item = get_object_or_404(BorrowedItem, id=pk, borrower__user=request.user)
+    borrower_pk = borrowed_item.borrower.pk
+    deleted_quantity = borrowed_item.quantity
     
     try:
         with transaction.atomic():
             # Get the product and update its stock
-            product = Product.objects.select_for_update().get(pk=item.product.pk)
+            product = Product.objects.select_for_update().get(pk=borrowed_item.product.pk)
             product.stock += deleted_quantity
             product.save()
             
             # Delete the borrowed item
-            item.delete()
+            borrowed_item.delete()
             
             messages.success(
                 request, 
@@ -1013,7 +925,10 @@ def test_email(request):
 
 @login_required
 def inventory_audit(request):
-    """View for conducting inventory audits"""
+    """Inventory audit view"""
+    # Filter products by current user
+    products = Product.objects.filter(user=request.user, is_deleted=False).order_by('name')
+    
     if request.method == 'POST':
         product_id = request.POST.get('product')
         physical_count = request.POST.get('physical_count')
@@ -1048,7 +963,6 @@ def inventory_audit(request):
             messages.error(request, f'Error during audit: {str(e)}')
 
     # Get products for audit
-    products = Product.objects.filter(is_deleted=False).order_by('name')
     pending_audits = InventoryAudit.objects.filter(adjusted=False).select_related('product')
 
     context = {
@@ -1059,8 +973,9 @@ def inventory_audit(request):
 
 @login_required
 def audit_history(request):
-    """View audit history"""
-    audits = InventoryAudit.objects.all().select_related('product', 'conducted_by')
+    """Audit history view"""
+    # Filter audits by current user's products
+    audits = InventoryAudit.objects.filter(product__user=request.user).order_by('-audit_date')
     
     # Filter by date range
     start_date = request.GET.get('start_date')

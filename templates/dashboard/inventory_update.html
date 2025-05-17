@@ -5,107 +5,174 @@
 {% block content %}
 <head>
     <style>
-        /* Match existing inventory page styles */
+        :root {
+            --primary-color: #04AA6D;
+            --primary-hover: #028c54;
+            --secondary-color: #333;
+            --light-gray: #f9f9f9;
+            --medium-gray: #ddd;
+            --white: #fff;
+        }
+
+        /* Base container styles */
         .update-container {
             max-width: 600px;
-            margin: 30px auto;
-            padding: 30px;
-            background-color: white;
+            width: 95%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: var(--white);
             border-radius: 10px;
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
         }
         
         .product-header {
-            border-bottom: 2px solid #04AA6D;
+            border-bottom: 2px solid var(--primary-color);
             padding-bottom: 15px;
             margin-bottom: 25px;
         }
-        
-        .btn-group {
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-            margin-top: 25px;
+
+        .product-header h2 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 0.5rem;
         }
-        
-        .btn {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background-color: #04AA6D;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #028c54;
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #5a6268;
-            transform: translateY(-2px);
-        }
-        
-        h2 {
-            color: #333;
-            margin-bottom: 5px;
+
+        .product-header p {
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            color: var(--secondary-color);
         }
         
         .current-details {
-            background-color: #f8f9fa;
+            background-color: var(--light-gray);
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #04AA6D;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .current-details h4 {
+            font-size: clamp(1.1rem, 3.5vw, 1.25rem);
+            margin-bottom: 1rem;
+        }
+
+        .current-details p {
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            margin-bottom: 0.5rem;
         }
         
-        /* Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .update-container {
-            animation: fadeIn 0.4s ease-out;
-        }
-        
-        /* Form styling */
+        /* Form styling with mobile optimizations */
         .form-group {
             margin-bottom: 20px;
         }
         
         .form-control {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            transition: border 0.3s;
+            padding: 12px;
+            border: 2px solid var(--medium-gray);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
         }
         
         .form-control:focus {
-            border-color: #04AA6D;
+            border-color: var(--primary-color);
             outline: none;
             box-shadow: 0 0 0 2px rgba(4, 170, 109, 0.2);
         }
 
-        /* Form field focus effects */
+        /* Mobile-optimized button group */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        @media (min-width: 480px) {
+            .btn-group {
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            touch-action: manipulation;
+        }
+
+        @media (min-width: 480px) {
+            .btn {
+                width: auto;
+                min-width: 120px;
+            }
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: var(--white);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        /* Touch-friendly focus states */
+        @media (hover: none) {
+            .btn:hover {
+                transform: none;
+            }
+
+            .btn:active {
+                transform: scale(0.98);
+            }
+        }
+
+        /* Form field focus effects with mobile optimization */
         .form-group {
             transition: transform 0.3s ease;
         }
 
-        .form-group:focus-within {
-            transform: scale(1.02);
+        @media (min-width: 768px) {
+            .form-group:focus-within {
+                transform: scale(1.02);
+            }
+        }
+
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            .form-control {
+                font-size: 16px;
+            }
+
+            select.form-control {
+                padding-right: 30px;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 2l4 4 4-4z' fill='%23333'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                background-size: 8px 8px;
+            }
         }
     </style>
 </head>
@@ -125,7 +192,6 @@
             <p><strong>Category:</strong> {{ item.category }}</p>
         </div>
         
-        <!-- Regular Update Form -->
         <form method="POST" id="updateForm">
             {% csrf_token %}
             {{ form|crispy }}
@@ -141,24 +207,36 @@
         </form>
     </div>
     
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Add hover effects for buttons
+            const form = document.getElementById('updateForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            // Add touch feedback
             const buttons = document.querySelectorAll('.btn');
             buttons.forEach(btn => {
-                btn.addEventListener('mouseenter', () => {
-                    if (!btn.disabled) {
-                        btn.style.transform = 'translateY(-2px)';
-                    }
+                btn.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
                 });
-                btn.addEventListener('mouseleave', () => {
-                    btn.style.transform = 'translateY(0)';
+                
+                btn.addEventListener('touchend', function() {
+                    this.style.transform = 'scale(1)';
                 });
             });
+
+            // Form submission handling
+            form.addEventListener('submit', function(e) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            });
+
+            // Prevent zoom on iOS when focusing inputs
+            const viewportMeta = document.createElement('meta');
+            viewportMeta.name = 'viewport';
+            viewportMeta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
+            document.head.appendChild(viewportMeta);
         });
     </script>
 </body>
+{% endblock %}
 {% endblock %}

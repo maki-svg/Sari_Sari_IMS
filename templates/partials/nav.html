@@ -397,60 +397,95 @@
 </head>
 <body>
     {% if user.is_authenticated %}
-    <div class="sidebar">
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle d-lg-none" type="button" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Backdrop -->
+    <div class="sidebar-backdrop"></div>
+
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'dashboard-index' %}">
+                <img src="{% static 'images/logo.svg' %}" alt="SariSync Logo" class="navbar-logo">
+                <span class="navbar-brand-text">SariSync</span>
+            </a>
+
+            <!-- Mobile User Info -->
+            <div class="d-lg-none ml-auto mr-3">
+                <span class="text-white">{{ user.username }}</span>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item d-none d-lg-block">
+                        <span class="nav-link">Welcome, {{ user.username }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
         <div class="sidebar-header">
             <img src="{% static 'images/logo.svg' %}" alt="SariSync Logo" class="sidebar-logo">
-            <h3>SariSync</h3>
+            <h3 class="d-none d-lg-block">SariSync</h3>
         </div>
 
-        <div class="nav-links">
-            <a href="{% url 'dashboard-index' %}" class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}">
-                <i class="fas fa-tachometer-alt"></i>
+        <nav class="nav-links">
+            <a href="{% url 'dashboard-index' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard-index' %}active{% endif %}">
+                <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="{% url 'dashboard-inventory' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard-inventory' %}active{% endif %}">
-                <i class="fas fa-boxes"></i>
+            <a href="{% url 'dashboard-inventory' %}" class="nav-link {% if 'inventory' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-box"></i>
                 <span>Inventory</span>
             </a>
-            <a href="{% url 'dashboard-inventory-audit' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard-inventory-audit' %}active{% endif %}">
-                <i class="fas fa-clipboard-check"></i>
-                <span>Inventory Audit</span>
-            </a>
-            <a href="{% url 'dashboard-audit-history' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard-audit-history' %}active{% endif %}">
-                <i class="fas fa-history"></i>
-                <span>Audit History</span>
-            </a>
-            <a href="{% url 'dashboard-sales' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard-sales' %}active{% endif %}">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Sales</span>
-            </a>
-            <a href="{% url 'dashboard-borrower-list' %}" class="nav-link {% if request.path == '/borrowers/' %}active{% endif %}">
+            <a href="{% url 'dashboard-borrower-list' %}" class="nav-link {% if 'borrower' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-users"></i>
                 <span>Borrowers</span>
             </a>
-        </div>
+            <a href="{% url 'dashboard-sales' %}" class="nav-link {% if 'sales' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-chart-line"></i>
+                <span>Sales</span>
+            </a>
+            <a href="{% url 'dashboard-audit' %}" class="nav-link {% if 'audit' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-history"></i>
+                <span>Audit History</span>
+            </a>
+        </nav>
 
         <div class="user-info">
-            <span>Welcome, {{ user.username }}</span>
+            <div class="user-profile d-flex align-items-center gap-2 mb-3">
+                <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="rounded-circle" width="40" height="40">
+                <div class="user-details d-none d-lg-block">
+                    <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
+                    <small class="text-muted">{{ user.email }}</small>
+                </div>
+            </div>
             <div class="user-actions">
-                <a href="{% url 'user-profile' %}" class="btn">
+                <a href="{% url 'user-profile' %}" class="btn btn-outline-light btn-sm mb-2">
                     <i class="fas fa-user"></i>
-                    <span>Profile</span>
+                    <span class="d-none d-lg-inline">Profile</span>
                 </a>
-                <button class="btn btn-danger" data-toggle="modal" data-target="#logoutModal">
+                <a href="{% url 'user-logout' %}" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </button>
+                    <span class="d-none d-lg-inline">Logout</span>
+                </a>
             </div>
         </div>
-    </div>
+    </aside>
 
     <!-- Logout Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Confirm Logout</h5>
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -459,10 +494,10 @@
                     Are you sure you want to log out?
                 </div>
                 <div class="modal-footer">
-                    <form id="logout-form" action="{% url 'user-logout' %}" method="post" class="d-flex w-100 justify-content-end">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <form action="{% url 'user-logout' %}" method="post" class="d-inline">
                         {% csrf_token %}
-                        <button type="button" class="btn" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger ml-2">Logout</button>
+                        <button type="submit" class="btn btn-danger">Logout</button>
                     </form>
                 </div>
             </div>
@@ -478,69 +513,39 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Add active class to current nav link
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-link');
-            
-            navLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-
-            // Hover effect for buttons
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(button => {
-                button.addEventListener('mouseenter', function() {
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = 'scale(1.2)';
-                    }
-                });
-
-                button.addEventListener('mouseleave', function() {
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = 'scale(1)';
-                    }
-                });
-            });
-
-            const mobileToggle = document.querySelector('.mobile-toggle');
+            const mobileToggle = document.querySelector('.mobile-nav-toggle');
             const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.overlay');
+            const backdrop = document.querySelector('.sidebar-backdrop');
+            const body = document.body;
 
-            function toggleMenu() {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
+            function toggleSidebar() {
+                sidebar.classList.toggle('show');
+                backdrop.classList.toggle('show');
+                body.classList.toggle('sidebar-open');
             }
 
-            mobileToggle.addEventListener('click', toggleMenu);
-            overlay.addEventListener('click', toggleMenu);
+            mobileToggle.addEventListener('click', toggleSidebar);
+            backdrop.addEventListener('click', toggleSidebar);
 
-            // Close menu when clicking a link on mobile
+            // Close sidebar on link click on mobile
+            const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
                 link.addEventListener('click', () => {
-                    if (window.innerWidth <= 768) {
-                        toggleMenu();
+                    if (window.innerWidth < 992) {
+                        toggleSidebar();
                     }
                 });
             });
 
             // Handle window resize
             window.addEventListener('resize', () => {
-                if (window.innerWidth > 768) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
+                if (window.innerWidth >= 992) {
+                    sidebar.classList.remove('show');
+                    backdrop.classList.remove('show');
+                    body.classList.remove('sidebar-open');
                 }
             });
         });
     </script>
-
-    <!-- Add mobile menu toggle button and overlay -->
-    <button class="mobile-toggle" aria-label="Toggle menu">
-        <i class="fas fa-bars"></i>
-    </button>
-    <div class="overlay"></div>
 </body>
 </html>
