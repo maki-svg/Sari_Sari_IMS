@@ -3,45 +3,27 @@
 
 {% block content %}
 <style>
-    :root {
-        --primary-color: #04AA6D;
-        --primary-hover: #028c54;
-        --secondary-color: #333;
-        --light-gray: #f9f9f9;
-        --medium-gray: #ddd;
-        --white: #fff;
-    }
-
-    /* Container Responsiveness */
-    .container {
-        padding: clamp(1rem, 4vw, 2rem);
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    /* Page Header */
+    /* Interactive Page Header styles */
     .page-header {
         background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-        padding: clamp(1rem, 4vw, 2rem);
+        padding: 2rem;
         border-radius: 15px;
-        margin-bottom: clamp(1rem, 4vw, 2rem);
+        margin-bottom: 2rem;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         position: relative;
         overflow: hidden;
         transition: all 0.3s ease;
     }
 
-    @media (min-width: 768px) {
-        .page-header:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
+    .page-header:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
 
     .page-title {
         color: var(--white);
         margin: 0;
-        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        font-size: 2.5rem;
         font-weight: 600;
         display: flex;
         align-items: center;
@@ -51,321 +33,259 @@
     }
 
     .page-title i {
-        font-size: clamp(1.2rem, 4vw, 2rem);
+        font-size: 2rem;
         transition: transform 0.3s ease;
     }
 
-    /* Summary Cards */
+    .page-header:hover .page-title i {
+        transform: rotate(15deg);
+    }
+
+    .page-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1));
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+
+    .page-header:hover::after {
+        transform: translateX(100%);
+    }
+
+    /* Sales-specific styles */
     .summary-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: clamp(1rem, 3vw, 1.5rem);
-        margin-bottom: clamp(1.5rem, 4vw, 2rem);
-    }
-
-    .summary-card {
-        background: var(--white);
-        padding: clamp(1rem, 3vw, 1.5rem);
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-    }
-
-    @media (min-width: 768px) {
-        .summary-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-    }
-
-    .summary-value {
-        font-size: clamp(1.5rem, 4vw, 2rem);
-        font-weight: 600;
-        color: var(--primary-color);
-        margin-bottom: 0.5rem;
-    }
-
-    .summary-label {
-        color: var(--secondary-color);
-        font-size: clamp(0.9rem, 2.5vw, 1rem);
-        opacity: 0.8;
-    }
-
-    /* Add Sale Form */
-    .add-sale-form {
-        background: var(--white);
-        padding: clamp(1rem, 3vw, 1.5rem);
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-bottom: clamp(1.5rem, 4vw, 2rem);
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: clamp(0.75rem, 2vw, 1rem);
-        align-items: end;
-    }
-
-    .form-group {
-        margin-bottom: clamp(0.75rem, 2vw, 1rem);
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: var(--secondary-color);
-        font-weight: 500;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: clamp(0.75rem, 2vw, 1rem);
-        border: 2px solid var(--medium-gray);
-        border-radius: 8px;
-        font-size: 16px;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.2);
-        outline: none;
-    }
-
-    /* Search Form */
-    .search-form {
         display: flex;
-        gap: clamp(0.5rem, 2vw, 1rem);
-        margin-bottom: clamp(1rem, 3vw, 1.5rem);
+        justify-content: space-around;
+        margin: 20px auto;
+        max-width: 1200px;
+        flex-wrap: wrap;
+        gap: 20px;
     }
-
-    @media (max-width: 576px) {
-        .search-form {
-            flex-direction: column;
-        }
-    }
-
-    .search-input {
+    
+    .summary-card {
+        background-color: var(--white);
+        border-radius: 10px;
+        padding: 25px;
         flex: 1;
-        padding: clamp(0.75rem, 2vw, 1rem);
-        border: 2px solid var(--medium-gray);
-        border-radius: 8px;
-        font-size: 16px;
-        min-width: 200px;
-    }
-
-    .search-button {
-        padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
-        background: var(--primary-color);
-        color: var(--white);
-        border: none;
-        border-radius: 8px;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
+        min-width: 220px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         transition: all 0.3s ease;
-        white-space: nowrap;
     }
-
-    .search-button:hover {
-        background: var(--primary-hover);
-        transform: translateY(-2px);
+    
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
     }
-
-    /* Table Styles */
+    
+    .summary-value {
+        font-size: 28px;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin: 15px 0;
+    }
+    
+    .form-container {
+        max-width: 650px;
+        margin: 30px auto;
+        padding: 30px;
+        background-color: var(--white);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    .price-display {
+        background-color: var(--light-gray);
+        padding: 20px;
+        border-radius: 8px;
+        margin: 25px 0;
+        border-left: 4px solid var(--primary-color);
+    }
+    
     .table-container {
-        background: var(--white);
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: var(--white);
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
-
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
+    
     .sales-table {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
+        margin-top: 20px;
     }
-
+    
     .sales-table th {
-        background: var(--secondary-color);
+        background-color: var(--secondary-color);
         color: var(--white);
-        padding: clamp(0.75rem, 2vw, 1rem);
+        padding: 15px;
         text-align: left;
-        font-weight: 600;
-        white-space: nowrap;
     }
-
+    
     .sales-table td {
-        padding: clamp(0.75rem, 2vw, 1rem);
+        padding: 15px;
         border-bottom: 1px solid var(--medium-gray);
-        vertical-align: middle;
     }
-
-    /* Mobile Table Optimizations */
-    @media (max-width: 768px) {
-        .sales-table thead {
-            display: none;
-        }
-
-        .sales-table tbody tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid var(--medium-gray);
-            border-radius: 8px;
-            background: var(--white);
-        }
-
-        .sales-table td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            border: none;
-            text-align: right;
-        }
-
-        .sales-table td::before {
-            content: attr(data-label);
-            font-weight: bold;
-            margin-right: 1rem;
-            text-align: left;
-        }
-
-        .sales-table td:last-child {
-            border-bottom: none;
-        }
-
-        .action-buttons {
-            justify-content: flex-end;
-            width: 100%;
-        }
-    }
-
-    /* Action Buttons */
+    
     .action-buttons {
         display: flex;
-        gap: 0.5rem;
+        gap: 10px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .summary-container {
+            flex-direction: column;
+        }
+        
+        .summary-card {
+            width: 100%;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
     }
 
-    .btn {
-        padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
-        border-radius: 8px;
-        font-size: clamp(0.9rem, 2.5vw, 1rem);
-        font-weight: 500;
-        display: inline-flex;
+    .search-form {
+        display: flex;
+        gap: 15px; /* Increased spacing between input and button */
         align-items: center;
-        gap: 0.5rem;
+        width: 100%;
+        max-width: 500px; /* Control the overall form width */
+    }
+
+    .search-input {
+        flex: 1;
+        min-width: 300px; /* Minimum width for the search input */
+        padding: 10px 15px;
+        border: 2px solid var(--medium-gray);
+        border-radius: 8px;
+        font-size: 1rem;
         transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.1);
+        outline: none;
+    }
+
+    .search-button {
+        padding: 10px 20px;
+        white-space: nowrap;
         border: none;
-        cursor: pointer;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        transition: all 0.3s ease;
     }
 
-    .btn-sm {
-        padding: clamp(0.4rem, 1.2vw, 0.6rem);
-        font-size: clamp(0.8rem, 2vw, 0.9rem);
-    }
-
-    .btn-warning {
-        background: #ffc107;
-        color: #000;
-    }
-
-    .btn-danger {
-        background: #dc3545;
-        color: var(--white);
-    }
-
-    .btn:hover {
+    .search-button:hover {
+        background-color: var(--primary-hover);
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 8px rgba(4, 170, 109, 0.2);
     }
 
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: clamp(2rem, 6vw, 4rem);
-        color: #6c757d;
-    }
+    @media (max-width: 768px) {
+        .search-form {
+            flex-direction: column;
+            gap: 10px;
+        }
 
-    .empty-state i {
-        font-size: clamp(2rem, 6vw, 4rem);
-        color: var(--medium-gray);
-        margin-bottom: 1rem;
-    }
+        .search-input {
+            min-width: 100%;
+        }
 
-    /* iOS Safari specific fixes */
-    @supports (-webkit-touch-callout: none) {
-        input, select {
-            font-size: 16px !important;
+        .search-button {
+            width: 100%;
         }
     }
 </style>
 
-<div class="container">
-    <!-- Page Header -->
+<!-- Page Content -->
+<div class="container-fluid">
+    <!-- Interactive Page Header -->
     <div class="page-header">
-        <h2 class="page-title">
-            <i class="fas fa-shopping-cart"></i>
-            Sales Management
-        </h2>
+        <h1 class="page-title">
+            <i class="fas fa-cash-register"></i>
+            <span>Sales Management</span>
+        </h1>
     </div>
 
     <!-- Sales Summary Section -->
     <div class="summary-container">
         <div class="summary-card">
-            <div class="summary-value">₱{{ total_sales|floatformat:2 }}</div>
             <div class="summary-label">Total Sales</div>
+            <div class="summary-value">{{ total_sales|floatformat:2 }} PHP</div>
+            <div class="summary-label">All-time revenue</div>
         </div>
         <div class="summary-card">
-            <div class="summary-value">{{ total_transactions }}</div>
             <div class="summary-label">Total Transactions</div>
+            <div class="summary-value">{{ total_transactions }}</div>
+            <div class="summary-label">Completed orders</div>
         </div>
         <div class="summary-card">
-            <div class="summary-value">{{ total_items_sold }}</div>
             <div class="summary-label">Items Sold</div>
+            <div class="summary-value">{{ total_items_sold }}</div>
+            <div class="summary-label">Total units sold</div>
         </div>
     </div>
 
-    <!-- Add Sale Form -->
-    <div class="add-sale-form">
-        <h3 class="mb-3">Add New Sale</h3>
-        <form method="POST" id="saleForm">
+    <!-- New Sale Form -->
+    <div class="form-container">
+        <h2 class="mb-4">Record New Sale</h2>
+        <form method="POST" id="sales-form">
             {% csrf_token %}
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" for="id_product">Product</label>
-                    {{ form.product }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="id_quantity">Quantity</label>
-                    {{ form.quantity }}
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="id_buyer_name">Buyer Name (Optional)</label>
-                    {{ form.buyer_name }}
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-plus"></i>
-                        Add Sale
-                    </button>
-                </div>
+            
+            <div class="form-group">
+                <label for="id_product">Product *</label>
+                <select name="product" id="id_product" class="form-control" required>
+                    <option value="">Select a product</option>
+                    {% for product in products %}
+                        <option value="{{ product.id }}" 
+                                data-price="{{ product.price }}"
+                                data-stock="{{ product.stock }}">
+                            {{ product.name }} ({{ product.stock }} available)
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
+            
+            <div class="form-group">
+                <label for="id_quantity">Quantity *</label>
+                <input type="number" name="quantity" id="id_quantity" 
+                       class="form-control" min="1" value="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_buyer_name">Customer Name (Optional)</label>
+                <input type="text" name="buyer_name" id="id_buyer_name" 
+                       class="form-control" placeholder="Enter customer name">
+            </div>
+            
+            <div class="price-display" id="price-display">
+                <i class="fas fa-info-circle"></i> Select a product to see details
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100" id="submit-btn">
+                <i class="fas fa-cash-register"></i> Record Sale
+            </button>
         </form>
     </div>
     
     <!-- Recent Sales Table -->
     <div class="table-container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="mb-0">Recent Sales</h3>
+            <h2 class="mb-0">Recent Sales</h2>
             <form class="search-form" method="GET">
                 <input type="text" 
                        name="q" 
@@ -374,8 +294,7 @@
                        value="{{ request.GET.q }}"
                        aria-label="Search sales">
                 <button type="submit" class="search-button">
-                    <i class="fas fa-search"></i>
-                    Search
+                    <i class="fas fa-search"></i> Search
                 </button>
             </form>
         </div>
@@ -396,13 +315,13 @@
                 <tbody>
                     {% for sale in recent_sales %}
                     <tr>
-                        <td data-label="Date">{{ sale.date|date:"M d, Y" }}</td>
-                        <td data-label="Product">{{ sale.product.name }}</td>
-                        <td data-label="Quantity">{{ sale.quantity }}</td>
-                        <td data-label="Price">₱{{ sale.price|floatformat:2 }}</td>
-                        <td data-label="Total">₱{{ sale.total|floatformat:2 }}</td>
-                        <td data-label="Customer">{{ sale.buyer_name|default:"-" }}</td>
-                        <td data-label="Actions">
+                        <td>{{ sale.date|date:"M d, Y" }}</td>
+                        <td>{{ sale.product.name }}</td>
+                        <td>{{ sale.quantity }}</td>
+                        <td>{{ sale.price|floatformat:2 }} PHP</td>
+                        <td>{{ sale.total|floatformat:2 }} PHP</td>
+                        <td>{{ sale.buyer_name|default:"-" }}</td>
+                        <td>
                             <div class="action-buttons">
                                 <a href="{% url 'dashboard-sales-edit' pk=sale.id %}" 
                                    class="btn btn-sm btn-warning">
@@ -417,99 +336,87 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7">
-                            <div class="empty-state">
-                                <i class="fas fa-shopping-cart"></i>
-                                <h5>No sales records found</h5>
-                                <p class="text-muted mb-0">Add a new sale to get started</p>
-                            </div>
-                        </td>
+                        <td colspan="7" class="text-center py-4">No sales records found</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        {% if recent_sales.has_other_pages %}
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if recent_sales.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ recent_sales.previous_page_number }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in recent_sales.paginator.page_range %}
+                        <li class="page-item {% if recent_sales.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+                    
+                    {% if recent_sales.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ recent_sales.next_page_number }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
     </div>
 </div>
 
+{% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('saleForm');
-    const productSelect = document.getElementById('id_product');
-    const quantityInput = document.getElementById('id_quantity');
+    document.addEventListener('DOMContentLoaded', function() {
+        const productSelect = document.getElementById('id_product');
+        const quantityInput = document.getElementById('id_quantity');
+        const priceDisplay = document.getElementById('price-display');
+        const submitBtn = document.getElementById('submit-btn');
 
-    if (form && productSelect && quantityInput) {
-        // Update max quantity when product changes
-        productSelect.addEventListener('change', function() {
-            const selectedOption = this.selectedOptions[0];
-            if (selectedOption) {
-                const text = selectedOption.textContent;
-                const match = text.match(/\(Stock: (\d+)\)/);
-                if (match) {
-                    const maxStock = parseInt(match[1]);
-                    quantityInput.max = maxStock;
-                    quantityInput.placeholder = `Max: ${maxStock}`;
-                }
-            }
-        });
-
-        // Form validation
-        form.addEventListener('submit', function(e) {
-            if (!productSelect.value) {
-                e.preventDefault();
-                alert('Please select a product');
-                return;
-            }
-
-            const quantity = parseInt(quantityInput.value);
-            if (!quantity || quantity < 1) {
-                e.preventDefault();
-                alert('Please enter a valid quantity');
-                return;
-            }
-
+        function updatePriceDisplay() {
             const selectedOption = productSelect.selectedOptions[0];
-            const match = selectedOption.textContent.match(/\(Stock: (\d+)\)/);
-            if (match) {
-                const maxStock = parseInt(match[1]);
-                if (quantity > maxStock) {
-                    e.preventDefault();
-                    alert(`Not enough stock. Only ${maxStock} units available.`);
-                    return;
+            if (selectedOption && selectedOption.value) {
+                const price = parseFloat(selectedOption.dataset.price);
+                const stock = parseInt(selectedOption.dataset.stock);
+                const quantity = parseInt(quantityInput.value) || 1;
+                const total = (price * quantity).toFixed(2);
+
+                priceDisplay.innerHTML = `
+                    <div class="mb-2"><i class="fas fa-tag"></i> Price: ${price.toFixed(2)} PHP</div>
+                    <div class="mb-2"><i class="fas fa-box"></i> Quantity: ${quantity}</div>
+                    <div class="mb-2"><i class="fas fa-warehouse"></i> Available: ${stock}</div>
+                    <div><i class="fas fa-calculator"></i> Total: ${total} PHP</div>
+                `;
+
+                if (quantity > stock) {
+                    submitBtn.disabled = true;
+                    priceDisplay.innerHTML += `
+                        <div class="text-danger mt-2">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Not enough stock!
+                        </div>
+                    `;
+                } else {
+                    submitBtn.disabled = false;
                 }
             }
-        });
-    }
+        }
 
-    // Add data-label attributes for mobile view
-    const table = document.querySelector('.sales-table');
-    const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.trim());
-    
-    table.querySelectorAll('tbody tr').forEach(row => {
-        row.querySelectorAll('td').forEach((cell, index) => {
-            cell.setAttribute('data-label', headers[index]);
-        });
-    });
-
-    // Delete confirmation
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            if (!confirm('Are you sure you want to delete this sale?')) {
-                e.preventDefault();
-            }
-        });
-    });
-
-    // Touch feedback for buttons
-    document.querySelectorAll('.btn').forEach(btn => {
-        btn.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.98)';
-        });
+        productSelect.addEventListener('change', updatePriceDisplay);
+        quantityInput.addEventListener('input', updatePriceDisplay);
         
-        btn.addEventListener('touchend', function() {
-            this.style.transform = 'scale(1)';
-        });
+                // Delete button animation        document.querySelectorAll('.delete-btn').forEach(btn => {            btn.addEventListener('click', function(e) {                const row = this.closest('tr');                row.style.transition = 'all 0.3s ease';                row.style.opacity = '0';                row.style.transform = 'translateX(-20px)';                setTimeout(() => {                    window.location.href = this.href;                }, 300);            });        });
     });
-});
 </script>
+{% endblock %}
 {% endblock %}

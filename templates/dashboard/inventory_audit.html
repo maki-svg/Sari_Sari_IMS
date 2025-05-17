@@ -2,222 +2,7 @@
 {% load static %}
 
 {% block content %}
-<style>
-    :root {
-        --primary-color: #04AA6D;
-        --primary-hover: #028c54;
-        --secondary-color: #333;
-        --light-gray: #f9f9f9;
-        --medium-gray: #ddd;
-        --white: #fff;
-        --danger: #dc3545;
-        --success: #28a745;
-    }
-
-    .container {
-        padding: clamp(1rem, 4vw, 2rem);
-    }
-
-    /* Page Header */
-    .page-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, #025B3A 100%);
-        padding: clamp(1rem, 4vw, 2rem);
-        border-radius: 15px;
-        margin-bottom: clamp(1rem, 4vw, 2rem);
-        color: var(--white);
-    }
-
-    .page-title {
-        font-size: clamp(1.5rem, 5vw, 2rem);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: clamp(0.5rem, 2vw, 1rem);
-    }
-
-    .inventory-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: clamp(0.75rem, 3vw, 1.5rem);
-        margin-top: clamp(1rem, 3vw, 1.5rem);
-    }
-
-    .stat-item {
-        background: rgba(255, 255, 255, 0.1);
-        padding: clamp(0.75rem, 2vw, 1rem);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    /* Card Styles */
-    .card {
-        background: var(--white);
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-bottom: clamp(1rem, 4vw, 2rem);
-        overflow: hidden;
-    }
-
-    .card-header {
-        padding: clamp(1rem, 3vw, 1.5rem);
-        background: var(--primary-color);
-        color: var(--white);
-    }
-
-    .card-header h5 {
-        margin: 0;
-        font-size: clamp(1.1rem, 3vw, 1.25rem);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .card-body {
-        padding: clamp(1rem, 3vw, 1.5rem);
-    }
-
-    /* Form Controls */
-    .form-label {
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        font-size: clamp(0.9rem, 2.5vw, 1rem);
-    }
-
-    .form-control {
-        width: 100%;
-        padding: clamp(0.75rem, 2vw, 1rem);
-        border: 2px solid var(--medium-gray);
-        border-radius: 8px;
-        font-size: 16px;
-        transition: all 0.3s ease;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-
-    .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.1);
-        outline: none;
-    }
-
-    .form-text {
-        font-size: clamp(0.8rem, 2vw, 0.875rem);
-        color: #666;
-        margin-top: 0.5rem;
-    }
-
-    /* Table Styles */
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        margin-top: clamp(1rem, 3vw, 1.5rem);
-    }
-
-    .table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table th {
-        background: var(--secondary-color);
-        color: var(--white);
-        padding: clamp(0.75rem, 2vw, 1rem);
-        text-align: left;
-        white-space: nowrap;
-    }
-
-    .table td {
-        padding: clamp(0.75rem, 2vw, 1rem);
-        border-bottom: 1px solid var(--medium-gray);
-    }
-
-    /* Mobile Table Optimizations */
-    @media (max-width: 768px) {
-        .table thead {
-            display: none;
-        }
-
-        .table tbody tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid var(--medium-gray);
-            border-radius: 8px;
-            background: var(--white);
-        }
-
-        .table td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            border: none;
-            text-align: right;
-        }
-
-        .table td::before {
-            content: attr(data-label);
-            font-weight: bold;
-            margin-right: 1rem;
-            text-align: left;
-        }
-    }
-
-    /* Buttons */
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: clamp(0.75rem, 2vw, 1rem);
-        border-radius: 8px;
-        font-size: clamp(0.9rem, 2.5vw, 1rem);
-        font-weight: 500;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-        min-height: 44px;
-        touch-action: manipulation;
-    }
-
-    .btn-primary {
-        background: var(--primary-color);
-        color: var(--white);
-    }
-
-    .btn-primary:hover {
-        background: var(--primary-hover);
-    }
-
-    .btn-success {
-        background: var(--success);
-        color: var(--white);
-    }
-
-    .btn-success:hover {
-        background: #1e7e34;
-    }
-
-    /* Text Colors */
-    .text-danger {
-        color: var(--danger);
-    }
-
-    .text-success {
-        color: var(--success);
-    }
-
-    /* iOS Safari specific fixes */
-    @supports (-webkit-touch-callout: none) {
-        input, select, textarea {
-            font-size: 16px !important;
-        }
-    }
-</style>
-
-<div class="container">
+<div class="container py-4">
     <!-- Page Header -->
     <div class="page-header">
         <h1 class="page-title">
@@ -239,9 +24,9 @@
     <div class="row">
         <!-- Audit Form -->
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-clipboard-list me-2"></i>New Audit</h5>
+            <div class="card glass-effect mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>New Audit</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST" id="auditForm">
@@ -261,7 +46,7 @@
                             <label for="physical_count" class="form-label">Physical Count</label>
                             <input type="number" name="physical_count" id="physical_count" 
                                    class="form-control" required min="0">
-                            <div id="stockDifference" class="form-text"></div>
+                            <div id="stockDifference" class="form-text text-muted mt-2"></div>
                         </div>
                         <div class="mb-3">
                             <label for="notes" class="form-label">Notes</label>
@@ -276,8 +61,8 @@
                                 </label>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-save"></i> Record Audit
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Record Audit
                         </button>
                     </form>
                 </div>
@@ -286,9 +71,9 @@
 
         <!-- Pending Audits -->
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-clock me-2"></i>Pending Audits</h5>
+            <div class="card glass-effect">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Pending Audits</h5>
                 </div>
                 <div class="card-body">
                     {% if pending_audits %}
@@ -306,15 +91,15 @@
                             <tbody>
                                 {% for audit in pending_audits %}
                                 <tr>
-                                    <td data-label="Product">{{ audit.product.name }}</td>
-                                    <td data-label="System Count">{{ audit.system_count }}</td>
-                                    <td data-label="Physical Count">{{ audit.physical_count }}</td>
-                                    <td data-label="Discrepancy" class="{% if audit.discrepancy < 0 %}text-danger{% elif audit.discrepancy > 0 %}text-success{% endif %}">
+                                    <td>{{ audit.product.name }}</td>
+                                    <td>{{ audit.system_count }}</td>
+                                    <td>{{ audit.physical_count }}</td>
+                                    <td class="{% if audit.discrepancy < 0 %}text-danger{% elif audit.discrepancy > 0 %}text-success{% endif %}">
                                         {{ audit.discrepancy }}
                                     </td>
-                                    <td data-label="Action">
+                                    <td>
                                         <a href="{% url 'dashboard-resolve-audit' audit.id %}" 
-                                           class="btn btn-success btn-sm">
+                                           class="btn btn-sm btn-success">
                                             <i class="fas fa-check"></i> Resolve
                                         </a>
                                     </td>
@@ -340,34 +125,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateStockDifference() {
         const selectedOption = productSelect.selectedOptions[0];
-        if (selectedOption && selectedOption.dataset.currentStock) {
+        if (selectedOption && physicalCount.value) {
             const currentStock = parseInt(selectedOption.dataset.currentStock);
-            const newCount = parseInt(physicalCount.value) || 0;
-            const difference = newCount - currentStock;
-            
-            if (difference !== 0) {
-                stockDifference.textContent = `Difference: ${difference > 0 ? '+' : ''}${difference} units`;
-                stockDifference.className = `form-text ${difference > 0 ? 'text-success' : 'text-danger'}`;
+            const newStock = parseInt(physicalCount.value);
+            const difference = newStock - currentStock;
+
+            let message = `Difference: ${difference} `;
+            if (difference < 0) {
+                message += `(Shortage)`;
+                stockDifference.className = 'form-text text-danger mt-2';
+            } else if (difference > 0) {
+                message += `(Surplus)`;
+                stockDifference.className = 'form-text text-success mt-2';
             } else {
-                stockDifference.textContent = 'No discrepancy';
-                stockDifference.className = 'form-text text-muted';
+                message += `(No discrepancy)`;
+                stockDifference.className = 'form-text text-muted mt-2';
             }
+            stockDifference.textContent = message;
+        } else {
+            stockDifference.textContent = '';
         }
     }
 
     productSelect.addEventListener('change', updateStockDifference);
     physicalCount.addEventListener('input', updateStockDifference);
-
-    // Touch feedback for buttons
-    document.querySelectorAll('.btn').forEach(btn => {
-        btn.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.98)';
-        });
-        
-        btn.addEventListener('touchend', function() {
-            this.style.transform = 'scale(1)';
-        });
-    });
 });
 </script>
 {% endblock %} 

@@ -5,24 +5,17 @@
 
 {% block content %}
 <style>
-    :root {
-        --primary-color: #04AA6D;
-        --primary-hover: #028c54;
-        --secondary-color: #333;
-        --light-gray: #f9f9f9;
-        --medium-gray: #ddd;
-        --white: #fff;
-    }
-
-    /* Page Header */
+    /* Modern dashboard header with glassmorphism effect */
     .dashboard-header {
-        background: linear-gradient(135deg, var(--primary-color) 0%, #025B3A 100%);
-        padding: clamp(1rem, 4vw, 2rem);
-        border-radius: 15px;
-        margin-bottom: clamp(1rem, 4vw, 2rem);
-        color: var(--white);
+        background: linear-gradient(135deg, #04AA6D 0%, #025B3A 100%);
+        padding: 2.5rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         position: relative;
         overflow: hidden;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .dashboard-header::before {
@@ -44,226 +37,338 @@
     .dashboard-header h2 {
         position: relative;
         z-index: 1;
-        font-size: clamp(1.5rem, 5vw, 2rem);
-        margin-bottom: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     }
 
-    /* Search Box */
+    /* Enhanced search box with floating effect */
     .search-box {
-        background: var(--white);
-        padding: clamp(1rem, 3vw, 1.5rem);
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-bottom: clamp(1rem, 3vw, 1.5rem);
+        background: white;
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(4, 170, 109, 0.1);
+    }
+
+    .search-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+        border-color: rgba(4, 170, 109, 0.3);
     }
 
     .filter-row {
         display: flex;
-        flex-wrap: wrap;
-        gap: clamp(0.5rem, 2vw, 1rem);
-        margin-bottom: clamp(1rem, 3vw, 1.5rem);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
-    /* Form Controls */
+    /* Modern form controls with floating labels */
     .input-group {
-        flex: 1;
-        min-width: 250px;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
     .input-group-text {
-        background: var(--white);
+        background: white;
         border: none;
-        padding: clamp(0.75rem, 2vw, 1rem);
+        padding: 0.8rem 1rem;
     }
 
-    .form-control,
-    .form-select {
-        width: 100%;
-        padding: clamp(0.75rem, 2vw, 1rem);
-        border: 2px solid var(--medium-gray);
-        border-radius: 8px;
-        font-size: 16px;
+    .form-control, .form-select {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 0.8rem 1.2rem;
         transition: all 0.3s ease;
+        font-size: 1rem;
     }
 
-    .form-control:focus,
-    .form-select:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.2);
-        outline: none;
+    .form-control:focus, .form-select:focus {
+        border-color: #04AA6D;
+        box-shadow: 0 0 0 0.25rem rgba(4, 170, 109, 0.15);
+        transform: scale(1.01);
     }
 
-    /* Action Buttons */
-    .action-btn {
-        padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
-        border-radius: 8px;
-        font-size: clamp(0.9rem, 2.5vw, 1rem);
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-        min-height: 44px;
-        touch-action: manipulation;
-        white-space: nowrap;
-    }
-
-    .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Status Badges */
+    /* Enhanced status badges with 3D effect */
     .status-badge {
-        padding: clamp(0.4rem, 1.5vw, 0.6rem) clamp(0.75rem, 2vw, 1rem);
-        border-radius: 20px;
-        font-size: clamp(0.8rem, 2vw, 0.9rem);
-        font-weight: 500;
+        padding: 0.6rem 1.2rem;
+        border-radius: 30px;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
-        gap: 0.4rem;
-        transition: all 0.3s ease;
+        gap: 0.6rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .status-badge i {
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .status-badge:hover {
+        transform: translateY(-2px);
+    }
+
+    .status-badge:hover i {
+        transform: rotate(360deg) scale(1.2);
     }
 
     .status-active {
-        background: linear-gradient(135deg, var(--primary-color) 0%, #028c54 100%);
-        color: var(--white);
+        background: linear-gradient(135deg, #04AA6D 0%, #028c54 100%);
+        color: white;
     }
 
     .status-overdue {
         background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        color: var(--white);
+        color: white;
     }
 
     .status-paid {
         background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-        color: var(--white);
+        color: white;
     }
 
-    /* Table Container */
+    /* Modern table design with card-like rows */
     .table-container {
-        background: var(--white);
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: white;
+        border-radius: 16px;
         overflow: hidden;
-        margin-top: clamp(1rem, 3vw, 1.5rem);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
     }
 
     .table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin: 0;
+        margin-bottom: 0;
     }
 
-    .table th {
-        background: var(--secondary-color);
-        color: var(--white);
-        padding: clamp(0.75rem, 2vw, 1rem);
-        text-align: left;
-        white-space: nowrap;
+    .table thead th {
+        background: linear-gradient(135deg, #333333 0%, #222222 100%);
+        color: white;
         font-weight: 600;
-        font-size: clamp(0.85rem, 2vw, 0.9rem);
+        border: none;
+        padding: 1.2rem 1rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .table td {
-        padding: clamp(0.75rem, 2vw, 1rem);
-        border-bottom: 1px solid var(--medium-gray);
+    .table tbody tr {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
     }
 
-    /* Mobile Table Optimizations */
-    @media (max-width: 768px) {
-        .table thead {
-            display: none;
-        }
-
-        .table tbody tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid var(--medium-gray);
-            border-radius: 8px;
-            background: var(--white);
-        }
-
-        .table td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            border: none;
-            text-align: right;
-        }
-
-        .table td::before {
-            content: attr(data-label);
-            font-weight: bold;
-            margin-right: 1rem;
-            text-align: left;
-        }
-
-        .action-buttons {
-            justify-content: flex-end;
-            gap: 0.5rem;
-        }
-
-        .status-badge {
-            margin-left: auto;
-        }
+    .table tbody tr:hover {
+        background-color: rgba(4, 170, 109, 0.05);
+        transform: scale(1.01) translateX(5px);
     }
 
-    /* Action Buttons in Table */
+    /* Modern action buttons with hover effects */
     .action-button {
-        padding: clamp(0.5rem, 1.5vw, 0.75rem);
-        border-radius: 8px;
+        padding: 0.6rem;
+        border-radius: 12px;
+        border: none;
+        background: #f8f9fa;
+        color: #333;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
-        width: 36px;
-        height: 36px;
-        background: var(--light-gray);
-        color: var(--secondary-color);
-        text-decoration: none;
+        width: 40px;
+        height: 40px;
+        margin: 0 0.2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .action-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-3px) rotate(8deg);
     }
 
     .action-button.view:hover {
         background: #17a2b8;
-        color: var(--white);
+        color: white;
+        box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
     }
 
     .action-button.edit:hover {
         background: #ffc107;
-        color: var(--white);
+        color: white;
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
     }
 
     .action-button.delete:hover {
         background: #dc3545;
-        color: var(--white);
+        color: white;
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
     }
 
-    /* Empty State */
+    /* Enhanced empty state with animation */
     .empty-state {
         text-align: center;
-        padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 3vw, 2rem);
+        padding: 4rem 2rem;
         color: #6c757d;
+        animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .empty-state i {
-        font-size: clamp(2rem, 6vw, 4rem);
-        color: var(--primary-color);
+        font-size: 4rem;
+        color: #04AA6D;
         opacity: 0.5;
-        margin-bottom: clamp(1rem, 3vw, 1.5rem);
+        margin-bottom: 1.5rem;
+        animation: bounce 2s infinite;
     }
 
-    /* iOS Safari specific fixes */
-    @supports (-webkit-touch-callout: none) {
-        input, select {
-            font-size: 16px !important;
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Modern buttons with gradient and hover effect */
+    .btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #04AA6D 0%, #028c54 100%);
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        border: none;
+    }
+
+    /* Loading animation enhancement */
+    .loading {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 3px solid rgba(4, 170, 109, 0.3);
+        border-radius: 50%;
+        border-top-color: #04AA6D;
+        animation: spin 1s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .filter-row {
+            flex-direction: column;
+        }
+        
+        .filter-row > div {
+            width: 100% !important;
+        }
+        
+        .action-button {
+            width: 36px;
+            height: 36px;
+            padding: 0.4rem;
+        }
+    }
+
+    /* Enhanced button styles with better spacing */
+    .action-btn {
+        margin: 0 10px;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 180px;
+        justify-content: center;
+    }
+
+    .action-btn:first-child {
+        margin-left: 0;
+    }
+
+    .action-btn:last-child {
+        margin-right: 0;
+    }
+
+    .action-btn i {
+        font-size: 1.1em;
+        transition: transform 0.3s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
+    .action-btn:hover i {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .btn-success.action-btn {
+        background: linear-gradient(135deg, #04AA6D 0%, #028c54 100%);
+        border: none;
+    }
+
+    .btn-primary.action-btn {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        border: none;
+    }
+
+    /* Table action buttons spacing */
+    .action-button {
+        margin: 0 5px;
+    }
+
+    .action-button:first-child {
+        margin-left: 0;
+    }
+
+    .action-button:last-child {
+        margin-right: 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .d-flex.gap-2 {
+            flex-direction: column;
+            gap: 1rem !important;
+        }
+
+        .action-btn {
+            margin: 5px 0;
+            width: 100%;
         }
     }
 </style>
@@ -271,7 +376,7 @@
 <div class="container-fluid py-4">
     <!-- Enhanced Header -->
     <div class="dashboard-header">
-        <h2 class="d-flex align-items-center">
+        <h2 class="text-white mb-0 d-flex align-items-center">
             <i class="fas fa-users me-2"></i>
             Borrower Management
         </h2>
@@ -281,18 +386,20 @@
     <div class="search-box">
         <form id="filterForm" class="mb-3">
             <div class="filter-row">
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" 
-                           name="search" 
-                           class="form-control" 
-                           placeholder="Search borrowers..."
-                           value="{{ search_query }}"
-                           autocomplete="off">
+                <div class="flex-grow-1">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" 
+                               name="search" 
+                               class="form-control" 
+                               placeholder="Search borrowers..."
+                               value="{{ search_query }}"
+                               autocomplete="off">
+                    </div>
                 </div>
-                <div class="input-group" style="min-width: 200px;">
+                <div style="width: 200px;">
                     <select name="status" class="form-select" id="statusFilter">
                         <option value="">All Status</option>
                         <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
@@ -303,14 +410,12 @@
             </div>
         </form>
 
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex gap-2">
             <a href="{% url 'dashboard-borrower-create' %}" class="btn btn-success action-btn">
-                <i class="fas fa-plus"></i>
-                <span>Add New Borrower</span>
+                <i class="fas fa-plus me-2"></i>Add New Borrower
             </a>
             <a href="{% url 'check-overdue' %}" class="btn btn-warning action-btn" data-email-action>
-                <i class="fas fa-envelope"></i>
-                <span>Send Email Notifications</span>
+                <i class="fas fa-envelope me-2"></i>Send Email Notifications
             </a>
         </div>
     </div>
@@ -318,7 +423,7 @@
     <!-- Enhanced Table -->
     <div class="table-container">
         <div class="table-responsive">
-            <table class="table">
+            <table class="table" id="borrowersTable">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -331,17 +436,17 @@
                 <tbody>
                     {% for borrower in borrowers %}
                     <tr>
-                        <td data-label="Name">{{ borrower.borrower_name }}</td>
-                        <td data-label="Contact">{{ borrower.contact_number }}</td>
-                        <td data-label="Status">
+                        <td>{{ borrower.borrower_name }}</td>
+                        <td>{{ borrower.contact_number }}</td>
+                        <td>
                             <span class="status-badge status-{{ borrower.status|lower }}">
                                 <i class="fas fa-{% if borrower.status == 'active' %}check-circle{% elif borrower.status == 'overdue' %}exclamation-circle{% else %}check-double{% endif %}"></i>
                                 {{ borrower.status }}
                             </span>
                         </td>
-                        <td data-label="Due Date">{{ borrower.due_date|date:"M d, Y" }}</td>
-                        <td data-label="Actions">
-                            <div class="action-buttons">
+                        <td>{{ borrower.due_date|date:"M d, Y" }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
                                 <a href="{% url 'dashboard-borrower-detail' borrower.pk %}" 
                                    class="action-button view" 
                                    title="View Details">
@@ -363,13 +468,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5">
-                            <div class="empty-state">
-                                <i class="fas fa-users"></i>
-                                <h5>No borrowers found</h5>
-                                <p class="text-muted mb-0">Add a new borrower to get started</p>
-                            </div>
-                        </td>
+                        <td colspan="5" class="text-center">No borrowers found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -378,43 +477,48 @@
     </div>
 </div>
 
+<!-- Add preconnect for faster image loading -->
+<link rel="preconnect" href="/media">
+
+<!-- Add prefetch for edit page -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const filterForm = document.getElementById('filterForm');
     const statusFilter = document.getElementById('statusFilter');
     const searchInput = document.querySelector('input[name="search"]');
 
-    // Auto-submit form with debounce
+    // Auto-submit form with loading state
     function submitForm() {
+        const submitButton = filterForm.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<div class="loading"></div>';
+        }
         filterForm.submit();
     }
 
+    // Debounced search
     let timeout = null;
     searchInput.addEventListener('input', function() {
         clearTimeout(timeout);
         timeout = setTimeout(submitForm, 500);
     });
 
+    // Status filter change
     statusFilter.addEventListener('change', submitForm);
 
-    // Touch feedback for buttons
-    document.querySelectorAll('.action-btn, .action-button').forEach(btn => {
-        btn.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.98)';
-        });
-        
-        btn.addEventListener('touchend', function() {
-            this.style.transform = 'scale(1)';
-        });
-    });
-
-    // Add data-label attributes for mobile view
-    const table = document.querySelector('.table');
-    const headers = Array.from(table.querySelectorAll('th')).map(th => th.textContent.trim());
-    
-    table.querySelectorAll('tbody tr').forEach(row => {
-        row.querySelectorAll('td').forEach((cell, index) => {
-            cell.setAttribute('data-label', headers[index]);
+    // Delete animation
+    document.querySelectorAll('.action-button.delete').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const row = this.closest('tr');
+            row.style.transition = 'all 0.3s ease';
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-20px)';
+            
+            setTimeout(() => {
+                window.location.href = this.href;
+            }, 300);
         });
     });
 });

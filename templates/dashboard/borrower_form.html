@@ -18,11 +18,6 @@
         --success-color: #28a745;
     }
 
-    /* Container Responsiveness */
-    .container {
-        padding: clamp(1rem, 4vw, 2rem);
-    }
-
     /* Form Card Styling */
     .form-card {
         background: var(--white);
@@ -30,26 +25,22 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         margin-bottom: 2rem;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        width: 100%;
-        max-width: 100%;
     }
 
-    @media (min-width: 768px) {
-        .form-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
+    .form-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
     }
 
     .card-header {
         background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
         color: var(--white);
-        padding: clamp(1rem, 3vw, 1.5rem);
+        padding: 1.5rem;
         border-radius: 15px 15px 0 0;
     }
 
     .header-title {
-        font-size: clamp(1.25rem, 4vw, 1.75rem);
+        font-size: 1.75rem;
         font-weight: 600;
         margin: 0;
         display: flex;
@@ -57,24 +48,18 @@
         gap: 0.75rem;
     }
 
-    .card-body {
-        padding: clamp(1rem, 3vw, 1.5rem);
-    }
-
     /* Form Sections */
     .form-section {
         background: var(--light-gray);
         border-radius: 10px;
-        padding: clamp(1rem, 3vw, 1.5rem);
+        padding: 1.5rem;
         margin-bottom: 1.5rem;
         transition: transform 0.3s ease, background 0.3s ease;
     }
 
-    @media (min-width: 768px) {
-        .form-section:hover {
-            background: var(--white);
-            transform: translateY(-3px);
-        }
+    .form-section:hover {
+        background: var(--white);
+        transform: translateY(-3px);
     }
 
     .section-title {
@@ -86,14 +71,19 @@
     }
 
     .section-title i {
-        font-size: clamp(1rem, 3vw, 1.25rem);
+        font-size: 1.25rem;
         color: var(--primary-color);
         margin-right: 0.75rem;
+        transition: transform 0.3s ease;
+    }
+
+    .form-section:hover .section-title i {
+        transform: rotate(10deg);
     }
 
     .section-title h5 {
         margin: 0;
-        font-size: clamp(1rem, 3vw, 1.1rem);
+        font-size: 1.1rem;
         font-weight: 600;
         color: var(--secondary-color);
     }
@@ -101,172 +91,221 @@
     /* Form Controls */
     .form-group {
         position: relative;
-        margin-bottom: 1.25rem;
     }
 
     .form-control {
         border: 2px solid var(--medium-gray);
         border-radius: 8px;
         padding: 0.75rem;
-        width: 100%;
-        font-size: 16px;
         transition: all 0.3s ease;
-        -webkit-appearance: none;
-        appearance: none;
     }
 
     .form-control:focus {
         border-color: var(--primary-color);
         box-shadow: 0 0 0 0.15rem rgba(4, 170, 109, 0.2);
-        outline: none;
     }
 
-    /* Row Responsiveness */
-    .row {
-        margin: 0 -0.5rem;
+    .form-control:valid:not(:placeholder-shown) {
+        border-color: var(--success-color);
     }
 
-    .col-md-6, .col-md-12 {
-        padding: 0 0.5rem;
+    .form-control.is-invalid {
+        border-color: var(--error-color);
     }
 
-    @media (max-width: 767px) {
-        .col-md-6 {
-            width: 100%;
-            margin-bottom: 1rem;
-        }
+    .form-control:valid:not(:placeholder-shown) + .valid-icon,
+    .form-control.is-invalid + .valid-icon {
+        display: block;
+    }
+
+    .valid-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: none;
+        font-size: 1rem;
+    }
+
+    .invalid-feedback {
+        color: var(--error-color);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
     }
 
     /* Signature Upload */
     .signature-upload {
         border: 2px dashed var(--medium-gray);
         border-radius: 10px;
-        padding: clamp(1rem, 3vw, 1.5rem);
+        padding: 1.5rem;
         text-align: center;
         transition: all 0.3s ease;
         cursor: pointer;
         background: var(--white);
-        margin-bottom: 1rem;
     }
 
     .signature-upload:hover,
     .signature-upload.dragover {
         border-color: var(--primary-color);
         background: rgba(4, 170, 109, 0.05);
+        transform: scale(1.01);
     }
 
-    @media (min-width: 768px) {
-        .signature-upload:hover {
-            transform: scale(1.01);
-        }
+    .signature-upload i {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .signature-upload:hover i,
+    .signature-upload.dragover i {
+        transform: translateY(-3px);
     }
 
     .signature-preview {
         max-width: 100%;
-        height: auto;
+        max-height: 150px;
         border-radius: 8px;
-        margin-top: 1rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        cursor: pointer;
+
+    }
+
+    .signature-preview:hover {
+        transform: scale(1.05);
     }
 
     /* Action Buttons */
     .action-buttons {
         display: flex;
-        flex-direction: column;
-        gap: 1rem;
+        justify-content: center;
+        gap: 2rem;
         margin-top: 2rem;
-    }
-
-    @media (min-width: 480px) {
-        .action-buttons {
-            flex-direction: row;
-            justify-content: flex-end;
-            gap: 1rem;
-        }
+        padding: 0 1rem;
     }
 
     .btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
         padding: 0.75rem 1.5rem;
         border-radius: 8px;
-        font-size: 1rem;
         font-weight: 500;
         transition: all 0.3s ease;
-        width: 100%;
-        touch-action: manipulation;
-    }
-
-    @media (min-width: 480px) {
-        .btn {
-            width: auto;
-            min-width: 120px;
-        }
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        min-width: 160px;
+        max-width: 200px;
+        justify-content: center;
     }
 
     .btn-success {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        background: var(--primary-color);
+        color: var(--white);
     }
 
     .btn-success:hover {
-        background-color: var(--primary-hover);
-        border-color: var(--primary-hover);
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(4, 170, 109, 0.2);
     }
 
     .btn-danger {
-        background-color: var(--danger-color);
-        border-color: var(--danger-color);
+        background: var(--danger-color);
+        color: var(--white);
     }
 
     .btn-danger:hover {
-        background-color: var(--danger-hover);
-        border-color: var(--danger-hover);
+        background: var(--danger-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
     }
 
-    /* Touch Device Optimizations */
-    @media (hover: none) {
-        .btn:hover {
-            transform: none;
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .form-section:hover {
-            transform: none;
-        }
-
-        .signature-upload:hover {
-            transform: none;
-        }
+    .btn i {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
     }
 
-    /* iOS Safari Specific Fixes */
-    @supports (-webkit-touch-callout: none) {
-        input[type="date"],
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        textarea {
-            font-size: 16px;
-        }
+    .btn:hover i {
+        transform: scale(1.1);
+    }
 
-        select.form-control {
-            padding-right: 30px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 2l4 4 4-4z' fill='%23333'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 8px 8px;
-        }
+    .btn:active {
+        transform: translateY(0);
+    }
+
+    /* Spinner */
+    .spinner-border {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.15em;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
+    .toast {
+        background: var(--white);
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: slideIn 0.3s ease;
+        max-width: 280px;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    .toast.success { border-left: 3px solid var(--success-color); }
+    .toast.error { border-left: 3px solid var(--error-color); }
+
+    /* Modal for Signature Preview */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: var(--white);
+        font-size: 2rem;
+        cursor: pointer;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="form-card" data-aos="fade-up">
@@ -277,7 +316,7 @@
                     </h3>
                 </div>
 
-                <div class="card-body">
+                <div class="card-body p-4">
                     {% if form.non_field_errors %}
                     <div class="alert alert-danger">
                         {% for error in form.non_field_errors %}
@@ -295,18 +334,30 @@
                                 <i class="fas fa-user"></i>
                                 <h5>Personal Information</h5>
                             </div>
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-12">
-                                    {{ form.borrower_name|as_crispy_field }}
+                                    <div class="form-group">
+                                        {{ form.borrower_name|as_crispy_field }}
+                                        <div class="invalid-feedback" id="borrower_name_error"></div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form.contact_number|as_crispy_field }}
+                                    <div class="form-group">
+                                        {{ form.contact_number|as_crispy_field }}
+                                        <div class="invalid-feedback" id="contact_number_error"></div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form.email|as_crispy_field }}
+                                    <div class="form-group">
+                                        {{ form.email|as_crispy_field }}
+                                        <div class="invalid-feedback" id="email_error"></div>
+                                    </div>
                                 </div>
                                 <div class="col-md-12">
-                                    {{ form.address|as_crispy_field }}
+                                    <div class="form-group">
+                                        {{ form.address|as_crispy_field }}
+                                        <div class="invalid-feedback" id="address_error"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -317,15 +368,24 @@
                                 <i class="fas fa-calendar-alt"></i>
                                 <h5>Loan Details</h5>
                             </div>
-                            <div class="row">
+                            <div class="row g-3">
                                 <div class="col-md-6">
-                                    {{ form.date_borrowed|as_crispy_field }}
+                                    <div class="form-group">
+                                        {{ form.date_borrowed|as_crispy_field }}
+                                        <div class="invalid-feedback" id="date_borrowed_error"></div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form.due_date|as_crispy_field }}
+                                    <div class="form-group">
+                                        {{ form.due_date|as_crispy_field }}
+                                        <div class="invalid-feedback" id="due_date_error"></div>
+                                    </div>
                                 </div>
                                 <div class="col-md-12">
-                                    {{ form.notes|as_crispy_field }}
+                                    <div class="form-group">
+                                        {{ form.notes|as_crispy_field }}
+                                        <div class="invalid-feedback" id="notes_error"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -337,20 +397,26 @@
                                 <h5>Signature (Optional)</h5>
                             </div>
                             <div class="signature-upload" id="signatureUpload">
-                                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
-                                <h6 class="mb-2">Drop your signature here or tap to browse</h6>
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h6 class="mb-2">Drop your signature here or click to browse</h6>
                                 <p class="text-muted mb-0">Supports: JPG, PNG (Max: 5MB)</p>
-                                <input type="file" name="signature" id="signatureInput" class="d-none" accept="image/*" capture="environment">
+                                <input type="file" name="signature" id="signatureInput" class="d-none" accept="image/*">
+                                <div class="invalid-feedback" id="signature_error"></div>
                             </div>
 
                             {% if form.instance.signature %}
                             <div class="text-center mt-3">
                                 <p class="text-muted mb-2">Current Signature</p>
-                                <img src="{{ form.instance.signature.url }}" 
-                                     alt="Current signature" 
-                                     class="signature-preview"
-                                     onclick="openModal(this.src)" 
-                                     loading="lazy">
+                                <div class="signature-image-container">
+                                    <img src="{{ form.instance.signature.url }}" 
+                                         alt="Current signature" 
+                                         class="signature-preview" 
+                                         onclick="openModal(this.src)" 
+                                         loading="lazy"
+                                         width="200"
+                                         height="auto"
+                                         style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                                </div>
                                 
                                 <div class="mt-2">
                                     <div class="form-check">
@@ -365,7 +431,7 @@
 
                             <div id="newSignaturePreview" class="text-center mt-3" style="display: none;">
                                 <p class="text-muted mb-2">New Signature Preview</p>
-                                <img id="previewImage" class="signature-preview" onclick="openModal(this.src)" loading="lazy">
+                                <img id="previewImage" class="signature-preview" onclick="openModal(this.src)" loading="lazy" style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
                             </div>
                         </div>
 
@@ -401,13 +467,9 @@
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize AOS with mobile-friendly settings
+    // Initialize AOS
     if (typeof AOS !== 'undefined') {
-        AOS.init({
-            duration: 800,
-            once: true,
-            disable: 'mobile'
-        });
+        AOS.init();
     }
 
     const form = document.getElementById('borrowerForm');
@@ -418,12 +480,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const signatureInput = document.getElementById('signatureInput');
     const newSignaturePreview = document.getElementById('newSignaturePreview');
     const previewImage = document.getElementById('previewImage');
-
-    // Prevent iOS zoom on input focus
-    const viewportMeta = document.createElement('meta');
-    viewportMeta.name = 'viewport';
-    viewportMeta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
-    document.head.appendChild(viewportMeta);
 
     // Handle form submission
     form.addEventListener('submit', async function(e) {
@@ -451,10 +507,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (response.ok && data.success) {
                 showToast('Borrower saved successfully!', 'success');
+                // Redirect to the specified URL or borrower list
                 setTimeout(() => {
                     window.location.href = data.redirect_url || "{% url 'dashboard-borrower-list' %}";
                 }, 1500);
             } else {
+                // Handle validation errors
                 if (data.errors) {
                     Object.keys(data.errors).forEach(field => {
                         const errorElement = document.getElementById(`${field}_error`);
@@ -462,6 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             errorElement.textContent = data.errors[field].join(' ');
                             errorElement.style.display = 'block';
                             
+                            // Add error class to the input
                             const input = document.querySelector(`[name="${field}"]`);
                             if (input) {
                                 input.classList.add('is-invalid');
@@ -477,57 +536,59 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             showToast('An error occurred. Please try again.', 'error');
         } finally {
+            // Re-enable submit button and hide spinner
             submitBtn.disabled = false;
             buttonText.classList.remove('d-none');
             spinner.classList.add('d-none');
         }
     });
 
-    // Signature upload handling
+    // File upload handling
     signatureUpload.addEventListener('click', () => signatureInput.click());
     signatureUpload.addEventListener('dragover', (e) => {
         e.preventDefault();
         signatureUpload.classList.add('dragover');
     });
-    signatureUpload.addEventListener('dragleave', () => {
-        signatureUpload.classList.remove('dragover');
-    });
+    signatureUpload.addEventListener('dragleave', () => signatureUpload.classList.remove('dragover'));
     signatureUpload.addEventListener('drop', (e) => {
         e.preventDefault();
         signatureUpload.classList.remove('dragover');
-        handleFiles(e.dataTransfer.files);
+        const file = e.dataTransfer.files[0];
+        handleFile(file);
     });
+    signatureInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
 
-    signatureInput.addEventListener('change', (e) => handleFiles(e.target.files));
-
-    function handleFiles(files) {
-        if (files && files[0]) {
-            const file = files[0];
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('File size must be less than 5MB', 'error');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                previewImage.src = e.target.result;
-                newSignaturePreview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+    function handleFile(file) {
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('File size must be less than 5MB', 'error');
+            return;
         }
+        if (!file.type.startsWith('image/')) {
+            showToast('Please upload an image file', 'error');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImage.src = e.target.result;
+            newSignaturePreview.style.display = 'block';
+            showToast('Signature uploaded successfully', 'success');
+        };
+        reader.readAsDataURL(file);
     }
 
-    // Touch feedback for buttons
-    const buttons = document.querySelectorAll('.btn');
-    buttons.forEach(btn => {
-        btn.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.98)';
+    function clearErrors() {
+        // Clear all error messages
+        document.querySelectorAll('.invalid-feedback').forEach(el => {
+            el.textContent = '';
+            el.style.display = 'none';
         });
         
-        btn.addEventListener('touchend', function() {
-            this.style.transform = 'scale(1)';
+        // Remove error classes from inputs
+        document.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
         });
-    });
+    }
 
     function showToast(message, type = 'info') {
         const toast = document.createElement('div');
@@ -541,16 +602,6 @@ document.addEventListener('DOMContentLoaded', function() {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 300);
         }, 3000);
-    }
-
-    function clearErrors() {
-        document.querySelectorAll('.invalid-feedback').forEach(el => {
-            el.style.display = 'none';
-            el.textContent = '';
-        });
-        document.querySelectorAll('.is-invalid').forEach(el => {
-            el.classList.remove('is-invalid');
-        });
     }
 
     // Email validation
