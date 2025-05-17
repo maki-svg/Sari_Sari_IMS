@@ -24,7 +24,7 @@ A comprehensive inventory management system designed for Sari-Sari stores, helpi
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/Sari_Sari_IMS.git
+git clone https://github.com/maki-svg/Sari_Sari_IMS.git
 cd Sari_Sari_IMS
 ```
 

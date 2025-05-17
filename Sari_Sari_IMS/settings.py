@@ -15,6 +15,7 @@ import os
 import warnings
 from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
+import dj_database_url
 
 # Load environment variables from .env file
 load_dotenv()
@@ -100,31 +101,31 @@ WSGI_APPLICATION = 'Sari_Sari_IMS.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Default to SQLite for local development
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-# Override with PostgreSQL if DATABASE_URL is set and not empty (e.g., on Render)
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    try:
-        import dj_database_url
-        DATABASES['default'] = dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    except Exception as e:
-        print(f"Error configuring database: {str(e)}")
-        # Fall back to SQLite if there's an error
-        DATABASES['default'] = {
+if DEBUG:
+    # Use SQLite for local development
+    DATABASES = {
+        'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
+    }
+else:
+    # Use PostgreSQL in production
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True
+        )
+    }
+
+# Ensure we have a database configuration
+if not DATABASES['default']:
+    raise Exception(
+        'Database configuration error: No database configured. '
+        'Please ensure DATABASE_URL is set in production or DEBUG=True for local SQLite.'
+    )
 
 
 # Password validation
@@ -175,13 +176,20 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Cloudinary configuration
-if not DEBUG:
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
-    }
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+# Use Cloudinary storage if credentials are available, otherwise use local storage
+if all([CLOUDINARY_STORAGE['CLOUD_NAME'], CLOUDINARY_STORAGE['API_KEY'], CLOUDINARY_STORAGE['API_SECRET']]):
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    CLOUDINARY_URL = f"cloudinary://{CLOUDINARY_STORAGE['API_KEY']}:{CLOUDINARY_STORAGE['API_SECRET']}@{CLOUDINARY_STORAGE['CLOUD_NAME']}"
+else:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    if not DEBUG:
+        warnings.warn("Cloudinary credentials not found. Using local file storage in production is not recommended.")
 
 LOGIN_REDIRECT_URL = 'dashboard-index'
 

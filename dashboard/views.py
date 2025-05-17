@@ -22,6 +22,7 @@ from django.db import IntegrityError
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import user_passes_test
 from django.conf import settings
+from django.urls import reverse
 
 logger = logging.getLogger(__name__)
 
@@ -457,20 +458,29 @@ def borrower_create(request):
     min_due_date = today + timedelta(days=1)
     
     if request.method == 'POST':
+        logger.info("Received POST request to create borrower")
+        logger.debug(f"POST data: {request.POST}")
+        logger.debug(f"FILES data: {request.FILES}")
+        
         form = BorrowerForm(request.POST, request.FILES)
+        logger.info("Form initialized with POST data")
+        
         if form.is_valid():
+            logger.info("Form is valid, attempting to save")
             try:
                 with transaction.atomic():
                     borrower_name = form.cleaned_data['borrower_name'].title()
+                    logger.debug(f"Processing borrower name: {borrower_name}")
                     
                     if Borrower.objects.filter(borrower_name__iexact=borrower_name).exists():
+                        logger.warning(f"Borrower with name '{borrower_name}' already exists")
+                        error_msg = f'A borrower with the name "{borrower_name}" already exists.'
                         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                             return JsonResponse({
-                                'errors': {
-                                    'borrower_name': [f'A borrower with the name "{borrower_name}" already exists.']
-                                }
+                                'success': False,
+                                'errors': {'borrower_name': [error_msg]}
                             }, status=400)
-                        form.add_error('borrower_name', f'A borrower with the name "{borrower_name}" already exists.')
+                        form.add_error('borrower_name', error_msg)
                         return render(request, 'dashboard/borrower_form.html', {
                             'form': form,
                             'today': today,
@@ -482,29 +492,70 @@ def borrower_create(request):
                     borrower.borrower_name = borrower_name
                     
                     if 'signature' in request.FILES:
-                        borrower.signature = request.FILES['signature']
+                        logger.info("Processing signature file")
+                        try:
+                            borrower.signature = request.FILES['signature']
+                            logger.info("Signature file assigned successfully")
+                        except Exception as e:
+                            logger.error(f"Error processing signature file: {str(e)}")
+                            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                                return JsonResponse({
+                                    'success': False,
+                                    'errors': {'signature': [f'Error uploading signature: {str(e)}']}
+                                }, status=400)
+                            form.add_error('signature', f'Error uploading signature: {str(e)}')
+                            raise
                     
-                    borrower.save()
+                    try:
+                        borrower.save()
+                        logger.info(f"Borrower '{borrower_name}' created successfully with ID {borrower.pk}")
+                    except Exception as e:
+                        logger.error(f"Error saving borrower: {str(e)}")
+                        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                            return JsonResponse({
+                                'success': False,
+                                'errors': {'__all__': [f'Error saving borrower: {str(e)}']}
+                            }, status=400)
+                        raise
+                    
                     messages.success(request, f'Borrower "{borrower_name}" created successfully!')
                     
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return JsonResponse({'success': True})
+                        return JsonResponse({
+                            'success': True,
+                            'message': f'Borrower "{borrower_name}" created successfully!',
+                            'redirect_url': reverse('dashboard-borrower-detail', kwargs={'pk': borrower.pk})
+                        })
                     return redirect('dashboard-borrower-detail', pk=borrower.pk)
                     
-            except IntegrityError:
+            except IntegrityError as e:
+                logger.error(f"IntegrityError while creating borrower: {str(e)}")
                 error_msg = f'A borrower with the name "{borrower_name}" already exists.'
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'errors': {'borrower_name': [error_msg]}}, status=400)
+                    return JsonResponse({
+                        'success': False,
+                        'errors': {'borrower_name': [error_msg]}
+                    }, status=400)
                 messages.error(request, error_msg)
             except Exception as e:
+                logger.error(f"Unexpected error while creating borrower: {str(e)}")
                 error_msg = f'Error creating borrower: {str(e)}'
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'errors': {'__all__': [error_msg]}}, status=400)
+                    return JsonResponse({
+                        'success': False,
+                        'errors': {'__all__': [error_msg]}
+                    }, status=400)
                 messages.error(request, error_msg)
         else:
+            logger.warning("Form validation failed")
+            logger.debug(f"Form errors: {form.errors}")
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'errors': form.errors}, status=400)
+                return JsonResponse({
+                    'success': False,
+                    'errors': form.errors
+                }, status=400)
     else:
+        logger.info("Displaying empty borrower creation form")
         form = BorrowerForm(initial={
             'date_borrowed': today,
             'due_date': min_due_date

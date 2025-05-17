@@ -8,8 +8,10 @@ import os
 from datetime import timedelta, datetime
 from django.db.models import Q
 from django.db import models
+import logging
+from django.core.validators import validate_email
 
-
+logger = logging.getLogger(__name__)
 
 # Product Categories
 CATEGORY = (
@@ -153,12 +155,47 @@ class BorrowerForm(forms.ModelForm):
         }
 
     def clean(self):
+        logger.info("Starting BorrowerForm validation")
         cleaned_data = super().clean()
+        logger.debug(f"Initial cleaned data: {cleaned_data}")
+        
+        # Validate borrower name
+        borrower_name = cleaned_data.get('borrower_name')
+        if borrower_name:
+            logger.debug(f"Validating borrower name: {borrower_name}")
+            cleaned_data['borrower_name'] = borrower_name.strip().title()
+            
+        # Validate dates
         date_borrowed = cleaned_data.get('date_borrowed')
         due_date = cleaned_data.get('due_date')
         
-        if date_borrowed and due_date and due_date < date_borrowed:
-            raise ValidationError("Due date cannot be before borrow date")
+        if date_borrowed and due_date:
+            logger.debug(f"Validating dates - borrowed: {date_borrowed}, due: {due_date}")
+            if due_date < date_borrowed:
+                logger.warning("Invalid dates: due date is before borrow date")
+                raise ValidationError("Due date cannot be before borrow date")
+        
+        # Validate contact number
+        contact_number = cleaned_data.get('contact_number')
+        if contact_number:
+            logger.debug(f"Validating contact number: {contact_number}")
+            # The model's validator will handle the actual validation
+            
+        # Validate email if provided
+        email = cleaned_data.get('email')
+        if email:
+            logger.debug(f"Validating email: {email}")
+            try:
+                validate_email(email)
+            except ValidationError as e:
+                logger.warning(f"Invalid email: {str(e)}")
+                self.add_error('email', str(e))
+        
+        # Log any form errors
+        if self.errors:
+            logger.warning(f"Form validation errors: {self.errors}")
+        else:
+            logger.info("Form validation successful")
         
         return cleaned_data
 
