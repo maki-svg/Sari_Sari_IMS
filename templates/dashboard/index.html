@@ -357,80 +357,40 @@
 
     /* Enhanced report section */
     .report-section {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
         background: rgba(255, 255, 255, 0.9);
         border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.4s ease;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
     .date-range-picker {
         display: flex;
-        gap: 1rem;
+        gap: 1.5rem;
+        align-items: center;
         flex: 1;
-        min-width: 280px;
     }
 
     .date-range-picker input {
-        padding: 0.75rem;
-        border: 2px solid rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        flex: 1;
-        min-width: 120px;
-    }
-
-    .generate-report-btn {
-        display: flex !important;
-        align-items: center;
-        gap: 0.5rem;
-        background-color: var(--secondary-color);
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        white-space: nowrap;
-        min-width: 160px;
-        justify-content: center;
-        margin: 0;
-    }
-
-    .generate-report-btn:hover {
-        background-color: #2b2b2b;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    /* Enhanced table responsiveness */
-    .table-responsive {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        margin: 1rem 0;
+        border: 2px solid var(--light-gray);
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        width: 100%;
+        padding: 0.8rem;
+        transition: all 0.3s ease;
+        flex: 1;
     }
 
-    .table {
-        margin-bottom: 0;
-        width: 100%;
-        min-width: 600px;
+    .date-range-picker input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.2);
+        outline: none;
     }
 
-    .table th,
-    .table td {
-        white-space: nowrap;
-        vertical-align: middle;
-        padding: 1rem;
-    }
-
-    /* Generate Report Button */
     .generate-report-btn {
         display: inline-flex !important;
         align-items: center;
@@ -449,6 +409,7 @@
         justify-content: center;
         visibility: visible !important;
         opacity: 1 !important;
+        margin-left: 1rem;
     }
 
     .generate-report-btn:hover {
@@ -466,51 +427,78 @@
         transform: rotate(10deg);
     }
 
+    /* Enhanced table responsiveness */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 1rem 0;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
+        background-color: white;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        min-width: 600px;
+    }
+
+    .table th,
+    .table td {
+        white-space: nowrap;
+        vertical-align: middle;
+        padding: 1rem;
+    }
+
+    .table thead th {
+        background: linear-gradient(135deg, var(--secondary-color), #222);
+        color: var(--white);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(4, 170, 109, 0.05);
+    }
+
     /* Mobile optimizations */
     @media (max-width: 768px) {
         .report-section {
-            padding: 1rem;
             flex-direction: column;
+            padding: 1rem;
         }
 
         .date-range-picker {
-            flex-direction: column;
             width: 100%;
-        }
-
-        .date-range-picker input {
-            width: 100%;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
         }
 
         .generate-report-btn {
             width: 100%;
-            margin-top: 0.5rem;
-            display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+            margin-left: 0;
         }
 
         .table-responsive {
             margin: 0.5rem 0;
             border-radius: 8px;
-            max-width: 100%;
-            overflow-x: auto;
         }
 
-        .table {
-            min-width: 600px;
-        }
-
-        .table td, 
-        .table th {
+        .table th,
+        .table td {
             padding: 0.75rem;
             font-size: 0.9rem;
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
         }
     }
 
@@ -735,17 +723,15 @@
         justify-content: space-between;
         align-items: center;
         transition: all 0.4s ease;
-    }
-
-    .report-section:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
     .date-range-picker {
         display: flex;
         gap: 1.5rem;
         align-items: center;
+        flex: 1;
     }
 
     .date-range-picker input {
@@ -753,6 +739,7 @@
         border-radius: 12px;
         padding: 0.8rem;
         transition: all 0.3s ease;
+        flex: 1;
     }
 
     .date-range-picker input:focus {
@@ -1224,6 +1211,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Report Generation with Enhanced Feedback
     document.getElementById('generateReport').addEventListener('click', async function() {
         const loadingOverlay = document.getElementById('loadingOverlay');
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates');
+            return;
+        }
+
         try {
             loadingOverlay.style.display = 'flex';
             const { jsPDF } = window.jspdf;
@@ -1235,84 +1230,175 @@ document.addEventListener('DOMContentLoaded', function() {
                 format: 'a4'
             });
 
-            // Enhanced header
+            // Enhanced header with gradient
+            const headerHeight = 50;
             doc.setFillColor(4, 170, 109);
-            doc.rect(0, 0, 210, 50, 'F');
+            doc.rect(0, 0, 210, headerHeight, 'F');
+
+            // Add logo if available
+            try {
+                const logo = document.querySelector('.navbar-logo');
+                if (logo) {
+                    const logoData = logo.src;
+                    doc.addImage(logoData, 'PNG', 20, 10, 30, 30);
+                }
+            } catch (e) {
+                console.warn('Logo could not be added to PDF:', e);
+            }
+
+            // Title and subtitle
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(32);
+            doc.setFontSize(28);
             doc.setTextColor(255, 255, 255);
             doc.text('SariSync Dashboard', 105, 25, { align: 'center' });
 
             doc.setFontSize(16);
             doc.text('Performance Report', 105, 35, { align: 'center' });
 
-            // Timestamp
-            doc.setFontSize(10);
+            // Date range
+            doc.setFontSize(12);
             doc.setTextColor(220, 220, 220);
-            const timestamp = new Date().toLocaleString('en-US', { 
-                dateStyle: 'full', 
-                timeStyle: 'short' 
-            });
-            doc.text(`Generated: ${timestamp}`, 105, 45, { align: 'center' });
+            doc.text(`Period: ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}`, 105, 45, { align: 'center' });
 
-            // Summary
+            // Summary section with enhanced styling
             const stats = document.querySelectorAll('.stats-value');
-            const totalSales = stats[0].textContent;
-            const totalTransactions = stats[1].textContent;
-            const totalItems = stats[2].textContent;
+            const summaryData = {
+                'Total Sales': stats[0].textContent,
+                'Total Transactions': stats[1].textContent,
+                'Total Items Sold': stats[2].textContent
+            };
 
+            let yPos = headerHeight + 10;
+
+            // Summary box with rounded corners
             doc.setDrawColor(4, 170, 109);
             doc.setFillColor(240, 255, 244);
-            doc.roundedRect(15, 55, 180, 35, 5, 5, 'FD');
+            doc.roundedRect(15, yPos, 180, 40, 3, 3, 'FD');
+
+            // Summary content
             doc.setTextColor(4, 170, 109);
             doc.setFontSize(16);
-            doc.text('Summary', 25, 65);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Summary', 25, yPos + 10);
+
             doc.setTextColor(51, 51, 51);
             doc.setFontSize(12);
-            doc.text([
-                `Total Sales: ${totalSales}`,
-                `Total Transactions: ${totalTransactions}`,
-                `Total Items Sold: ${totalItems}`
-            ], 25, 75, { lineHeightFactor: 1.6 });
+            doc.setFont('helvetica', 'normal');
+            let summaryY = yPos + 20;
+            Object.entries(summaryData).forEach(([label, value]) => {
+                doc.text(`${label}: ${value}`, 25, summaryY);
+                summaryY += 8;
+            });
 
-            // Charts
+            yPos += 50;
+
+            // Charts section
             const charts = [
                 { name: 'Category Distribution', canvas: document.getElementById('categoryChart') },
                 { name: 'Sales Trend', canvas: document.getElementById('salesTrendChart') },
                 { name: 'Borrower Status', canvas: document.getElementById('borrowerChart') }
             ];
 
-            let yPos = 100;
             for (const chart of charts) {
                 if (chart.canvas) {
+                    // Add chart title
                     doc.setFontSize(14);
                     doc.setTextColor(4, 170, 109);
+                    doc.setFont('helvetica', 'bold');
                     doc.text(chart.name, 105, yPos, { align: 'center' });
+
+                    // Add chart image
                     const imgData = chart.canvas.toDataURL('image/png', 1.0);
-                    doc.addImage(imgData, 'PNG', 15, yPos + 10, 180, 80);
-                    yPos += 100;
-                    if (yPos > 240 && charts.indexOf(chart) < charts.length - 1) {
+                    doc.addImage(imgData, 'PNG', 15, yPos + 5, 180, 80);
+                    
+                    yPos += 90;
+
+                    // Add new page if needed
+                    if (yPos > 250 && charts.indexOf(chart) < charts.length - 1) {
                         doc.addPage();
                         yPos = 20;
                     }
                 }
             }
 
-            // Footer
+            // Low stock items table if available
+            const lowStockTable = document.querySelector('.table');
+            if (lowStockTable) {
+                if (yPos > 200) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+
+                doc.setFontSize(14);
+                doc.setTextColor(4, 170, 109);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Low Stock Items', 105, yPos, { align: 'center' });
+
+                const tableData = [];
+                const tableHeaders = ['Product', 'Current Stock'];
+                
+                lowStockTable.querySelectorAll('tbody tr').forEach(row => {
+                    const productName = row.querySelector('h6').textContent;
+                    const stockValue = row.querySelector('.stock-value').textContent;
+                    tableData.push([productName, stockValue]);
+                });
+
+                doc.autoTable({
+                    startY: yPos + 10,
+                    head: [tableHeaders],
+                    body: tableData,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [4, 170, 109],
+                        textColor: 255,
+                        fontSize: 12,
+                        fontStyle: 'bold'
+                    },
+                    styles: {
+                        fontSize: 10,
+                        cellPadding: 5
+                    },
+                    alternateRowStyles: {
+                        fillColor: [245, 245, 245]
+                    }
+                });
+            }
+
+            // Footer with page numbers
             const pageCount = doc.internal.getNumberOfPages();
             doc.setFontSize(8);
             doc.setTextColor(128, 128, 128);
             for (let i = 1; i <= pageCount; i++) {
                 doc.setPage(i);
-                doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+                doc.text(
+                    `Page ${i} of ${pageCount} | Generated on ${new Date().toLocaleString()}`,
+                    doc.internal.pageSize.width / 2,
+                    doc.internal.pageSize.height - 10,
+                    { align: 'center' }
+                );
             }
 
-            // Save PDF
-            const date = new Date();
-            const dateStr = date.toISOString().split('T')[0];
-            const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, '-');
-            const fileName = `SariSync-Dashboard-${dateStr}-${timeStr}.pdf`;
+            // Save the PDF
+            const fileName = `SariSync-Report-${startDate}-to-${endDate}.pdf`;
             doc.save(fileName);
+
+            // Show success message
+            const toast = document.createElement('div');
+            toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-3';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Report generated successfully!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            new bootstrap.Toast(toast).show();
 
         } catch (error) {
             console.error('Error generating report:', error);

@@ -1203,14 +1203,270 @@
         body.authenticated .sidebar {
             display: block !important;
         }
+
+        /* Navigation Bar Styles */
+        .navbar {
+            background-color: var(--secondary-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1030;
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0;
+        }
+
+        .navbar-logo {
+            width: 40px;
+            height: 40px;
+        }
+
+        .navbar-brand-text {
+            color: var(--white);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: var(--white);
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .navbar-dark .navbar-nav .nav-link i {
+            font-size: 1.1rem;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: 250px;
+            height: calc(100vh - 56px);
+            background-color: var(--white);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1020;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, #04AA6D 0%, #025B3A 100%);
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+        }
+
+        .sidebar-header h3 {
+            color: var(--white);
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .sidebar ul {
+            padding: 1rem 0;
+        }
+
+        .sidebar li {
+            margin: 0.5rem 0;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: rgba(4, 170, 109, 0.1);
+            color: var(--primary-color);
+        }
+
+        .sidebar i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Mobile Navigation */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            body.sidebar-open .sidebar {
+                transform: translateX(0);
+            }
+
+            .navbar-toggler {
+                display: block;
+            }
+
+            .navbar-collapse {
+                position: fixed;
+                top: 56px;
+                left: 0;
+                right: 0;
+                background-color: var(--secondary-color);
+                padding: 1rem;
+                max-height: calc(100vh - 56px);
+                overflow-y: auto;
+            }
+
+            .navbar-nav {
+                margin: 0;
+            }
+
+            .nav-link {
+                padding: 0.75rem 1rem !important;
+            }
+        }
     </style>
     {% block extra_style %}{% endblock %}
 </head>
 <body class="{% if user.is_authenticated %}authenticated{% endif %}">
-    {% if user.is_authenticated %}
-        {% include 'partials/nav.html' %}
-    {% endif %}
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'dashboard-home' %}">
+                <img src="{% static 'images/logo.svg' %}" alt="SariSync Logo" class="navbar-logo">
+                <span class="navbar-brand-text">SariSync</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard-home' %}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'inventory' %}">
+                            <i class="fas fa-box"></i> Inventory
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'inventory-audit' %}">
+                            <i class="fas fa-clipboard-check"></i> Inventory Audit
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'audit-history' %}">
+                            <i class="fas fa-history"></i> Audit History
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'sales' %}">
+                            <i class="fas fa-shopping-cart"></i> Sales
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'borrower-list' %}">
+                            <i class="fas fa-users"></i> Borrowers
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-user"></i> {{ user.username }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="{% url 'profile' %}">
+                                <i class="fas fa-id-card"></i> Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="{% static 'images/logo.svg' %}" alt="SariSync Logo" class="sidebar-logo">
+            <h3>SariSync</h3>
+        </div>
+        <ul class="list-unstyled">
+            <li>
+                <a href="{% url 'dashboard-home' %}" class="{% if request.resolver_match.url_name == 'dashboard-home' %}active{% endif %}">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inventory' %}" class="{% if request.resolver_match.url_name == 'inventory' %}active{% endif %}">
+                    <i class="fas fa-box"></i>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inventory-audit' %}" class="{% if request.resolver_match.url_name == 'inventory-audit' %}active{% endif %}">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Inventory Audit</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'audit-history' %}" class="{% if request.resolver_match.url_name == 'audit-history' %}active{% endif %}">
+                    <i class="fas fa-history"></i>
+                    <span>Audit History</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'sales' %}" class="{% if request.resolver_match.url_name == 'sales' %}active{% endif %}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Sales</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'borrower-list' %}" class="{% if request.resolver_match.url_name == 'borrower-list' %}active{% endif %}">
+                    <i class="fas fa-users"></i>
+                    <span>Borrowers</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
     <main>
         {% if messages %}
             <div class="messages">
@@ -1371,6 +1627,42 @@
     });
     </script>
 
-    {% block extra_js %}{% endblock %}
+    <!-- Bootstrap and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Mobile Navigation Script -->
+    <script>
+        $(document).ready(function() {
+            // Toggle sidebar on mobile
+            $('.navbar-toggler').click(function() {
+                $('body').toggleClass('sidebar-open');
+            });
+
+            // Close sidebar when clicking outside
+            $(document).click(function(event) {
+                if (!$(event.target).closest('.sidebar, .navbar-toggler').length) {
+                    $('body').removeClass('sidebar-open');
+                }
+            });
+
+            // Handle active states
+            const currentPath = window.location.pathname;
+            $('.sidebar a').each(function() {
+                if ($(this).attr('href') === currentPath) {
+                    $(this).addClass('active');
+                }
+            });
+
+            // Close dropdown menu on mobile after clicking
+            $('.nav-link').click(function() {
+                if ($(window).width() < 768) {
+                    $('.navbar-collapse').collapse('hide');
+                }
+            });
+        });
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>
