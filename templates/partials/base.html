@@ -247,188 +247,172 @@
 
         @media (max-width: 768px) {
             body.authenticated main {
-                padding-top: 70px;
+                margin-left: 0;
+                width: 100%;
+                padding-top: 60px;
             }
 
             .container-fluid {
-                padding: 1rem;
+                padding: 0.75rem;
             }
 
-            /* Prevent content from being hidden under the navbar */
+            .dashboard-header {
+                padding: 1.25rem;
+                margin: 0.75rem;
+                border-radius: 15px;
+            }
+
+            .dashboard-header h2 {
+                font-size: 1.35rem;
+            }
+
+            .card {
+                margin: 0.75rem;
+                border-radius: 12px;
+            }
+
+            .form-section {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            /* Improve form controls for touch */
+            .form-control, .form-select, .btn {
+                min-height: 44px; /* Better touch target size */
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+
+            /* Make tables scrollable horizontally */
             .table-responsive {
-                margin: 0.5rem -0.5rem;
-                padding: 0 0.5rem;
+                margin: 0 -0.75rem;
+                padding: 0 0.75rem;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
 
             .table {
+                min-width: 100%;
                 font-size: 0.9rem;
+            }
+
+            .table th, .table td {
                 white-space: nowrap;
-            }
-
-            /* Prevent button overlap in forms */
-            .form-group {
-                margin-bottom: 1.5rem;
-            }
-
-            /* Fix button groups */
-            .btn-group {
-                display: flex;
-                flex-direction: column;
-                gap: 0.75rem;
-                width: 100%;
-                margin: 1rem 0;
-            }
-
-            .btn-group .btn {
-                width: 100%;
-                margin: 0;
-            }
-
-            /* Fix modal footer buttons */
-            .modal-footer {
-                flex-direction: column;
-                padding: 1rem;
-                gap: 0.75rem;
-            }
-
-            .modal-footer .btn {
-                width: 100%;
-                margin: 0;
-                justify-content: center;
-            }
-
-            /* Fix search bar container */
-            .search-bar-container {
-                flex-direction: column;
-                padding: 0.5rem;
-                gap: 0.75rem;
-            }
-
-            .search-bar {
-                width: 100%;
-            }
-
-            /* Fix dashboard cards */
-            .card {
-                margin: 0.75rem 0;
-                width: 100%;
-            }
-
-            .card-body {
-                padding: 1rem;
-            }
-
-            /* Fix stats grid */
-            .stats-container {
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
-                padding: 0.5rem;
-            }
-
-            /* Fix alert messages */
-            .messages {
-                top: 70px;
-                left: 10px;
-                right: 10px;
-                z-index: 1030;
-            }
-
-            .alert {
-                margin-bottom: 0.5rem;
-                padding: 0.75rem 1rem;
-            }
-
-            /* Fix navigation spacing */
-            .nav-item {
-                margin: 0.25rem 0;
-            }
-
-            /* Fix form inputs */
-            .form-control {
-                height: 45px;
-                margin-bottom: 0.5rem;
-            }
-
-            /* Fix select dropdowns */
-            select.form-control {
-                padding-right: 2rem;
-            }
-
-            /* Fix date inputs */
-            input[type="date"].form-control {
-                padding: 0.5rem;
-            }
-
-            /* Fix checkbox and radio spacing */
-            .form-check {
-                padding: 0.5rem 0;
-            }
-
-            /* Fix table cell spacing */
-            td, th {
                 padding: 0.75rem 0.5rem;
-                white-space: nowrap;
             }
 
-            /* Fix action buttons in tables */
-            td .btn {
-                padding: 0.5rem;
-                margin: 0.25rem;
-                min-width: 40px;
-                justify-content: center;
-            }
-
-            /* Fix pagination */
-            .pagination {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-                justify-content: center;
-                padding: 0.5rem;
-            }
-
-            .page-item {
+            /* Improve action buttons */
+            .action-button {
+                width: 40px;
+                height: 40px;
                 margin: 0.25rem;
             }
 
-            /* Fix modal sizing */
+            /* Adjust status badges */
+            .status-badge {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            /* Improve modal display */
             .modal-dialog {
                 margin: 0.5rem;
                 max-width: calc(100% - 1rem);
             }
 
             .modal-content {
-                max-height: calc(100vh - 2rem);
+                border-radius: 15px;
+            }
+
+            .modal-header {
+                padding: 1rem;
+            }
+
+            .modal-body {
+                padding: 1rem;
+                max-height: calc(100vh - 120px);
                 overflow-y: auto;
             }
 
-            /* Fix dropdown menus */
+            .modal-footer {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                margin: 0;
+            }
+
+            /* Improve form layouts */
+            .form-row {
+                margin: 0 -0.375rem;
+            }
+
+            .form-row > [class*="col-"] {
+                padding: 0 0.375rem;
+            }
+
+            /* Enhance search and filter sections */
+            .search-box {
+                padding: 1rem;
+                margin: 0.75rem;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .filter-row > div {
+                width: 100% !important;
+            }
+
+            /* Improve navigation */
+            .nav-link {
+                padding: 0.75rem 1rem;
+            }
+
+            /* Better alerts positioning */
+            .messages {
+                top: 70px;
+                left: 10px;
+                right: 10px;
+                max-width: none;
+            }
+
+            .alert {
+                margin: 0.5rem 0;
+                padding: 0.75rem;
+            }
+
+            /* Improve button groups */
+            .btn-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-group .btn {
+                width: 100%;
+                margin: 0.25rem 0;
+            }
+
+            /* Enhance dropdowns */
             .dropdown-menu {
                 width: 100%;
                 max-height: 60vh;
                 overflow-y: auto;
             }
 
-            /* Fix icons in buttons */
-            .btn i {
-                margin-right: 0.5rem;
-            }
-
-            /* Fix spacing in dashboard header */
-            .dashboard-header {
-                padding: 1rem;
-                margin-bottom: 1rem;
-            }
-
-            /* Fix chart containers */
+            /* Improve chart containers */
             .chart-container {
-                margin: 1rem 0;
+                margin: 0.75rem 0;
                 overflow-x: auto;
             }
 
             canvas {
-                min-height: 300px;
+                max-width: 100%;
+                height: auto !important;
             }
         }
 
@@ -442,78 +426,78 @@
                 padding: 0.5rem;
             }
 
-            /* Stack form elements */
-            .form-row {
-                margin: 0;
+            .dashboard-header {
+                padding: 1rem;
+                margin: 0.5rem;
             }
 
-            .form-row > [class*="col-"] {
-                padding: 0.25rem;
+            .dashboard-header h2 {
+                font-size: 1.25rem;
             }
 
-            /* Adjust button sizes */
+            .card {
+                margin: 0.5rem;
+            }
+
+            .table {
+                font-size: 0.85rem;
+            }
+
             .btn {
                 padding: 0.5rem 0.75rem;
                 font-size: 0.9rem;
             }
 
-            /* Reduce modal padding */
-            .modal-header {
+            .form-control, .form-select {
+                font-size: 16px;
+                padding: 0.5rem;
+            }
+
+            /* Improve form spacing */
+            .form-group {
+                margin-bottom: 0.75rem;
+            }
+
+            /* Adjust modal padding */
+            .modal-header,
+            .modal-body,
+            .modal-footer {
                 padding: 0.75rem;
             }
 
-            .modal-body {
-                padding: 0.75rem;
-            }
-
-            /* Adjust table font size */
-            .table {
-                font-size: 0.85rem;
-            }
-
-            /* Fix long text overflow */
-            td {
-                max-width: 150px;
+            /* Better table cell handling */
+            .table td {
+                max-width: 120px;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
         }
 
-        /* Fix landscape mode issues */
+        /* Landscape mode optimizations */
         @media (max-height: 480px) and (orientation: landscape) {
             body.authenticated main {
                 padding-top: 45px;
             }
 
-            .dashboard-header,
-            .page-header {
-                padding: 1rem;
+            .dashboard-header {
+                padding: 0.75rem;
+                margin: 0.5rem;
             }
 
             .modal-dialog {
-                margin: 0.25rem auto;
-            }
-
-            .stats-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            /* Adjust modal height */
-            .modal-dialog {
-                max-height: 100vh;
+                margin: 0.25rem;
             }
 
             .modal-content {
-                max-height: calc(100vh - 1rem);
+                max-height: calc(100vh - 0.5rem);
             }
 
-            /* Adjust form layout */
+            /* Optimize form layouts for landscape */
             .form-row {
                 display: flex;
                 flex-wrap: wrap;
             }
 
-            /* Make buttons more compact */
             .btn-group {
                 flex-direction: row;
                 flex-wrap: wrap;
@@ -522,6 +506,43 @@
             .btn-group .btn {
                 width: auto;
                 flex: 1;
+            }
+
+            /* Adjust grid layouts */
+            .row {
+                margin: 0 -0.375rem;
+            }
+
+            .col, [class*="col-"] {
+                padding: 0 0.375rem;
+            }
+        }
+
+        /* Touch-friendly enhancements */
+        @media (hover: none) and (pointer: coarse) {
+            /* Larger touch targets */
+            .btn,
+            .form-control,
+            .form-select,
+            .nav-link,
+            .dropdown-item {
+                min-height: 44px;
+                padding: 0.75rem 1rem;
+            }
+
+            /* Improve touch feedback */
+            .btn:active,
+            .nav-link:active,
+            .dropdown-item:active {
+                transform: scale(0.98);
+            }
+
+            /* Better scrolling */
+            .table-responsive,
+            .modal-body,
+            .dropdown-menu {
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
             }
         }
 
