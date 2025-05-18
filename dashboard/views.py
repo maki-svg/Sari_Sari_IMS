@@ -507,20 +507,33 @@ def borrower_update(request, pk):
                         borrower.signature = request.FILES['signature']
                     
                     borrower.save()
-                    messages.success(request, f'Successfully updated {borrower.borrower_name}')
                     
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return JsonResponse({'success': True})
+                        return JsonResponse({
+                            'success': True,
+                            'message': f'Successfully updated {borrower.borrower_name}',
+                            'redirect_url': reverse('dashboard-borrower-detail', kwargs={'pk': borrower.pk})
+                        })
+                    
+                    messages.success(request, f'Successfully updated {borrower.borrower_name}')
                     return redirect('dashboard-borrower-detail', pk=borrower.pk)
             
             except Exception as e:
-                error_msg = f'Error updating borrower: {str(e)}'
+                logger.error(f"Error updating borrower: {str(e)}")
+                error_msg = 'Error updating borrower. Please try again.'
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({'errors': {'__all__': [error_msg]}}, status=400)
+                    return JsonResponse({
+                        'success': False,
+                        'message': error_msg,
+                        'errors': {'__all__': [error_msg]}
+                    }, status=400)
                 messages.error(request, error_msg)
         else:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'errors': form.errors}, status=400)
+                return JsonResponse({
+                    'success': False,
+                    'errors': form.errors
+                }, status=400)
     else:
         form = BorrowerForm(instance=borrower)
     

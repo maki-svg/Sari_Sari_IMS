@@ -801,19 +801,26 @@
 
             try {
                 const formData = new FormData(form);
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
                 const response = await fetch(window.location.href, {
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken
+                    },
+                    credentials: 'same-origin'
                 });
 
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    showToast(data.message || 'Borrower saved successfully!', 'success');
-                    window.location.href = data.redirect_url;
+                    showToast('Borrower saved successfully!', 'success');
+                    // Wait for toast to show before redirecting
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url || '{% url "dashboard-borrower-list" %}';
+                    }, 1000);
                 } else {
                     // Reset button state
                     submitBtn.disabled = false;
@@ -823,13 +830,13 @@
                     // Handle validation errors
                     if (data.errors) {
                         Object.entries(data.errors).forEach(([field, errors]) => {
-                            const errorMessage = Array.isArray(errors) ? errors.join(' ') : errors;
+                            const errorMessage = Array.isArray(errors) ? errors[0] : errors;
                             const errorElement = document.getElementById(`${field}_error`);
                             if (errorElement) {
                                 errorElement.textContent = errorMessage;
                                 errorElement.style.display = 'block';
                                 
-                                const input = document.querySelector(`[name="${field}"]`);
+                                const input = form.querySelector(`[name="${field}"]`);
                                 if (input) {
                                     input.classList.add('is-invalid');
                                 }
@@ -837,7 +844,7 @@
                         });
                         showToast('Please correct the errors and try again.', 'error');
                     } else {
-                        showToast('An error occurred while saving. Please try again.', 'error');
+                        showToast(data.message || 'An error occurred while saving. Please try again.', 'error');
                     }
                 }
             } catch (error) {
