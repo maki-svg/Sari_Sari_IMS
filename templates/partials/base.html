@@ -186,7 +186,7 @@
         body.authenticated main {
             margin-left: 250px;
             width: calc(100% - 250px);
-            padding: 60px 0 0 0;
+            padding: 20px 0 0 0;
             align-items: flex-start;
         }
 
@@ -290,7 +290,7 @@
         body.authenticated main {
             margin-left: 250px;
             width: calc(100% - 250px);
-            padding: 60px 0 0 0;
+            padding: 20px 0 0 0;
             align-items: flex-start;
         }
 
@@ -401,7 +401,7 @@
             body.authenticated main {
                 margin-left: 0;
                 width: 100%;
-                padding-top: 56px;
+                padding-top: 0;
             }
 
             .container-fluid {
@@ -1252,10 +1252,10 @@
         /* Sidebar Styles */
         .sidebar {
             position: fixed;
-            top: 56px;
+            top: 0;
             left: 0;
             width: 250px;
-            height: calc(100vh - 56px);
+            height: 100vh;
             background-color: var(--white);
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
             z-index: 1020;
@@ -1315,6 +1315,12 @@
 
         /* Mobile Navigation */
         @media (max-width: 768px) {
+            body.authenticated main {
+                margin-left: 0;
+                width: 100%;
+                padding-top: 0;
+            }
+
             .sidebar {
                 transform: translateX(-100%);
             }
@@ -1322,104 +1328,12 @@
             body.sidebar-open .sidebar {
                 transform: translateX(0);
             }
-
-            .navbar-toggler {
-                display: block;
-            }
-
-            .navbar-collapse {
-                position: fixed;
-                top: 56px;
-                left: 0;
-                right: 0;
-                background-color: var(--secondary-color);
-                padding: 1rem;
-                max-height: calc(100vh - 56px);
-                overflow-y: auto;
-            }
-
-            .navbar-nav {
-                margin: 0;
-            }
-
-            .nav-link {
-                padding: 0.75rem 1rem !important;
-            }
         }
     </style>
     {% block extra_style %}{% endblock %}
 </head>
 <body class="{% if user.is_authenticated %}authenticated{% endif %}">
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'dashboard-index' %}">
-                <img src="{% static 'images/logo.svg' %}" alt="SariSync Logo" class="navbar-logo">
-                <span class="navbar-brand-text">SariSync</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard-index' %}">
-                            <i class="fas fa-home"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard-inventory' %}">
-                            <i class="fas fa-box"></i> Inventory
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard-inventory-audit' %}">
-                            <i class="fas fa-clipboard-check"></i> Inventory Audit
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard-audit-history' %}">
-                            <i class="fas fa-history"></i> Audit History
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard-sales' %}">
-                            <i class="fas fa-shopping-cart"></i> Sales
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard-borrower-list' %}">
-                            <i class="fas fa-users"></i> Borrowers
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-user"></i> {{ user.username }}
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="{% url 'user-profile' %}">
-                                <i class="fas fa-id-card"></i> Profile
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{% url 'user-logout' %}">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </div>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'user-login' %}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'user-register' %}">Register</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
-
+    {% if user.is_authenticated %}
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
@@ -1463,8 +1377,21 @@
                     <span>Borrowers</span>
                 </a>
             </li>
+            <li>
+                <a href="{% url 'user-profile' %}" class="{% if request.resolver_match.url_name == 'user-profile' %}active{% endif %}">
+                    <i class="fas fa-id-card"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'user-logout' %}">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
+    {% endif %}
 
     <!-- Main Content -->
     <main>
@@ -1634,30 +1561,49 @@
     <!-- Mobile Navigation Script -->
     <script>
         $(document).ready(function() {
-            // Toggle sidebar on mobile
-            $('.navbar-toggler').click(function() {
-                $('body').toggleClass('sidebar-open');
-            });
+            // Add mobile menu toggle button
+            if ($('body').hasClass('authenticated')) {
+                const menuToggle = $('<button>', {
+                    class: 'mobile-menu-toggle',
+                    html: '<i class="fas fa-bars"></i>'
+                }).css({
+                    position: 'fixed',
+                    top: '10px',
+                    left: '10px',
+                    zIndex: 1030,
+                    background: 'var(--primary-color)',
+                    border: 'none',
+                    color: 'white',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    display: 'none'
+                });
 
-            // Close sidebar when clicking outside
-            $(document).click(function(event) {
-                if (!$(event.target).closest('.sidebar, .navbar-toggler').length) {
-                    $('body').removeClass('sidebar-open');
-                }
-            });
+                $('body').append(menuToggle);
+
+                // Show toggle button only on mobile
+                $(window).on('resize', function() {
+                    menuToggle.css('display', $(window).width() < 768 ? 'block' : 'none');
+                }).trigger('resize');
+
+                // Toggle sidebar on mobile
+                menuToggle.click(function() {
+                    $('body').toggleClass('sidebar-open');
+                });
+
+                // Close sidebar when clicking outside
+                $(document).click(function(event) {
+                    if (!$(event.target).closest('.sidebar, .mobile-menu-toggle').length) {
+                        $('body').removeClass('sidebar-open');
+                    }
+                });
+            }
 
             // Handle active states
             const currentPath = window.location.pathname;
             $('.sidebar a').each(function() {
                 if ($(this).attr('href') === currentPath) {
                     $(this).addClass('active');
-                }
-            });
-
-            // Close dropdown menu on mobile after clicking
-            $('.nav-link').click(function() {
-                if ($(window).width() < 768) {
-                    $('.navbar-collapse').collapse('hide');
                 }
             });
         });
