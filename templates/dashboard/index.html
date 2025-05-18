@@ -170,37 +170,163 @@
         color: #333;
     }
 
-    /* Mobile Responsiveness */
+    /* Report section styles */
+    .report-section {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .date-range-picker {
+        display: flex;
+        gap: 1rem;
+        flex: 1;
+        min-width: 280px;
+    }
+
+    .date-range-picker .input-group {
+        flex: 1;
+    }
+
+    .date-range-picker input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #eee;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    .generate-report-btn {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .generate-report-btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(4, 170, 109, 0.2);
+    }
+
+    /* Enhanced table styles */
+    .table-responsive {
+        margin: 1.5rem 0;
+        border-radius: 16px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        background: white;
+        position: relative;
+    }
+
+    .table-responsive::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(to right, transparent, rgba(0,0,0,0.1));
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .table-responsive:hover::after {
+        opacity: 1;
+    }
+
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 3px;
+        opacity: 0.8;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-hover);
+    }
+
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+        white-space: nowrap;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        background: linear-gradient(135deg, var(--secondary-color), #222);
+        color: white;
+        padding: 1rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        vertical-align: middle;
+        z-index: 1;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #eee;
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(4, 170, 109, 0.05);
+        transform: translateX(5px);
+    }
+
+    .table tbody tr:hover td {
+        color: var(--primary-color);
+    }
+
     @media (max-width: 768px) {
-        .stats-container {
-            grid-template-columns: 1fr;
+        .table-responsive {
+            margin: 1rem 0;
+            border-radius: 12px;
         }
 
-        .date-range-container {
-            flex-direction: column;
+        .table thead th,
+        .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.875rem;
         }
 
-        .date-picker {
-            width: 100%;
-        }
-
-        .chart-container {
-            padding: 1rem;
-            margin: 0.5rem 0;
-        }
-
-        .stat-card {
-            padding: 1rem;
-        }
-
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 1.25rem;
-        }
-
-        .stat-value {
-            font-size: 1.25rem;
+        .table tbody tr:hover {
+            transform: none;
         }
     }
 
@@ -307,36 +433,6 @@
     .col-md-4:nth-child(1) .animate-slide-in { animation-delay: 0.1s; }
     .col-md-4:nth-child(2) .animate-slide-in { animation-delay: 0.2s; }
     .col-md-4:nth-child(3) .animate-slide-in { animation-delay: 0.3s; }
-
-    /* Enhanced table styles */
-    .table-responsive {
-        margin-top: 1.5rem;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        background: linear-gradient(135deg, var(--secondary-color), #222);
-        color: var(--white);
-        padding: 1.2rem;
-        text-transform: uppercase;
-        font-size: 0.9rem;
-        letter-spacing: 0.5px;
-    }
-
-    .table tbody tr {
-        transition: all 0.4s ease;
-    }
-
-    .table tbody tr:hover {
-        background: rgba(4, 170, 109, 0.05);
-        transform: translateX(5px);
-    }
 
     /* Enhanced button styles */
     .btn-outline-primary {
@@ -778,257 +874,128 @@
             margin-top: 0.5rem;
         }
     }
+
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+
+        .date-range-container {
+            flex-direction: column;
+        }
+
+        .date-picker {
+            width: 100%;
+        }
+
+        .chart-container {
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .stat-card {
+            padding: 1rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+
+        .report-section {
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .date-range-picker {
+            width: 100%;
+        }
+
+        .generate-report-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .table-responsive {
+            margin: 1rem 0;
+            border-radius: 12px;
+        }
+
+        .table thead th,
+        .table tbody td {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .table tbody tr:hover {
+            transform: none;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<style>
-    /* Base styles */
-    :root {
-        --primary-color: #04AA6D;
-        --primary-hover: #028c54;
-        --secondary-color: #333;
-        --light-gray: #f9f9f9;
-        --white: #fff;
-        --warning-color: #ffc107;
-        --danger-color: #dc3545;
-    }
+<div class="dashboard-header">
+    <h2 class="page-title">
+        <i class="fas fa-chart-line"></i>
+        Dashboard Overview
+    </h2>
+    <div class="stats-summary">
+        <div class="stat-item">
+            <i class="fas fa-box"></i>
+            <span>{{ total_products }} Products</span>
+        </div>
+        <div class="stat-item">
+            <i class="fas fa-users"></i>
+            <span>{{ total_borrowers }} Borrowers</span>
+        </div>
+        <div class="stat-item">
+            <i class="fas fa-shopping-cart"></i>
+            <span>{{ total_sales }} Sales</span>
+        </div>
+    </div>
+</div>
 
-    /* Enhanced chart cards with glassmorphism */
-    .chart-card {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        padding: 24px;
-        margin-bottom: 24px;
-        height: 100%;
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
+<!-- Report Generation Section -->
+<div class="report-section glass-effect">
+    <div class="date-range-picker">
+        <div class="input-group">
+            <label for="start_date" class="form-label">Start Date</label>
+            <input type="date" id="start_date" class="form-control" name="start_date">
+        </div>
+        <div class="input-group">
+            <label for="end_date" class="form-label">End Date</label>
+            <input type="date" id="end_date" class="form-control" name="end_date">
+        </div>
+    </div>
+    <button class="generate-report-btn" onclick="generateReport()">
+        <i class="fas fa-file-pdf"></i>
+        Generate Report
+    </button>
+</div>
 
-    .chart-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    .chart-container {
-        position: relative;
-        height: 320px;
-        width: 100%;
-        transition: all 0.3s ease;
-    }
-
-    .stats-card {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 16px;
-        padding: 1.5rem;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-
-    .stats-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    }
-
-    .stats-icon {
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.9);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .stats-info {
-        flex: 1;
-    }
-
-    .stats-label {
-        color: #6c757d;
-        font-size: 0.875rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }
-
-    .stats-value {
-        color: #2c3e50;
-        font-size: 1.75rem;
-        font-weight: 700;
-        margin: 0;
-        line-height: 1.2;
-    }
-
-    .progress {
-        background-color: rgba(0, 0, 0, 0.05);
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 0.5rem;
-    }
-
-    .progress-bar {
-        transition: width 1s ease;
-    }
-
-    /* Animation for stats cards */
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .animate-slide-in {
-        animation: slideUp 0.6s ease forwards;
-    }
-
-    .col-md-4:nth-child(1) .animate-slide-in { animation-delay: 0.1s; }
-    .col-md-4:nth-child(2) .animate-slide-in { animation-delay: 0.2s; }
-    .col-md-4:nth-child(3) .animate-slide-in { animation-delay: 0.3s; }
-
-    /* Enhanced table styles */
-    .table-responsive {
-        margin-top: 1.5rem;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        background: linear-gradient(135deg, var(--secondary-color), #222);
-        color: var(--white);
-        padding: 1.2rem;
-        text-transform: uppercase;
-        font-size: 0.9rem;
-        letter-spacing: 0.5px;
-    }
-
-    .table tbody tr {
-        transition: all 0.4s ease;
-    }
-
-    .table tbody tr:hover {
-        background: rgba(4, 170, 109, 0.05);
-        transform: translateX(5px);
-    }
-
-    /* Enhanced report section */
-    .report-section {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: all 0.4s ease;
-    }
-
-    .report-section:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-    }
-
-    .date-range-picker {
-        display: flex;
-        gap: 1.5rem;
-        align-items: center;
-    }
-
-    .date-range-picker input {
-        border: 2px solid var(--light-gray);
-        border-radius: 12px;
-        padding: 0.8rem;
-        transition: all 0.3s ease;
-    }
-
-    .date-range-picker input:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.2);
-        outline: none;
-    }
-
-    .generate-btn {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-        color: var(--white);
-        padding: 0.8rem 1.8rem;
-        border-radius: 12px;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.6rem;
-        font-weight: 600;
-        transition: all 0.4s ease;
-    }
-
-    .generate-btn:hover {
-        background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
-        transform: translateY(-3px);
-        box-shadow: 0 6px 16px rgba(4, 170, 109, 0.3);
-    }
-
-    /* Enhanced page header */
-    .page-header {
-        background: linear-gradient(135deg, var(--primary-color), #025B3A);
-        padding: 2.5rem;
-        border-radius: 20px;
-        margin-bottom: 2.5rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        position: relative;
-        overflow: hidden;
-        animation: slideIn 0.6s ease-out forwards;
-    }
-
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-        animation: rotate 15s linear infinite;
-    }
-
-    @keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    .page-title {
-        color: var(--white);
-        margin: 0;
-        font-size: 2.8rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 1.2rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .page-title i {
-        font-size: 2.2rem;
-        transition: transform 0.4s ease;
-    }
-
-    .page-header:hover .page-title i {
-        transform: rotate(360deg) scale(1.1);
-    }
-</style>
+<!-- Stats Cards Section -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="stats-card animate-slide-in">
+            <div class="d-flex align-items-center">
+                <div class="stats-icon bg-primary">
+                    <i class="fas fa-dollar-sign text-white"></i>
+                </div>
+                <div class="stats-info ms-3">
+                    <p class="stats-label">Total Sales</p>
+                    <h3 class="stats-value">₱{{ total_sales_amount }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ... other stats cards ... -->
+</div>
 
 <!-- Loading Overlay -->
 <div class="loading-overlay" id="loadingOverlay">
@@ -1419,6 +1386,88 @@ document.addEventListener('DOMContentLoaded', function() {
     simulateChartUpdate(categoryChart, 'categories');
     simulateChartUpdate(salesChart, 'sales');
     simulateChartUpdate(borrowerChart, 'borrowers');
+
+    // Initialize date inputs with current month
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    document.getElementById('start_date').value = firstDay.toISOString().split('T')[0];
+    document.getElementById('end_date').value = lastDay.toISOString().split('T')[0];
+
+    // Report Generation Function
+    window.generateReport = function() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates');
+            return;
+        }
+
+        // Show loading state
+        const button = document.querySelector('.generate-report-btn');
+        const originalContent = button.innerHTML;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+        button.disabled = true;
+
+        try {
+            // Create PDF
+            const doc = new jsPDF();
+            
+            // Add header
+            doc.setFontSize(20);
+            doc.text('SariSync Report', 105, 20, { align: 'center' });
+            
+            // Add date range
+            doc.setFontSize(12);
+            doc.text(`Report Period: ${startDate} to ${endDate}`, 105, 30, { align: 'center' });
+            
+            // Add stats
+            doc.setFontSize(14);
+            doc.text('Summary Statistics', 20, 45);
+            
+            // Create table for stats
+            const statsData = [
+                ['Total Sales', `₱${document.querySelector('.stats-value').textContent.replace('₱', '')}`],
+                ['Total Products', '{{ total_products }}'],
+                ['Total Borrowers', '{{ total_borrowers }}']
+            ];
+            
+            doc.autoTable({
+                startY: 50,
+                head: [['Metric', 'Value']],
+                body: statsData,
+                theme: 'grid',
+                headStyles: { fillColor: [4, 170, 109] }
+            });
+            
+            // Add transactions table
+            doc.text('Recent Transactions', 20, doc.previousAutoTable.finalY + 20);
+            
+            const transactionsData = Array.from(document.querySelectorAll('.table tbody tr')).map(row => {
+                return Array.from(row.children).map(cell => cell.textContent.trim());
+            });
+            
+            doc.autoTable({
+                startY: doc.previousAutoTable.finalY + 25,
+                head: [['Date', 'Product', 'Customer', 'Amount', 'Status']],
+                body: transactionsData,
+                theme: 'grid',
+                headStyles: { fillColor: [4, 170, 109] }
+            });
+            
+            // Save the PDF
+            doc.save(`sarisync-report-${startDate}-to-${endDate}.pdf`);
+        } catch (error) {
+            console.error('Error generating report:', error);
+            alert('Error generating report. Please try again.');
+        } finally {
+            // Restore button state
+            button.innerHTML = originalContent;
+            button.disabled = false;
+        }
+    };
 
     // Report Generation with Enhanced Feedback
     document.getElementById('generateReport').addEventListener('click', async function() {
