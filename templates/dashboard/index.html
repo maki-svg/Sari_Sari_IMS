@@ -430,6 +430,42 @@
         padding: 1rem;
     }
 
+    /* Generate Report Button */
+    .generate-report-btn {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        min-width: 160px;
+        justify-content: center;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .generate-report-btn:hover {
+        background-color: #2b2b2b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .generate-report-btn i {
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .generate-report-btn:hover i {
+        transform: rotate(10deg);
+    }
+
     /* Mobile optimizations */
     @media (max-width: 768px) {
         .report-section {
@@ -548,40 +584,6 @@
     .table th,
     .table td {
         white-space: nowrap;
-    }
-
-    /* Generate Report Button */
-    .generate-report-btn {
-        background-color: var(--secondary-color);
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        white-space: nowrap;
-        min-width: 160px;
-        justify-content: center;
-    }
-
-    .generate-report-btn:hover {
-        background-color: #2b2b2b;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .generate-report-btn i {
-        font-size: 1.1rem;
-        transition: transform 0.3s ease;
-    }
-
-    .generate-report-btn:hover i {
-        transform: rotate(10deg);
     }
 
     .generate-report-btn span {
@@ -722,36 +724,6 @@
     .col-md-4:nth-child(2) .animate-slide-in { animation-delay: 0.2s; }
     .col-md-4:nth-child(3) .animate-slide-in { animation-delay: 0.3s; }
 
-    /* Enhanced table styles */
-    .table-responsive {
-        margin-top: 1.5rem;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        background: linear-gradient(135deg, var(--secondary-color), #222);
-        color: var(--white);
-        padding: 1.2rem;
-        text-transform: uppercase;
-        font-size: 0.9rem;
-        letter-spacing: 0.5px;
-    }
-
-    .table tbody tr {
-        transition: all 0.4s ease;
-    }
-
-    .table tbody tr:hover {
-        background: rgba(4, 170, 109, 0.05);
-        transform: translateX(5px);
-    }
-
     /* Enhanced report section */
     .report-section {
         background: rgba(255, 255, 255, 0.9);
@@ -878,7 +850,7 @@
             <input type="date" id="startDate" value="{{ today|date:'Y-m-d' }}" aria-label="Start Date">
             <input type="date" id="endDate" value="{{ today|date:'Y-m-d' }}" aria-label="End Date">
         </div>
-        <button class="generate-report-btn" id="generateReport" style="display: flex; align-items: center; gap: 0.5rem;">
+        <button class="generate-report-btn" id="generateReport">
             <i class="fas fa-file-pdf"></i>
             <span>Generate Report</span>
         </button>
@@ -981,7 +953,7 @@
             <div class="card-body p-0">
                 {% if low_stock_items %}
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0" style="min-width: 600px;">
+                    <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th scope="col" class="px-4">PRODUCT</th>

@@ -719,7 +719,7 @@
     @media (max-height: 480px) and (orientation: landscape) {
         .stats-row {
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        }
+    }
 
         .stat-card {
             padding: 0.75rem;
@@ -769,7 +769,7 @@
 
     .stat-card:hover {
         transform: translateY(-2px);
-    }
+        }
 
     .stat-icon {
         width: 40px;
@@ -868,8 +868,8 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="fas fa-cubes"></i>
-                </div>
+            <i class="fas fa-cubes"></i>
+        </div>
                 <div class="stat-content">
                     <div class="stat-label">Total Products:</div>
                     <div class="stat-value">{{ items.count }}</div>
@@ -877,8 +877,8 @@
             </div>
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
                 <div class="stat-content">
                     <div class="stat-label">Low Stock</div>
                     <div class="stat-value">Items: {{ items|count_low_stock }}</div>
@@ -886,7 +886,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-icon">
-                    <i class="fas fa-coins"></i>
+            <i class="fas fa-coins"></i>
                 </div>
                 <div class="stat-content">
                     <div class="stat-label">Total</div>
