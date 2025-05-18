@@ -357,58 +357,51 @@
 
     /* Enhanced report section */
     .report-section {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 16px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        transition: all 0.4s ease;
-    }
-
-    .report-section:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        gap: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
     }
 
     .date-range-picker {
         display: flex;
-        gap: 1.5rem;
-        align-items: center;
+        gap: 1rem;
+        flex: 1;
+        min-width: 280px;
     }
 
     .date-range-picker input {
-        border: 2px solid var(--light-gray);
-        border-radius: 12px;
-        padding: 0.8rem;
-        transition: all 0.3s ease;
+        padding: 0.75rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #333;
+        flex: 1;
     }
 
-    .date-range-picker input:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(4, 170, 109, 0.2);
-        outline: none;
-    }
-
-    .generate-btn {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-        color: var(--white);
-        padding: 0.8rem 1.8rem;
-        border-radius: 12px;
+    .generate-report-btn {
+        background-color: var(--secondary-color);
+        color: white;
         border: none;
-        display: inline-flex;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
         align-items: center;
-        gap: 0.6rem;
-        font-weight: 600;
-        transition: all 0.4s ease;
+        gap: 0.5rem;
+        white-space: nowrap;
     }
 
-    .generate-btn:hover {
-        background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
-        transform: translateY(-3px);
-        box-shadow: 0 6px 16px rgba(4, 170, 109, 0.3);
+    .generate-report-btn:hover {
+        background-color: #2b2b2b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
     /* Enhanced page header */
@@ -459,70 +452,90 @@
         transform: rotate(360deg) scale(1.1);
     }
 
-    /* Generate Report Button Styles */
-    .generate-report-btn {
-        background-color: var(--secondary-color);
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-        font-weight: 500;
-        transition: all 0.3s ease;
+    /* Enhanced Low Stock Alert Table */
+    .alerts-section .table-responsive {
+        margin: 0;
+        border-radius: 0 0 12px 12px;
+    }
+
+    .alerts-section .table {
+        margin-bottom: 0;
+    }
+
+    .alerts-section .table th {
+        background: #f8f9fa;
+        color: #333;
+        font-weight: 600;
+        padding: 1rem;
+        white-space: nowrap;
+    }
+
+    .alerts-section .table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .alerts-section .product-icon {
+        width: 32px;
+        height: 32px;
         display: flex;
         align-items: center;
-        gap: 8px;
-        width: 100%;
         justify-content: center;
+        background: rgba(0,0,0,0.05);
+        border-radius: 8px;
     }
 
-    .generate-report-btn:hover {
-        background-color: #2b2b2b;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .generate-report-btn:active {
-        transform: translateY(0);
-    }
-
-    .generate-report-btn i {
-        font-size: 1.1em;
-    }
-
-    /* Loading overlay for report generation */
-    .loading-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .loading-spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid var(--primary-color);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
+    /* Mobile Responsiveness */
     @media (max-width: 768px) {
+        .report-section {
+            padding: 1rem;
+            flex-direction: column;
+        }
+
+        .date-range-picker {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .date-range-picker input {
+            width: 100%;
+        }
+
         .generate-report-btn {
-            padding: 10px 20px;
-            font-size: 14px;
+            width: 100%;
+            justify-content: center;
+            padding: 0.875rem;
+        }
+
+        .alerts-section .table th,
+        .alerts-section .table td {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .alerts-section .product-icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        .alerts-section .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .alerts-section h6 {
+            font-size: 0.875rem;
+        }
+
+        .alerts-section small {
+            font-size: 0.75rem;
+        }
+    }
+
+    /* Print styles */
+    @media print {
+        .report-section {
+            display: none;
         }
     }
 </style>
@@ -671,23 +684,6 @@
         transform: translateX(5px);
     }
 
-    /* Enhanced button styles */
-    .btn-outline-primary {
-        color: var(--primary-color);
-        border-color: var(--primary-color);
-        border-radius: 12px;
-        padding: 0.8rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-outline-primary:hover {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-        color: var(--white);
-        transform: translateY(-3px);
-        box-shadow: 0 6px 16px rgba(4, 170, 109, 0.3);
-    }
-
     /* Enhanced report section */
     .report-section {
         background: rgba(255, 255, 255, 0.9);
@@ -813,12 +809,15 @@
             <input type="date" id="startDate" value="{{ today|date:'Y-m-d' }}" aria-label="Start Date">
             <input type="date" id="endDate" value="{{ today|date:'Y-m-d' }}" aria-label="End Date">
         </div>
+        <button class="generate-report-btn" id="generateReport">
+            <i class="fas fa-file-pdf"></i> Generate Report
+        </button>
     </div>
 
     <!-- Stats Container -->
     <div class="row g-4 mb-4">
         <!-- Total Sales Card -->
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="stats-card glass-effect animate-slide-in">
                 <div class="d-flex align-items-center mb-2">
                     <div class="stats-icon me-3">
@@ -836,7 +835,7 @@
         </div>
 
         <!-- Transactions Card -->
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="stats-card glass-effect animate-slide-in">
                 <div class="d-flex align-items-center mb-2">
                     <div class="stats-icon me-3">
@@ -854,7 +853,7 @@
         </div>
 
         <!-- Items Sold Card -->
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="stats-card glass-effect animate-slide-in">
                 <div class="d-flex align-items-center mb-2">
                     <div class="stats-icon me-3">
@@ -867,23 +866,6 @@
                 </div>
                 <div class="progress" style="height: 4px;">
                     <div class="progress-bar bg-warning" role="progressbar" style="width: 100%"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Generate Report Card -->
-        <div class="col-md-3">
-            <div class="stats-card glass-effect animate-slide-in">
-                <div class="d-flex align-items-center mb-2">
-                    <div class="stats-icon me-3">
-                        <i class="fas fa-file-pdf fa-2x text-info"></i>
-                    </div>
-                    <div class="stats-info">
-                        <h6 class="stats-label mb-1">Reports</h6>
-                        <button class="generate-report-btn" id="generateReport">
-                            <i class="fas fa-file-pdf"></i> Generate Report
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
