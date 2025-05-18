@@ -1717,6 +1717,94 @@
     </script>
 
     {% block extra_scripts %}{% endblock %}
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to logout?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a href="{% url 'user-logout' %}" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    /* Modal styles */
+    .modal-content {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+    }
+
+    .modal .btn {
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .modal .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+    }
+
+    .modal .btn-danger {
+        background-color: #dc3545;
+        border: none;
+    }
+
+    @media (max-width: 576px) {
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+        
+        .modal-content {
+            border-radius: 12px;
+        }
+        
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+            padding: 1rem;
+        }
+    }
+    </style>
+
+    <script>
+    // Update the logout button to show confirmation modal
+    $(document).ready(function() {
+        // Update the logout button to trigger modal
+        $('.logout-btn').on('click', function(e) {
+            e.preventDefault();
+            $('#logoutModal').modal('show');
+        });
+    });
+    </script>
 </body>
 </html>
 
