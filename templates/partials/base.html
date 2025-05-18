@@ -1353,7 +1353,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'dashboard-home' %}">
+            <a class="navbar-brand" href="{% url 'dashboard-index' %}">
                 <img src="{% static 'images/logo.svg' %}" alt="SariSync Logo" class="navbar-logo">
                 <span class="navbar-brand-text">SariSync</span>
             </a>
@@ -1364,7 +1364,7 @@
                 <ul class="navbar-nav ml-auto">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard-home' %}">
+                        <a class="nav-link" href="{% url 'dashboard-index' %}">
                             <i class="fas fa-home"></i> Dashboard
                         </a>
                     </li>
@@ -1428,7 +1428,7 @@
         </div>
         <ul class="list-unstyled">
             <li>
-                <a href="{% url 'dashboard-home' %}" class="{% if request.resolver_match.url_name == 'dashboard-home' %}active{% endif %}">
+                <a href="{% url 'dashboard-index' %}" class="{% if request.resolver_match.url_name == 'dashboard-index' %}active{% endif %}">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
