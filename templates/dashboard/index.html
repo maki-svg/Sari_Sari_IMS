@@ -87,6 +87,122 @@
     .toast:hover {
         opacity: 1;
     }
+
+    /* Enhanced Dashboard Stats */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Date Range Picker */
+    .date-range-container {
+        display: flex;
+        gap: 1rem;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+    }
+
+    .date-picker {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .date-picker input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+
+    /* Chart Container */
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .chart-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+
+        .date-range-container {
+            flex-direction: column;
+        }
+
+        .date-picker {
+            width: 100%;
+        }
+
+        .chart-container {
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .stat-card {
+            padding: 1rem;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -374,16 +490,13 @@
         <div class="date-range-picker">
             <input type="date" id="startDate" value="{{ today|date:'Y-m-d' }}" aria-label="Start Date">
             <input type="date" id="endDate" value="{{ today|date:'Y-m-d' }}" aria-label="End Date">
-            <button class="generate-btn btn-modern" id="generateReport">
-                <i class="fas fa-file-pdf"></i> Generate Report
-            </button>
         </div>
     </div>
 
     <!-- Stats Container -->
     <div class="row g-4 mb-4">
         <!-- Total Sales Card -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="stats-card glass-effect animate-slide-in">
                 <div class="d-flex align-items-center mb-2">
                     <div class="stats-icon me-3">
@@ -401,7 +514,7 @@
         </div>
 
         <!-- Transactions Card -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="stats-card glass-effect animate-slide-in">
                 <div class="d-flex align-items-center mb-2">
                     <div class="stats-icon me-3">
@@ -419,7 +532,7 @@
         </div>
 
         <!-- Items Sold Card -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="stats-card glass-effect animate-slide-in">
                 <div class="d-flex align-items-center mb-2">
                     <div class="stats-icon me-3">
@@ -432,6 +545,26 @@
                 </div>
                 <div class="progress" style="height: 4px;">
                     <div class="progress-bar bg-warning" role="progressbar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generate Report Card -->
+        <div class="col-md-3">
+            <div class="stats-card glass-effect animate-slide-in">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="stats-icon me-3">
+                        <i class="fas fa-file-pdf fa-2x text-danger"></i>
+                    </div>
+                    <div class="stats-info">
+                        <h6 class="stats-label mb-1">Generate Report</h6>
+                        <button class="btn btn-danger btn-sm mt-2" id="generateReport">
+                            <i class="fas fa-file-pdf"></i> Export PDF
+                        </button>
+                    </div>
+                </div>
+                <div class="progress" style="height: 4px;">
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: 100%"></div>
                 </div>
             </div>
         </div>
