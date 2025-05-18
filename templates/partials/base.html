@@ -249,25 +249,15 @@
             body.authenticated main {
                 margin-left: 0;
                 width: 100%;
-                padding-top: 60px;
+                padding-top: 56px;
             }
 
             .container-fluid {
-                padding: 0.75rem;
-            }
-
-            .dashboard-header {
-                padding: 1.25rem;
-                margin: 0.75rem;
-                border-radius: 15px;
-            }
-
-            .dashboard-header h2 {
-                font-size: 1.35rem;
+                padding: 0.5rem;
             }
 
             .card {
-                margin: 0.75rem;
+                margin: 0.5rem;
                 border-radius: 12px;
             }
 
@@ -276,55 +266,47 @@
                 margin-bottom: 1rem;
             }
 
-            /* Improve form controls for touch */
-            .form-control, .form-select, .btn {
-                min-height: 44px; /* Better touch target size */
-                font-size: 16px; /* Prevent zoom on iOS */
-            }
-
-            /* Make tables scrollable horizontally */
+            /* Improve table responsiveness */
             .table-responsive {
-                margin: 0 -0.75rem;
-                padding: 0 0.75rem;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                margin: 0;
+                padding: 0;
+                border: none;
             }
 
             .table {
+                font-size: 0.875rem;
                 min-width: 100%;
-                font-size: 0.9rem;
             }
 
-            .table th, .table td {
-                white-space: nowrap;
-                padding: 0.75rem 0.5rem;
+            .table th, 
+            .table td {
+                padding: 0.5rem;
+                white-space: normal;
+                word-break: break-word;
             }
 
-            /* Improve action buttons */
-            .action-button {
-                width: 40px;
-                height: 40px;
-                margin: 0.25rem;
+            /* Better form layouts */
+            .form-group {
+                margin-bottom: 1rem;
             }
 
-            /* Adjust status badges */
-            .status-badge {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
+            .form-control {
+                font-size: 16px; /* Prevent zoom on iOS */
+                height: 38px;
             }
 
-            /* Improve modal display */
+            /* Improve button sizes */
+            .btn {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.875rem;
+                height: auto;
+                min-height: 38px;
+            }
+
+            /* Fix modal display */
             .modal-dialog {
                 margin: 0.5rem;
                 max-width: calc(100% - 1rem);
-            }
-
-            .modal-content {
-                border-radius: 15px;
-            }
-
-            .modal-header {
-                padding: 1rem;
             }
 
             .modal-body {
@@ -333,232 +315,211 @@
                 overflow-y: auto;
             }
 
-            .modal-footer {
-                padding: 1rem;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .modal-footer .btn {
-                width: 100%;
-                margin: 0;
-            }
-
-            /* Improve form layouts */
-            .form-row {
-                margin: 0 -0.375rem;
-            }
-
-            .form-row > [class*="col-"] {
-                padding: 0 0.375rem;
-            }
-
-            /* Enhance search and filter sections */
-            .search-box {
-                padding: 1rem;
-                margin: 0.75rem;
-            }
-
-            .filter-row {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-
-            .filter-row > div {
-                width: 100% !important;
-            }
-
-            /* Improve navigation */
-            .nav-link {
-                padding: 0.75rem 1rem;
-            }
-
             /* Better alerts positioning */
             .messages {
-                top: 70px;
+                top: 60px;
                 left: 10px;
                 right: 10px;
                 max-width: none;
             }
 
-            .alert {
-                margin: 0.5rem 0;
+            /* Improve navigation */
+            .nav-link {
+                padding: 0.5rem 1rem;
+            }
+
+            /* Fix dashboard cards */
+            .dashboard-header {
+                padding: 1rem;
+                margin: 0.5rem;
+                border-radius: 12px;
+            }
+
+            .stat-item {
                 padding: 0.75rem;
             }
 
-            /* Improve button groups */
+            /* Fix grid system */
+            .row {
+                margin-left: -0.5rem;
+                margin-right: -0.5rem;
+            }
+
+            .col, [class*="col-"] {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            /* Fix form inputs */
+            select.form-control {
+                padding-right: 1.75rem;
+            }
+
+            /* Fix button groups */
             .btn-group {
-                flex-direction: column;
+                display: flex;
                 width: 100%;
             }
 
             .btn-group .btn {
-                width: 100%;
-                margin: 0.25rem 0;
+                flex: 1;
             }
 
-            /* Enhance dropdowns */
+            /* Fix dropdowns */
             .dropdown-menu {
+                position: fixed !important;
+                top: auto !important;
+                left: 0 !important;
+                right: 0 !important;
                 width: 100%;
                 max-height: 60vh;
-                overflow-y: auto;
+                margin: 0;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
             }
 
-            /* Improve chart containers */
+            /* Fix charts */
             .chart-container {
-                margin: 0.75rem 0;
-                overflow-x: auto;
+                position: relative;
+                height: 300px;
+                width: 100%;
             }
 
             canvas {
-                max-width: 100%;
-                height: auto !important;
+                max-width: 100% !important;
             }
         }
 
         /* Additional fixes for very small screens */
         @media (max-width: 480px) {
-            body.authenticated main {
-                padding-top: 55px;
-            }
-
             .container-fluid {
-                padding: 0.5rem;
-            }
-
-            .dashboard-header {
-                padding: 1rem;
-                margin: 0.5rem;
-            }
-
-            .dashboard-header h2 {
-                font-size: 1.25rem;
+                padding: 0.25rem;
             }
 
             .card {
-                margin: 0.5rem;
-            }
-
-            .table {
-                font-size: 0.85rem;
+                margin: 0.25rem;
             }
 
             .btn {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.9rem;
+                font-size: 0.8125rem;
+                padding: 0.25rem 0.5rem;
             }
 
-            .form-control, .form-select {
+            .table {
+                font-size: 0.8125rem;
+            }
+
+            .form-control {
                 font-size: 16px;
-                padding: 0.5rem;
+                height: 36px;
             }
 
-            /* Improve form spacing */
+            .nav-link {
+                padding: 0.375rem 0.75rem;
+            }
+
+            /* Improve form layouts */
             .form-group {
                 margin-bottom: 0.75rem;
             }
 
-            /* Adjust modal padding */
-            .modal-header,
-            .modal-body,
-            .modal-footer {
-                padding: 0.75rem;
+            /* Stack buttons on very small screens */
+            .btn-group {
+                flex-direction: column;
             }
 
-            /* Better table cell handling */
-            .table td {
-                max-width: 120px;
-                overflow: hidden;
-                text-overflow: ellipsis;
+            .btn-group .btn {
+                margin: 0.125rem 0;
+            }
+
+            /* Adjust headings */
+            h1, .h1 { font-size: 1.75rem; }
+            h2, .h2 { font-size: 1.5rem; }
+            h3, .h3 { font-size: 1.25rem; }
+            h4, .h4 { font-size: 1.125rem; }
+        }
+
+        /* Fix for iOS devices */
+        @supports (-webkit-touch-callout: none) {
+            .form-control,
+            select.form-control,
+            textarea.form-control {
+                font-size: 16px !important;
+            }
+
+            .modal {
+                min-height: -webkit-fill-available;
+            }
+
+            .modal-body {
+                max-height: 70vh;
             }
         }
 
-        /* Landscape mode optimizations */
+        /* Fix for landscape mode */
         @media (max-height: 480px) and (orientation: landscape) {
             body.authenticated main {
                 padding-top: 45px;
             }
 
-            .dashboard-header {
-                padding: 0.75rem;
-                margin: 0.5rem;
+            .container-fluid {
+                padding: 0.25rem;
             }
 
             .modal-dialog {
-                margin: 0.25rem;
+                margin: 0.25rem auto;
             }
 
-            .modal-content {
-                max-height: calc(100vh - 0.5rem);
+            .modal-body {
+                max-height: calc(100vh - 100px);
             }
 
-            /* Optimize form layouts for landscape */
+            /* Improve form layouts in landscape */
             .form-row {
                 display: flex;
                 flex-wrap: wrap;
+                margin: 0 -0.25rem;
             }
 
+            .form-row > [class*="col-"] {
+                padding: 0 0.25rem;
+            }
+
+            /* Keep buttons horizontal in landscape */
             .btn-group {
                 flex-direction: row;
-                flex-wrap: wrap;
             }
 
             .btn-group .btn {
-                width: auto;
-                flex: 1;
-            }
-
-            /* Adjust grid layouts */
-            .row {
-                margin: 0 -0.375rem;
-            }
-
-            .col, [class*="col-"] {
-                padding: 0 0.375rem;
-            }
-        }
-
-        /* Touch-friendly enhancements */
-        @media (hover: none) and (pointer: coarse) {
-            /* Larger touch targets */
-            .btn,
-            .form-control,
-            .form-select,
-            .nav-link,
-            .dropdown-item {
-                min-height: 44px;
-                padding: 0.75rem 1rem;
-            }
-
-            /* Improve touch feedback */
-            .btn:active,
-            .nav-link:active,
-            .dropdown-item:active {
-                transform: scale(0.98);
-            }
-
-            /* Better scrolling */
-            .table-responsive,
-            .modal-body,
-            .dropdown-menu {
-                -webkit-overflow-scrolling: touch;
-                scroll-behavior: smooth;
+                margin: 0 0.125rem;
             }
         }
 
         /* Print styles */
         @media print {
             body.authenticated main {
-                margin: 0;
-                width: 100%;
-                padding: 0;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
-            .sidebar,
-            .messages,
-            .btn-print,
+            .container-fluid {
+                padding: 0 !important;
+            }
+
             .no-print {
                 display: none !important;
+            }
+
+            .table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+            }
+
+            .table th,
+            .table td {
+                background-color: #fff !important;
+                border: 1px solid #ddd !important;
             }
         }
 
