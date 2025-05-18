@@ -390,6 +390,7 @@
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         position: relative;
         overflow: hidden;
+        animation: slideIn 0.6s ease-out forwards;
     }
 
     .page-header::before {
@@ -430,10 +431,21 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        animation: fadeIn 0.5s ease-out forwards;
     }
 
     .stat-item i {
-        font-size: 1rem;
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-item:hover i {
+        transform: scale(1.2) rotate(10deg);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     /* Enhanced Table Responsiveness */
@@ -443,11 +455,30 @@
         margin: 1rem 0;
         border-radius: 12px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    .table-container::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 5px;
+        background: linear-gradient(to right, transparent, rgba(0,0,0,0.1));
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .table-container:hover::after {
+        opacity: 1;
     }
 
     table {
         min-width: 800px;
         width: 100%;
+        margin-bottom: 0;
     }
 
     /* Mobile Optimizations */
@@ -458,20 +489,13 @@
             border-radius: 15px;
         }
 
-        .page-header h4 {
-            font-size: 1.25rem;
-        }
-
         .inventory-stats {
             gap: 1rem;
             margin-top: 0.75rem;
+            flex-direction: column;
         }
 
         .stat-item {
-            font-size: 0.8125rem;
-        }
-
-        .stat-item i {
             font-size: 0.875rem;
         }
 
@@ -484,13 +508,12 @@
         table td {
             padding: 0.75rem;
             font-size: 0.875rem;
+            white-space: nowrap;
         }
 
-        .edit-btn,
-        .delete-btn {
-            width: 32px;
-            height: 32px;
-            font-size: 0.875rem;
+        .generate-report-btn {
+            width: 100%;
+            margin-top: 0.5rem;
         }
     }
 
