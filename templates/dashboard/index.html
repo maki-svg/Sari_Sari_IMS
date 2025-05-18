@@ -396,6 +396,8 @@
         align-items: center;
         gap: 0.5rem;
         white-space: nowrap;
+        min-width: 160px;
+        justify-content: center;
     }
 
     .generate-report-btn:hover {
@@ -480,10 +482,13 @@
     .alerts-section .table-responsive {
         margin: 0;
         border-radius: 0 0 15px 15px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .alerts-section .table {
         margin: 0;
+        min-width: 600px; /* Ensure minimum width for readability */
     }
 
     .alerts-section .table th {
@@ -494,6 +499,9 @@
         font-size: 0.875rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
     }
 
     .alerts-section .table td {
@@ -542,22 +550,11 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    /* Mobile Responsiveness */
+    /* Mobile optimizations for alerts section */
     @media (max-width: 768px) {
-        .alerts-section {
-            margin: 1rem 0;
-        }
-
-        .alerts-section .card {
-            border-radius: 12px;
-        }
-
-        .alerts-section .card-header {
-            padding: 0.875rem 1rem;
-        }
-
-        .alerts-section .card-header i {
-            font-size: 1.1rem;
+        .alerts-section .table-responsive {
+            margin: 0.5rem;
+            border-radius: 8px;
         }
 
         .alerts-section .table th,
@@ -569,23 +566,6 @@
         .alerts-section .product-icon {
             width: 32px;
             height: 32px;
-        }
-
-        .alerts-section .product-icon i {
-            font-size: 1rem;
-        }
-
-        .alerts-section h6 {
-            font-size: 0.875rem;
-        }
-
-        .alerts-section small {
-            font-size: 0.75rem;
-        }
-
-        .alerts-section .badge {
-            font-size: 0.75rem;
-            padding: 0.4rem 0.6rem;
         }
 
         .alerts-section .btn-sm {
@@ -1051,7 +1031,8 @@
             <input type="date" id="endDate" value="{{ today|date:'Y-m-d' }}" aria-label="End Date">
         </div>
         <button class="generate-report-btn" id="generateReport">
-            <i class="fas fa-file-pdf"></i> Generate Report
+            <i class="fas fa-file-pdf"></i>
+            <span>Generate Report</span>
         </button>
     </div>
 
