@@ -549,368 +549,111 @@
             min-height: -webkit-fill-available;
         }
     }
+
+    /* Debug styles to ensure content is visible */
+    body {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .form-card {
+        opacity: 1 !important;
+        visibility: visible !important;
+        background: var(--white);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin: 1rem auto;
+        max-width: 800px;
+        width: 100%;
+        position: relative;
+        z-index: 1000;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="form-card" data-aos="fade-up">
-                <div class="card-header">
-                    <h3 class="header-title">
-                        <i class="fas {% if form.instance.pk %}fa-user-edit{% else %}fa-user-plus{% endif %}"></i>
-                        {% if form.instance.pk %}Update{% else %}Add{% endif %} Borrower
-                    </h3>
+<div class="container-fluid py-4">
+    <div class="form-card" style="opacity: 1 !important; visibility: visible !important; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); margin: 1rem auto; max-width: 800px; width: 100%; position: relative; z-index: 1000;">
+        <div class="card-header">
+            <h3 class="header-title">
+                <i class="fas fa-user-edit"></i>
+                {{ title }}
+            </h3>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" enctype="multipart/form-data" id="borrowerForm" novalidate>
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="action-buttons">
+                    <a href="{% url 'dashboard-borrower-list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-success" id="submitBtn">
+                        <i class="fas fa-save"></i>
+                        <span class="button-text">Save Changes</span>
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    </button>
                 </div>
-
-                <div class="card-body p-4">
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {% for error in form.non_field_errors %}
-                        <p class="mb-0">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-
-                    <form method="POST" enctype="multipart/form-data" id="borrowerForm" novalidate>
-                        {% csrf_token %}
-
-                        <!-- Personal Information -->
-                        <div class="form-section" data-aos="fade-up" data-aos-delay="100">
-                            <div class="section-title">
-                                <i class="fas fa-user"></i>
-                                <h5>Personal Information</h5>
-                            </div>
-                            <div class="row g-3">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        {{ form.borrower_name|as_crispy_field }}
-                                        <div class="invalid-feedback" id="borrower_name_error"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        {{ form.contact_number|as_crispy_field }}
-                                        <div class="invalid-feedback" id="contact_number_error"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        {{ form.email|as_crispy_field }}
-                                        <div class="invalid-feedback" id="email_error"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        {{ form.address|as_crispy_field }}
-                                        <div class="invalid-feedback" id="address_error"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Loan Details -->
-                        <div class="form-section" data-aos="fade-up" data-aos-delay="200">
-                            <div class="section-title">
-                                <i class="fas fa-calendar-alt"></i>
-                                <h5>Loan Details</h5>
-                            </div>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        {{ form.date_borrowed|as_crispy_field }}
-                                        <div class="invalid-feedback" id="date_borrowed_error"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        {{ form.due_date|as_crispy_field }}
-                                        <div class="invalid-feedback" id="due_date_error"></div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        {{ form.notes|as_crispy_field }}
-                                        <div class="invalid-feedback" id="notes_error"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Signature Upload -->
-                        <div class="form-section" data-aos="fade-up" data-aos-delay="300">
-                            <div class="section-title">
-                                <i class="fas fa-signature"></i>
-                                <h5>Signature (Optional)</h5>
-                            </div>
-                            <div class="signature-upload" id="signatureUpload">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <h6 class="mb-2">Drop your signature here or click to browse</h6>
-                                <p class="text-muted mb-0">Supports: JPG, PNG (Max: 5MB)</p>
-                                <input type="file" name="signature" id="signatureInput" class="d-none" accept="image/*">
-                                <div class="invalid-feedback" id="signature_error"></div>
-                            </div>
-
-                            {% if form.instance.signature %}
-                            <div class="text-center mt-3">
-                                <p class="text-muted mb-2">Current Signature</p>
-                                <div class="signature-image-container">
-                                    <img src="{{ form.instance.signature.url }}" 
-                                         alt="Current signature" 
-                                         class="signature-preview" 
-                                         onclick="openModal(this.src)" 
-                                         loading="lazy"
-                                         width="200"
-                                         height="auto"
-                                         style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                                </div>
-                                
-                                <div class="mt-2">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="remove_signature" id="removeSignature">
-                                        <label class="form-check-label" for="removeSignature">
-                                            Remove current signature
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-
-                            <div id="newSignaturePreview" class="text-center mt-3" style="display: none;">
-                                <p class="text-muted mb-2">New Signature Preview</p>
-                                <img id="previewImage" class="signature-preview" onclick="openModal(this.src)" loading="lazy" style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="action-buttons">
-                            <button type="submit" class="btn btn-success" id="submitBtn">
-                                <i class="fas {% if form.instance.pk %}fa-save{% else %}fa-plus-circle{% endif %}"></i>
-                                <span class="button-text">{% if form.instance.pk %}Update{% else %}Add{% endif %}</span>
-                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                            </button>
-                            <a href="{% url 'dashboard-borrower-list' %}" class="btn btn-danger">
-                                <i class="fas fa-times"></i>
-                                <span>Cancel</span>
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
 
 <div class="toast-container"></div>
 
-<!-- Modal for Signature Preview -->
-<div class="modal" id="signatureModal">
-    <span class="modal-close">&times;</span>
-    <img class="modal-content" id="modalImage">
-</div>
 {% endblock %}
 
-{% block extra_js %}
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+{% block extra_scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        AOS.init();
+$(document).ready(function() {
+    const form = $('#borrowerForm');
+    const submitBtn = $('#submitBtn');
+    const spinner = submitBtn.find('.spinner-border');
+    const buttonText = submitBtn.find('.button-text');
+
+    form.on('submit', function(e) {
+        e.preventDefault();
         
-        const form = document.getElementById('borrowerForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const spinner = submitBtn.querySelector('.spinner-border');
-        const buttonText = submitBtn.querySelector('.button-text');
-        const signatureUpload = document.getElementById('signatureUpload');
-        const signatureInput = document.getElementById('signatureInput');
-        const newSignaturePreview = document.getElementById('newSignaturePreview');
-        const previewImage = document.getElementById('previewImage');
-        const removeSignature = document.getElementById('removeSignature');
-
-        // Handle signature upload click
-        signatureUpload.addEventListener('click', function() {
-            signatureInput.click();
-        });
-
-        // Handle signature file selection
-        signatureInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                    alert('File size must be less than 5MB');
-                    this.value = '';
-                    return;
-                }
-                
-                if (!file.type.startsWith('image/')) {
-                    alert('Please upload an image file');
-                    this.value = '';
-                    return;
-                }
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    newSignaturePreview.style.display = 'block';
-                    if (removeSignature) {
-                        removeSignature.checked = false;
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Handle drag and drop
-        signatureUpload.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            this.classList.add('dragover');
-        });
-
-        signatureUpload.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            this.classList.remove('dragover');
-        });
-
-        signatureUpload.addEventListener('drop', function(e) {
-            e.preventDefault();
-            this.classList.remove('dragover');
-            
-            const file = e.dataTransfer.files[0];
-            if (file) {
-                signatureInput.files = e.dataTransfer.files;
-                const event = new Event('change');
-                signatureInput.dispatchEvent(event);
-            }
-        });
-
-        // Handle remove signature checkbox
-        if (removeSignature) {
-            removeSignature.addEventListener('change', function() {
-                if (this.checked) {
-                    signatureInput.value = '';
-                    newSignaturePreview.style.display = 'none';
-                }
-            });
-        }
-
-        // Clear previous errors when focusing on inputs
-        document.querySelectorAll('input, textarea').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.classList.remove('is-invalid');
-                const errorDiv = document.getElementById(`${this.name}_error`);
-                if (errorDiv) {
-                    errorDiv.textContent = '';
-                    errorDiv.style.display = 'none';
-                }
-            });
-        });
-
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            spinner.classList.remove('d-none');
-            buttonText.textContent = 'Saving...';
-            
-            // Clear previous errors
-            document.querySelectorAll('.invalid-feedback').forEach(el => {
-                el.textContent = '';
-                el.style.display = 'none';
-            });
-            document.querySelectorAll('.is-invalid').forEach(el => {
-                el.classList.remove('is-invalid');
-            });
-
-            try {
-                const formData = new FormData(form);
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-                
-                // Handle signature file
-                const signatureInput = document.getElementById('signatureInput');
-                const removeSignature = document.getElementById('removeSignature');
-                
-                // Only append signature if a new file is selected and remove_signature is not checked
-                if (signatureInput.files.length > 0 && !removeSignature?.checked) {
-                    formData.set('signature', signatureInput.files[0]);
-                }
-                
-                const response = await fetch(window.location.href, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': csrfToken
-                    },
-                    credentials: 'same-origin'
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    showToast('Borrower saved successfully!', 'success');
-                    // Wait for toast to show before redirecting
-                    setTimeout(() => {
-                        window.location.href = data.redirect_url || '{% url "dashboard-borrower-list" %}';
-                    }, 1000);
+        // Show loading state
+        submitBtn.prop('disabled', true);
+        spinner.removeClass('d-none');
+        buttonText.text('Saving...');
+        
+        // Submit form with AJAX
+        $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function(response) {
+                if (response.success) {
+                    window.location.href = response.redirect_url || '{% url "dashboard-borrower-list" %}';
                 } else {
                     // Reset button state
-                    submitBtn.disabled = false;
-                    spinner.classList.add('d-none');
-                    buttonText.textContent = '{% if form.instance.pk %}Update{% else %}Add{% endif %}';
+                    submitBtn.prop('disabled', false);
+                    spinner.addClass('d-none');
+                    buttonText.text('Save Changes');
                     
-                    // Handle validation errors
-                    if (data.errors) {
-                        Object.entries(data.errors).forEach(([field, errors]) => {
-                            const errorMessage = Array.isArray(errors) ? errors[0] : errors;
-                            const errorElement = document.getElementById(`${field}_error`);
-                            if (errorElement) {
-                                errorElement.textContent = errorMessage;
-                                errorElement.style.display = 'block';
-                                
-                                const input = form.querySelector(`[name="${field}"]`);
-                                if (input) {
-                                    input.classList.add('is-invalid');
-                                }
-                            }
-                        });
-                        showToast('Please correct the errors and try again.', 'error');
-                    } else {
-                        showToast(data.message || 'An error occurred while saving. Please try again.', 'error');
-                    }
+                    // Show error message
+                    alert('Error saving borrower. Please try again.');
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('An error occurred. Please try again.', 'error');
-                
+            },
+            error: function() {
                 // Reset button state
-                submitBtn.disabled = false;
-                spinner.classList.add('d-none');
-                buttonText.textContent = '{% if form.instance.pk %}Update{% else %}Add{% endif %}';
+                submitBtn.prop('disabled', false);
+                spinner.addClass('d-none');
+                buttonText.text('Save Changes');
+                
+                // Show error message
+                alert('Error saving borrower. Please try again.');
             }
         });
     });
-
-    function showToast(message, type = 'info') {
-        const toastContainer = document.querySelector('.toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.innerHTML = `
-            <div class="toast-content">
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-                <span>${message}</span>
-            </div>
-        `;
-        toastContainer.appendChild(toast);
-        
-        // Trigger reflow to enable animation
-        toast.offsetHeight;
-        toast.classList.add('show');
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
+});
 </script>
 {% endblock %}
