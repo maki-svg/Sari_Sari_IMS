@@ -453,14 +453,37 @@
         transform: rotate(360deg) scale(1.1);
     }
 
-    /* Enhanced Low Stock Alert Table */
+    /* Enhanced Low Stock Alerts Section */
+    .alerts-section {
+        margin: 1.5rem 0;
+        animation: slideIn 0.6s ease-out forwards;
+    }
+
+    .alerts-section .card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .alerts-section .card-header {
+        background: linear-gradient(135deg, #dc3545, #b02a37);
+        padding: 1rem 1.5rem;
+        border: none;
+    }
+
+    .alerts-section .card-header i {
+        font-size: 1.2rem;
+        margin-right: 0.75rem;
+    }
+
     .alerts-section .table-responsive {
         margin: 0;
-        border-radius: 0 0 12px 12px;
+        border-radius: 0 0 15px 15px;
     }
 
     .alerts-section .table {
-        margin-bottom: 0;
+        margin: 0;
     }
 
     .alerts-section .table th {
@@ -468,7 +491,9 @@
         color: #333;
         font-weight: 600;
         padding: 1rem;
-        white-space: nowrap;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .alerts-section .table td {
@@ -477,35 +502,62 @@
     }
 
     .alerts-section .product-icon {
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.05);
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(0,0,0,0.05);
+    }
+
+    .alerts-section .product-icon i {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+
+    .alerts-section h6 {
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .alerts-section small {
+        font-size: 0.85rem;
+    }
+
+    .alerts-section .badge {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .alerts-section .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
         border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .alerts-section .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
-        .report-section {
-            padding: 1rem;
-            flex-direction: column;
+        .alerts-section {
+            margin: 1rem 0;
         }
 
-        .date-range-picker {
-            flex-direction: column;
-            width: 100%;
+        .alerts-section .card {
+            border-radius: 12px;
         }
 
-        .date-range-picker input {
-            width: 100%;
+        .alerts-section .card-header {
+            padding: 0.875rem 1rem;
         }
 
-        .generate-report-btn {
-            width: 100%;
-            justify-content: center;
-            padding: 0.875rem;
+        .alerts-section .card-header i {
+            font-size: 1.1rem;
         }
 
         .alerts-section .table th,
@@ -515,13 +567,12 @@
         }
 
         .alerts-section .product-icon {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
         }
 
-        .alerts-section .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
+        .alerts-section .product-icon i {
+            font-size: 1rem;
         }
 
         .alerts-section h6 {
@@ -530,6 +581,67 @@
 
         .alerts-section small {
             font-size: 0.75rem;
+        }
+
+        .alerts-section .badge {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.6rem;
+        }
+
+        .alerts-section .btn-sm {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.8125rem;
+        }
+    }
+
+    /* Small Mobile Screens */
+    @media (max-width: 480px) {
+        .alerts-section .card-header h5 {
+            font-size: 1rem;
+        }
+
+        .alerts-section .table th {
+            font-size: 0.75rem;
+            padding: 0.625rem;
+        }
+
+        .alerts-section .table td {
+            padding: 0.625rem;
+        }
+
+        .alerts-section .product-icon {
+            width: 28px;
+            height: 28px;
+            margin-right: 0.5rem !important;
+        }
+
+        .alerts-section h6 {
+            font-size: 0.8125rem;
+        }
+
+        .alerts-section .btn-sm {
+            padding: 0.375rem 0.625rem;
+            font-size: 0.75rem;
+        }
+
+        .alerts-section .badge {
+            font-size: 0.7rem;
+            padding: 0.35rem 0.5rem;
+        }
+    }
+
+    /* Landscape Mode */
+    @media (max-height: 480px) and (orientation: landscape) {
+        .alerts-section .table-responsive {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .alerts-section .table th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #f8f9fa;
         }
     }
 
