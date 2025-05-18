@@ -37,6 +37,9 @@
             --primary-color: #04AA6D;
             --primary-hover: #028c54;
             --secondary-color: #333;
+            --sidebar-bg: #1a1f2b;
+            --sidebar-hover: #2c3344;
+            --sidebar-text: #ffffff;
             --light-gray: #f9f9f9;
             --medium-gray: #ddd;
             --dark-gray: #666;
@@ -1249,6 +1252,29 @@
             font-size: 1.1rem;
         }
 
+        /* Mobile Menu Toggle Button */
+        .mobile-menu-toggle {
+            display: none;
+        }
+
+        /* Top Menu Button */
+        .menu-toggle {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--sidebar-text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1050;
+            display: none;
+        }
+
+        body.authenticated .menu-toggle {
+            display: block;
+        }
+
         /* Sidebar Styles */
         .sidebar {
             position: fixed;
@@ -1256,19 +1282,19 @@
             left: 0;
             width: 250px;
             height: 100vh;
-            background-color: var(--white);
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            background-color: var(--sidebar-bg);
             z-index: 1040;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
+            color: var(--sidebar-text);
         }
 
         .sidebar-header {
             padding: 1.5rem;
-            background: linear-gradient(135deg, #04AA6D 0%, #025B3A 100%);
             display: flex;
             align-items: center;
             gap: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .sidebar-logo {
@@ -1277,12 +1303,8 @@
             transition: transform 0.3s ease;
         }
 
-        .sidebar-header:hover .sidebar-logo {
-            transform: rotate(360deg);
-        }
-
         .sidebar-header h3 {
-            color: var(--white);
+            color: var(--sidebar-text);
             margin: 0;
             font-size: 1.5rem;
             font-weight: 600;
@@ -1303,7 +1325,7 @@
             align-items: center;
             gap: 1rem;
             padding: 0.75rem 1.5rem;
-            color: var(--secondary-color);
+            color: var(--sidebar-text);
             text-decoration: none;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
@@ -1311,8 +1333,7 @@
 
         .sidebar a:hover,
         .sidebar a.active {
-            background-color: rgba(4, 170, 109, 0.1);
-            color: var(--primary-color);
+            background-color: var(--sidebar-hover);
             border-left-color: var(--primary-color);
         }
 
@@ -1320,30 +1341,56 @@
             width: 20px;
             text-align: center;
             font-size: 1.1rem;
-            transition: transform 0.3s ease;
         }
 
-        .sidebar a:hover i {
-            transform: scale(1.2);
+        /* Welcome text in sidebar */
+        .welcome-text {
+            padding: 1rem 1.5rem;
+            color: var(--sidebar-text);
+            opacity: 0.8;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Profile and Logout buttons */
+        .sidebar-buttons {
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .profile-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            width: 100%;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            width: 100%;
+            text-align: center;
+            text-decoration: none;
         }
 
         /* Mobile Responsive Adjustments */
         @media (max-width: 768px) {
-            .mobile-menu-toggle {
-                display: flex;
-                align-items: center;
-            }
-
             body.authenticated main {
                 margin-left: 0;
                 width: 100%;
-                padding-top: 50px;
             }
 
             .sidebar {
                 transform: translateX(-100%);
-                top: 50px;
-                height: calc(100vh - 50px);
             }
 
             body.sidebar-open .sidebar {
@@ -1361,38 +1408,15 @@
                 background: rgba(0, 0, 0, 0.5);
                 z-index: 1030;
             }
-
-            /* Animate overlay */
-            body::before {
-                opacity: 0;
-                visibility: hidden;
-                transition: opacity 0.3s ease, visibility 0.3s ease;
-            }
-
-            body.sidebar-open::before {
-                opacity: 1;
-                visibility: visible;
-            }
-
-            /* Improve sidebar animation */
-            .sidebar {
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-
-            /* Adjust content padding */
-            .container-fluid {
-                padding: 1rem;
-            }
         }
     </style>
     {% block extra_style %}{% endblock %}
 </head>
 <body class="{% if user.is_authenticated %}authenticated{% endif %}">
     {% if user.is_authenticated %}
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle">
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle">
         <i class="fas fa-bars"></i>
-        <span>SariSync</span>
     </button>
 
     <!-- Sidebar -->
@@ -1401,6 +1425,11 @@
             <img src="{% static 'images/logo.svg' %}" alt="SariSync Logo" class="sidebar-logo">
             <h3>SariSync</h3>
         </div>
+        
+        <div class="welcome-text">
+            Welcome, {{ user.username }}
+        </div>
+
         <ul class="list-unstyled">
             <li>
                 <a href="{% url 'dashboard-index' %}" class="{% if request.resolver_match.url_name == 'dashboard-index' %}active{% endif %}">
@@ -1438,19 +1467,16 @@
                     <span>Borrowers</span>
                 </a>
             </li>
-            <li>
-                <a href="{% url 'user-profile' %}" class="{% if request.resolver_match.url_name == 'user-profile' %}active{% endif %}">
-                    <i class="fas fa-id-card"></i>
-                    <span>Profile</span>
-                </a>
-            </li>
-            <li>
-                <a href="{% url 'user-logout' %}">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </li>
         </ul>
+
+        <div class="sidebar-buttons">
+            <a href="{% url 'user-profile' %}" class="profile-btn">
+                <i class="fas fa-id-card"></i> Profile
+            </a>
+            <a href="{% url 'user-logout' %}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
     </div>
     {% endif %}
 
@@ -1623,16 +1649,18 @@
     <script>
         $(document).ready(function() {
             if ($('body').hasClass('authenticated')) {
-                // Toggle sidebar on mobile menu button click
-                $('.mobile-menu-toggle').click(function(e) {
+                // Toggle sidebar on menu button click
+                $('.menu-toggle').click(function(e) {
                     e.stopPropagation();
                     $('body').toggleClass('sidebar-open');
+                    $(this).find('i').toggleClass('fa-bars fa-times');
                 });
 
                 // Close sidebar when clicking outside
                 $(document).click(function(event) {
                     if (!$(event.target).closest('.sidebar').length && $('body').hasClass('sidebar-open')) {
                         $('body').removeClass('sidebar-open');
+                        $('.menu-toggle i').removeClass('fa-times').addClass('fa-bars');
                     }
                 });
 
@@ -1640,12 +1668,6 @@
                 $('.sidebar').click(function(e) {
                     e.stopPropagation();
                 });
-
-                // Add smooth transitions for menu items
-                $('.sidebar a').hover(
-                    function() { $(this).find('i').addClass('fa-bounce'); },
-                    function() { $(this).find('i').removeClass('fa-bounce'); }
-                );
 
                 // Handle active states
                 const currentPath = window.location.pathname;
@@ -1676,10 +1698,20 @@
 
                     if (diff > 0) { // Swipe right
                         $('body').addClass('sidebar-open');
+                        $('.menu-toggle i').removeClass('fa-bars').addClass('fa-times');
                     } else { // Swipe left
                         $('body').removeClass('sidebar-open');
+                        $('.menu-toggle i').removeClass('fa-times').addClass('fa-bars');
                     }
                 }
+
+                // Handle window resize
+                $(window).resize(function() {
+                    if ($(window).width() > 768) {
+                        $('body').removeClass('sidebar-open');
+                        $('.menu-toggle i').removeClass('fa-times').addClass('fa-bars');
+                    }
+                });
             }
         });
     </script>
@@ -1687,3 +1719,5 @@
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
+
+
