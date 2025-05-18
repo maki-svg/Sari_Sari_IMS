@@ -1369,7 +1369,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inventory' %}">
+                        <a class="nav-link" href="{% url 'dashboard-inventory' %}">
                             <i class="fas fa-box"></i> Inventory
                         </a>
                     </li>
@@ -1434,7 +1434,7 @@
                 </a>
             </li>
             <li>
-                <a href="{% url 'inventory' %}" class="{% if request.resolver_match.url_name == 'inventory' %}active{% endif %}">
+                <a href="{% url 'dashboard-inventory' %}" class="{% if request.resolver_match.url_name == 'dashboard-inventory' %}active{% endif %}">
                     <i class="fas fa-box"></i>
                     <span>Inventory</span>
                 </a>
