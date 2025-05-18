@@ -1374,22 +1374,22 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inventory-audit' %}">
+                        <a class="nav-link" href="{% url 'dashboard-inventory-audit' %}">
                             <i class="fas fa-clipboard-check"></i> Inventory Audit
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'audit-history' %}">
+                        <a class="nav-link" href="{% url 'dashboard-audit-history' %}">
                             <i class="fas fa-history"></i> Audit History
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'sales' %}">
+                        <a class="nav-link" href="{% url 'dashboard-sales' %}">
                             <i class="fas fa-shopping-cart"></i> Sales
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'borrower-list' %}">
+                        <a class="nav-link" href="{% url 'dashboard-borrower-list' %}">
                             <i class="fas fa-users"></i> Borrowers
                         </a>
                     </li>
@@ -1440,25 +1440,25 @@
                 </a>
             </li>
             <li>
-                <a href="{% url 'inventory-audit' %}" class="{% if request.resolver_match.url_name == 'inventory-audit' %}active{% endif %}">
+                <a href="{% url 'dashboard-inventory-audit' %}" class="{% if request.resolver_match.url_name == 'dashboard-inventory-audit' %}active{% endif %}">
                     <i class="fas fa-clipboard-check"></i>
                     <span>Inventory Audit</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'audit-history' %}" class="{% if request.resolver_match.url_name == 'audit-history' %}active{% endif %}">
+                <a href="{% url 'dashboard-audit-history' %}" class="{% if request.resolver_match.url_name == 'dashboard-audit-history' %}active{% endif %}">
                     <i class="fas fa-history"></i>
                     <span>Audit History</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'sales' %}" class="{% if request.resolver_match.url_name == 'sales' %}active{% endif %}">
+                <a href="{% url 'dashboard-sales' %}" class="{% if request.resolver_match.url_name == 'dashboard-sales' %}active{% endif %}">
                     <i class="fas fa-shopping-cart"></i>
                     <span>Sales</span>
                 </a>
             </li>
             <li>
-                <a href="{% url 'borrower-list' %}" class="{% if request.resolver_match.url_name == 'borrower-list' %}active{% endif %}">
+                <a href="{% url 'dashboard-borrower-list' %}" class="{% if request.resolver_match.url_name == 'dashboard-borrower-list' %}active{% endif %}">
                     <i class="fas fa-users"></i>
                     <span>Borrowers</span>
                 </a>
