@@ -6,6 +6,17 @@
 
 {% block extra_style %}
 <style>
+    /* Base styles */
+    :root {
+        --primary-color: #04AA6D;
+        --primary-hover: #028c54;
+        --secondary-color: #333;
+        --light-gray: #f9f9f9;
+        --white: #fff;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+    }
+
     .login-page {
         display: flex;
         min-height: 100vh;
@@ -125,12 +136,12 @@
     }
 
     .form-control {
+        width: 100%;
         padding: 0.875rem;
         border: 2px solid #eee;
         border-radius: 12px;
         font-size: 1rem;
         transition: all 0.3s ease;
-        width: 100%;
         background: #f8f9fa;
     }
 
@@ -158,6 +169,10 @@
         font-weight: 600;
         transition: all 0.3s ease;
         margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
     .btn-login:hover {
@@ -225,6 +240,53 @@
         .form-control {
             font-size: 16px;
         }
+    }
+
+    /* Add these new styles for better form alignment */
+    #loginForm {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    #loginForm .form-group {
+        margin-bottom: 0;
+    }
+
+    #loginForm .form-control {
+        text-align: left;
+        padding: 1rem;
+        height: auto;
+    }
+
+    #loginForm label {
+        text-align: left;
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    #loginForm .btn-login {
+        margin-top: 1rem;
+    }
+
+    /* Ensure consistent input styling */
+    #id_username, #id_password {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #eee;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        text-align: left;
+    }
+
+    #id_username:focus, #id_password:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(4, 170, 109, 0.1);
+        background: white;
+        outline: none;
     }
 </style>
 {% endblock %}

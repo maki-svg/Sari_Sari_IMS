@@ -406,229 +406,32 @@
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
 
-    /* Enhanced page header */
-    .page-header {
-        background: linear-gradient(135deg, var(--primary-color), #025B3A);
-        padding: 2.5rem;
-        border-radius: 20px;
-        margin-bottom: 2.5rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        position: relative;
-        overflow: hidden;
-        animation: slideIn 0.6s ease-out forwards;
-    }
-
-    .page-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-        animation: rotate 15s linear infinite;
-    }
-
-    @keyframes rotate {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-
-    .page-title {
-        color: var(--white);
-        margin: 0;
-        font-size: 2.8rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 1.2rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .page-title i {
-        font-size: 2.2rem;
-        transition: transform 0.4s ease;
-    }
-
-    .page-header:hover .page-title i {
-        transform: rotate(360deg) scale(1.1);
-    }
-
-    /* Enhanced Low Stock Alerts Section */
-    .alerts-section {
-        margin: 1.5rem 0;
-        animation: slideIn 0.6s ease-out forwards;
-    }
-
-    .alerts-section .card {
-        border: none;
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .alerts-section .card-header {
-        background: linear-gradient(135deg, #dc3545, #b02a37);
-        padding: 1rem 1.5rem;
-        border: none;
-    }
-
-    .alerts-section .card-header i {
-        font-size: 1.2rem;
-        margin-right: 0.75rem;
-    }
-
-    .alerts-section .table-responsive {
-        margin: 0;
-        border-radius: 0 0 15px 15px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .alerts-section .table {
-        margin: 0;
-        min-width: 600px; /* Ensure minimum width for readability */
-    }
-
-    .alerts-section .table th {
-        background: #f8f9fa;
-        color: #333;
-        font-weight: 600;
-        padding: 1rem;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
-
-    .alerts-section .table td {
-        padding: 1rem;
-        vertical-align: middle;
-    }
-
-    .alerts-section .product-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        background: rgba(0, 0, 0, 0.05);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .alerts-section .product-icon i {
+    .generate-report-btn i {
         font-size: 1.1rem;
-        color: #6c757d;
+        transition: transform 0.3s ease;
     }
 
-    .alerts-section h6 {
-        font-size: 0.95rem;
-        margin: 0;
+    .generate-report-btn:hover i {
+        transform: rotate(10deg);
     }
 
-    .alerts-section small {
-        font-size: 0.85rem;
+    .generate-report-btn span {
+        font-weight: 500;
     }
 
-    .alerts-section .badge {
-        font-size: 0.85rem;
-        padding: 0.5rem 0.75rem;
-    }
-
-    .alerts-section .btn-sm {
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-
-    .alerts-section .btn-sm:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Mobile optimizations for alerts section */
+    /* Mobile Optimizations */
     @media (max-width: 768px) {
-        .alerts-section .table-responsive {
-            margin: 0.5rem;
-            border-radius: 8px;
-        }
-
-        .alerts-section .table th,
-        .alerts-section .table td {
-            padding: 0.75rem;
-            font-size: 0.875rem;
-        }
-
-        .alerts-section .product-icon {
-            width: 32px;
-            height: 32px;
-        }
-
-        .alerts-section .btn-sm {
-            padding: 0.4rem 0.75rem;
-            font-size: 0.8125rem;
-        }
-    }
-
-    /* Small Mobile Screens */
-    @media (max-width: 480px) {
-        .alerts-section .card-header h5 {
-            font-size: 1rem;
-        }
-
-        .alerts-section .table th {
-            font-size: 0.75rem;
-            padding: 0.625rem;
-        }
-
-        .alerts-section .table td {
-            padding: 0.625rem;
-        }
-
-        .alerts-section .product-icon {
-            width: 28px;
-            height: 28px;
-            margin-right: 0.5rem !important;
-        }
-
-        .alerts-section h6 {
-            font-size: 0.8125rem;
-        }
-
-        .alerts-section .btn-sm {
-            padding: 0.375rem 0.625rem;
-            font-size: 0.75rem;
-        }
-
-        .alerts-section .badge {
-            font-size: 0.7rem;
-            padding: 0.35rem 0.5rem;
-        }
-    }
-
-    /* Landscape Mode */
-    @media (max-height: 480px) and (orientation: landscape) {
-        .alerts-section .table-responsive {
-            max-height: calc(100vh - 200px);
-            overflow-y: auto;
-        }
-
-        .alerts-section .table th {
-            position: sticky;
-            top: 0;
-            z-index: 1;
-            background: #f8f9fa;
-        }
-    }
-
-    /* Print styles */
-    @media print {
         .report-section {
-            display: none;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .date-range-picker {
+            width: 100%;
+        }
+
+        .generate-report-btn {
+            width: 100%;
         }
     }
 
@@ -738,6 +541,10 @@
 
     .generate-report-btn:hover i {
         transform: rotate(10deg);
+    }
+
+    .generate-report-btn span {
+        font-weight: 500;
     }
 
     /* Mobile Optimizations */
