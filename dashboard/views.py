@@ -486,6 +486,7 @@ def borrower_update(request, pk):
     """Update borrower view"""
     # Get borrower for current user
     borrower = get_object_or_404(Borrower, id=pk, user=request.user)
+    old_signature = borrower.signature
     
     if request.method == 'POST':
         form = BorrowerForm(request.POST, request.FILES, instance=borrower)
@@ -496,14 +497,37 @@ def borrower_update(request, pk):
                     
                     # Handle signature removal
                     if request.POST.get('remove_signature') == 'on':
-                        if borrower.signature:
-                            borrower.signature.delete(save=False)
+                        if old_signature:
+                            # Store the name/path of the old signature
+                            old_signature_name = old_signature.name
+                            # Set signature to None before saving
                             borrower.signature = None
+                            borrower.save()
+                            # Now try to delete the old file
+                            try:
+                                import os
+                                from django.conf import settings
+                                full_path = os.path.join(settings.MEDIA_ROOT, old_signature_name)
+                                if os.path.exists(full_path):
+                                    os.remove(full_path)
+                            except Exception as e:
+                                logger.error(f"Error deleting signature file: {str(e)}")
                     
                     # Handle new signature upload
                     elif 'signature' in request.FILES:
-                        if borrower.signature:
-                            borrower.signature.delete(save=False)
+                        # If there's an old signature, delete it first
+                        if old_signature:
+                            try:
+                                import os
+                                from django.conf import settings
+                                old_signature_name = old_signature.name
+                                full_path = os.path.join(settings.MEDIA_ROOT, old_signature_name)
+                                if os.path.exists(full_path):
+                                    os.remove(full_path)
+                            except Exception as e:
+                                logger.error(f"Error deleting old signature file: {str(e)}")
+                        
+                        # Save the new signature
                         borrower.signature = request.FILES['signature']
                     
                     borrower.save()

@@ -803,6 +803,15 @@
                 const formData = new FormData(form);
                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 
+                // Handle signature file
+                const signatureInput = document.getElementById('signatureInput');
+                const removeSignature = document.getElementById('removeSignature');
+                
+                // Only append signature if a new file is selected and remove_signature is not checked
+                if (signatureInput.files.length > 0 && !removeSignature?.checked) {
+                    formData.set('signature', signatureInput.files[0]);
+                }
+                
                 const response = await fetch(window.location.href, {
                     method: 'POST',
                     body: formData,
