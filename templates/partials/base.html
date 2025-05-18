@@ -172,10 +172,10 @@
             margin-left: 0 !important;
             width: 100% !important;
             padding: 0 !important;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
         }
 
         /* Center content vertically on login/register pages */
@@ -185,7 +185,7 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            padding: 0;
+            padding: 1rem;
         }
 
         /* Authenticated user styles */
@@ -1044,6 +1044,66 @@
         body.opening-link .navbar,
         body.opening-link .sidebar {
             display: none !important;
+        }
+
+        /* Hide navigation elements when not authenticated */
+        body:not(.authenticated) .navbar,
+        body:not(.authenticated) .sidebar {
+            display: none !important;
+        }
+
+        /* Center login content */
+        body:not(.authenticated) main {
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding: 0 !important;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Full-width container for login page */
+        body:not(.authenticated) .container-fluid {
+            max-width: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        /* Center content vertically */
+        body:not(.authenticated) .content-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 1rem;
+        }
+
+        /* Mobile optimizations for login */
+        @media (max-width: 768px) {
+            body:not(.authenticated) .content-wrapper {
+                padding: 1rem;
+            }
+
+            body:not(.authenticated) .card {
+                margin: 0;
+                border-radius: 12px;
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+
+        /* Ensure no navigation shows on initial load */
+        .navbar, .sidebar {
+            display: none;
+        }
+
+        /* Only show navigation after authentication is confirmed */
+        body.authenticated .navbar,
+        body.authenticated .sidebar {
+            display: block !important;
         }
     </style>
     {% block extra_style %}{% endblock %}
